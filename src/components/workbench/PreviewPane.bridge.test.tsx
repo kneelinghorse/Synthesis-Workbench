@@ -91,9 +91,10 @@ describe("PreviewPane PostMessage bridge", () => {
     });
 
     expect(postMessage).toHaveBeenCalled();
+    // Sandboxed srcDoc iframe gets opaque origin — wildcard is intentional (see PreviewPane.tsx).
     expect(
       postMessage.mock.calls.some(
-        (call) => typeof call[1] === "string" && call[1] !== "*"
+        (call) => call[1] === "*"
       )
     ).toBe(true);
     expect(

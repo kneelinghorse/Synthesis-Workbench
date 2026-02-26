@@ -3,7 +3,7 @@ metadata:
   name: Test Project
   slug: test-project
   createdAt: '2026-02-25T00:39:34.234Z'
-  updatedAt: '2026-02-26T04:41:16.479Z'
+  updatedAt: '2026-02-26T21:31:32.506Z'
 relationships:
   designs: []
   tokensFile: state/tokens.yaml

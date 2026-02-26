@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CompositionErrorOverlay } from "@/components/workbench/CompositionErrorOverlay";
+import { DesignExportButton } from "@/components/workbench/DesignExportButton";
 import { FoundryStatusChip } from "@/components/workbench/FoundryStatusChip";
 import { PreviewPane } from "@/components/workbench/PreviewPane";
 import { mapFoundryTokensToWorkbenchPaths } from "@/lib/foundry/token-bridge";
@@ -221,8 +223,11 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, syncCanonicalTokens, theme, themeSyncNonce]);
 
+  const document = useDocumentStateStore((s) => s.document);
+
   const isRendering = compositionStatus === "rendering";
   const hasErrors = compositionErrors.length > 0;
+  const showOfflineEmptyState = isOfflineMode && !html && !document;
   const handleReloadPreview = useCallback(() => {
     setPreviewReloadNonce((previous) => previous + 1);
   }, []);
@@ -287,6 +292,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
             >
               Reload Preview
             </button>
+            <DesignExportButton />
           </div>
           <div className="flex items-center gap-2 text-xs text-white/50">
             {themeSyncStatus === "loading" && (
@@ -349,37 +355,30 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
           </div>
         )}
 
-        <PreviewPane html={html} reloadNonce={previewReloadNonce} />
+        {showOfflineEmptyState ? (
+          <div className="flex h-full min-h-[320px] flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-black/20 px-6 py-10 text-center">
+            <div className="text-sm font-medium text-white/60">
+              No design loaded
+            </div>
+            <p className="mt-2 max-w-sm text-xs leading-relaxed text-white/40">
+              Foundry is offline — static preview mode is active. Load a design
+              document or use the chat to create a component composition. The
+              preview will render using built-in fallback styles.
+            </p>
+            <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-white/30">
+              Try: &ldquo;Create a Card with a heading and a Button&rdquo;
+            </p>
+          </div>
+        ) : (
+          <PreviewPane html={html} reloadNonce={previewReloadNonce} />
+        )}
 
         {hasErrors && !isRendering && (
-          <div className="absolute bottom-0 left-0 right-0 z-10 max-h-32 overflow-y-auto rounded-b-3xl border-t border-red-500/20 bg-red-950/80 px-4 py-2 text-xs text-red-300 backdrop-blur">
-            {compositionErrors.map((err, i) => (
-              <div
-                key={`${err.componentId}-${i}`}
-                className="flex items-center justify-between gap-3 py-0.5"
-              >
-                <span className="min-w-0 flex-1 truncate">
-                  [{err.componentRef}] {err.message}
-                </span>
-                <span className="flex shrink-0 items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => requestRetry()}
-                    className="rounded border border-red-300/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-red-100 hover:border-red-200/50 hover:bg-red-900/40"
-                  >
-                    Retry
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => skipComponent(err.componentId)}
-                    className="rounded border border-red-300/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-red-100 hover:border-red-200/50 hover:bg-red-900/40"
-                  >
-                    Skip
-                  </button>
-                </span>
-              </div>
-            ))}
-          </div>
+          <CompositionErrorOverlay
+            errors={compositionErrors}
+            onRetry={requestRetry}
+            onSkip={skipComponent}
+          />
         )}
       </div>
     </div>

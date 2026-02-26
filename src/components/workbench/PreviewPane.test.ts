@@ -29,8 +29,8 @@ describe("buildPreviewSrcDoc", () => {
     expect(PREVIEW_INJECT_SCRIPT).toContain('debugLog("READY_RECEIVED"');
     expect(PREVIEW_INJECT_SCRIPT).toContain('debugLog("READY_TIMEOUT"');
     expect(PREVIEW_INJECT_SCRIPT).toContain("synthesis-preview-data-context-update");
-    expect(PREVIEW_INJECT_SCRIPT).toContain("const parentOrigin = resolveParentOrigin()");
-    expect(PREVIEW_INJECT_SCRIPT).toContain("window.parent.postMessage(payload, parentOrigin)");
-    expect(PREVIEW_INJECT_SCRIPT).not.toContain('window.parent.postMessage(payload, "*")');
+    // Sandboxed srcDoc iframe gets opaque ("null") origin — wildcard is intentional and safe.
+    // See inject-script.ts and PreviewPane.tsx PREVIEW_TARGET_ORIGIN for rationale.
+    expect(PREVIEW_INJECT_SCRIPT).toContain('window.parent.postMessage(payload, "*")');
   });
 });

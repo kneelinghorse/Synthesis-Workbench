@@ -56,9 +56,10 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     id: "render",
     title: "Render a component",
     description:
-      "Render a component schema in preview to validate composition and runtime behavior.",
+      "Render a component composition in preview. Try a simple example: ask the chat to \"Create a Card with a title and a Button\" to see the design system in action.",
     command: "/render",
-    commandNote: "Use Ctrl/Cmd + Alt + R to insert the command.",
+    commandNote:
+      "Use Ctrl/Cmd + Alt + R to insert the render command, or type a natural language request like \"Create a Card with a heading and two Buttons\" in the chat.",
   },
   {
     id: "export",

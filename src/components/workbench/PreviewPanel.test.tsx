@@ -96,12 +96,16 @@ describe("PreviewPanel error actions", () => {
   it("shows retry/skip controls and wires them to document actions", () => {
     render(<PreviewPanel />);
 
-    expect(screen.getByText(/\[oods:Failing\]\s+Render failed/)).toBeTruthy();
-    expect(screen.getByText("Retry")).toBeTruthy();
+    // New CompositionErrorOverlay shows ref and message in separate elements
+    expect(screen.getByText("oods:Failing")).toBeTruthy();
+    expect(screen.getByText("Render failed")).toBeTruthy();
     expect(screen.getByText("Skip")).toBeTruthy();
+    expect(screen.getByText("Retry All")).toBeTruthy();
 
     const retryNonceBefore = useDocumentStateStore.getState().retryNonce;
-    fireEvent.click(screen.getByText("Retry"));
+    // Click the per-error Retry button (not "Retry All")
+    const retryButtons = screen.getAllByText("Retry");
+    fireEvent.click(retryButtons[retryButtons.length - 1]);
     expect(useDocumentStateStore.getState().retryNonce).toBe(retryNonceBefore + 1);
 
     fireEvent.click(screen.getByText("Skip"));
@@ -253,6 +257,19 @@ describe("PreviewPanel error actions", () => {
       screen.getByText(
         "Foundry MCP is unavailable. Static Preview mode is active and theme token sync is disabled."
       )
+    ).toBeTruthy();
+  });
+
+  it("shows offline empty state when Foundry is offline and no document is loaded", () => {
+    vi.mocked(getFoundryMcpClient).mockReturnValue(null as any);
+    useDocumentStateStore.getState().reset();
+    usePreviewStateStore.getState().reset();
+
+    render(<PreviewPanel />);
+
+    expect(screen.getByText("No design loaded")).toBeTruthy();
+    expect(
+      screen.getByText(/Load a design document or use the chat/)
     ).toBeTruthy();
   });
 });

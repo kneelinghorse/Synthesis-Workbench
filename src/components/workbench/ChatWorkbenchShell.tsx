@@ -5,9 +5,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ChatPanel } from "@/components/workbench/ChatPanel";
+import { ComponentBrowser } from "@/components/workbench/ComponentBrowser";
 import { FirstRunOnboarding } from "@/components/workbench/FirstRunOnboarding";
 import { PreviewPanel } from "@/components/workbench/PreviewPanel";
 import { ProjectBrowser } from "@/components/workbench/ProjectBrowser";
+import { ProjectSwitcher } from "@/components/workbench/ProjectSwitcher";
 import { TemplateBrowser } from "@/components/workbench/TemplateBrowser";
 import { usePhaseStore } from "@/lib/stores/phase-state";
 import { cn } from "@/lib/utils";
@@ -37,6 +39,7 @@ export const ChatWorkbenchShell = () => {
   const workflowMode = usePhaseStore((state) => state.workflowMode);
   const setWorkflowMode = usePhaseStore((state) => state.setWorkflowMode);
   const [previewVisible, setPreviewVisible] = useState(true);
+  const [componentBrowserOpen, setComponentBrowserOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [shortcutNotice, setShortcutNotice] = useState<ShortcutNotice | null>(
     null
@@ -177,9 +180,12 @@ export const ChatWorkbenchShell = () => {
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">
               Workbench Runtime
             </p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">
-              LocalRuntime Chat Surface
-            </h1>
+            <div className="mt-2 flex items-center gap-3">
+              <h1 className="text-2xl font-semibold text-white">
+                LocalRuntime Chat Surface
+              </h1>
+              <ProjectSwitcher />
+            </div>
             <p className="mt-2 text-xs text-white/55">
               Active phase: {phaseLabel}. Workflow mode: {workflowMode}. Press{" "}
               <span className="font-semibold">?</span> for keyboard shortcuts.
@@ -222,6 +228,14 @@ export const ChatWorkbenchShell = () => {
               type="button"
               variant="outline"
               className="border-white/30 bg-white/5 text-white hover:bg-white/10"
+              onClick={() => setComponentBrowserOpen((open) => !open)}
+            >
+              {componentBrowserOpen ? "Hide Components" : "Components"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="border-white/30 bg-white/5 text-white hover:bg-white/10"
               onClick={() => setPreviewVisible((visible) => !visible)}
             >
               {previewVisible ? "Hide Preview" : "Show Preview"}
@@ -259,6 +273,7 @@ export const ChatWorkbenchShell = () => {
         <FirstRunOnboarding />
         <ProjectBrowser />
         <TemplateBrowser />
+        {componentBrowserOpen && <ComponentBrowser />}
 
         <section
           className={cn(

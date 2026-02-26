@@ -1,0 +1,152 @@
+{
+  "run_id": "fdcbf5ab-a218-4a73-acbc-f6247caeb7d4",
+  "mode": "app",
+  "targets": [
+    {
+      "name": "neverssl-components-s8",
+      "url": "https://neverssl.com/"
+    }
+  ],
+  "project_id": "stage1-neverssl.com-2026-02-15",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-v1-https://neverssl.com/-1-/",
+      "status": "ok",
+      "ms": 9423
+    },
+    {
+      "id": "web.network_trace",
+      "version": "1.0.0",
+      "cache_key": "web.network_trace-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 5197
+    },
+    {
+      "id": "a11y.scan",
+      "version": "1.0.0",
+      "cache_key": "a11y.scan-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 9020
+    },
+    {
+      "id": "perf.scan",
+      "version": "1.0.0",
+      "cache_key": "perf.scan-v1-https://neverssl.com/-desktop-5",
+      "status": "ok",
+      "ms": 14956
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 684
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "ia.outline",
+      "version": "1.0.0",
+      "cache_key": "ia.outline-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "app.profile",
+      "version": "1.0.0",
+      "cache_key": "app.profile-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 0
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "discovered": [
+        "/"
+      ],
+      "page_types": [
+        {
+          "type": "home",
+          "routes": [
+            "/"
+          ],
+          "confidence": 0.65
+        }
+      ]
+    },
+    "web_crawl": {
+      "seeded_routes": [
+        "/"
+      ],
+      "max_depth": 1,
+      "discovered_routes": [
+        "/"
+      ],
+      "evidence": {
+        "crawl_manifest_path": "evidence/web_crawl/crawl.json"
+      }
+    },
+    "perf": {
+      "preset": "desktop",
+      "pages": [
+        {
+          "route": "/",
+          "url": "https://neverssl.com/",
+          "performance_score": null,
+          "metrics": {
+            "fcp_ms": null,
+            "lcp_ms": null,
+            "cls": null,
+            "tbt_ms": null,
+            "speed_index_ms": null,
+            "interactive_ms": null
+          },
+          "top_opportunities": [],
+          "evidence_ref": "evidence/perf/root.json"
+        }
+      ],
+      "evidence": {
+        "perf_manifest_path": "evidence/perf/perf_manifest.json"
+      },
+      "artifact": {
+        "perf_report_ref": "perf_report.json"
+      }
+    },
+    "ia_outline": {
+      "evidence": {
+        "ia_manifest_path": "evidence/ia/ia_manifest.json"
+      },
+      "artifact": {
+        "ia_outline_ref": "ia_outline.json"
+      }
+    },
+    "app_profile": {
+      "artifact": {
+        "app_profile_ref": "app_profile.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-component-analysis/raw/stage1/neverssl-components-s8/fdcbf5ab-a218-4a73-acbc-f6247caeb7d4/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-component-analysis/raw/stage1/neverssl-components-s8/fdcbf5ab-a218-4a73-acbc-f6247caeb7d4/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-02-15T01:57:35.926Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

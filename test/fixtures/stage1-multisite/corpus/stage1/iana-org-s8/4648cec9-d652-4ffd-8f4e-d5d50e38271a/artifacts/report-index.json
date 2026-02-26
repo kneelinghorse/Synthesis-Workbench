@@ -1,0 +1,47 @@
+{
+  "kind": "report_index",
+  "version": "1.1.0",
+  "run_id": "4648cec9-d652-4ffd-8f4e-d5d50e38271a",
+  "generated_at": "2026-02-15T01:45:48.647Z",
+  "artifacts": [
+    {
+      "type": "baseline_metrics",
+      "path": "baseline_metrics.json",
+      "description": "Baseline UX metrics derived from computed styles.",
+      "metadata": {
+        "bytes": 50483,
+        "modified_at": "2026-02-15T01:45:48.644Z"
+      }
+    },
+    {
+      "type": "report_index",
+      "path": "report-index.json",
+      "description": "Index of artifacts produced in this run."
+    },
+    {
+      "type": "style_fingerprint",
+      "path": "style_fingerprint.json",
+      "description": "Design token fingerprint extracted from UI styles.",
+      "metadata": {
+        "bytes": 7868,
+        "modified_at": "2026-02-15T01:45:48.644Z"
+      }
+    },
+    {
+      "type": "surface_snapshot",
+      "path": "surface_snapshot.json",
+      "description": "Surface snapshot capturing DOM and visual context.",
+      "metadata": {
+        "bytes": 16987,
+        "modified_at": "2026-02-15T01:45:48.648Z"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "iana-org-s8",
+      "name": "iana-org-s8",
+      "artifacts": []
+    }
+  ]
+}

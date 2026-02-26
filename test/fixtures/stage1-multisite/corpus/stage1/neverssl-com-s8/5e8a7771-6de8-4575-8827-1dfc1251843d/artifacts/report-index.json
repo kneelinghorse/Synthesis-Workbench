@@ -1,0 +1,47 @@
+{
+  "kind": "report_index",
+  "version": "1.1.0",
+  "run_id": "5e8a7771-6de8-4575-8827-1dfc1251843d",
+  "generated_at": "2026-02-15T01:42:49.657Z",
+  "artifacts": [
+    {
+      "type": "baseline_metrics",
+      "path": "baseline_metrics.json",
+      "description": "Baseline UX metrics derived from computed styles.",
+      "metadata": {
+        "bytes": 1382,
+        "modified_at": "2026-02-15T01:42:49.657Z"
+      }
+    },
+    {
+      "type": "report_index",
+      "path": "report-index.json",
+      "description": "Index of artifacts produced in this run."
+    },
+    {
+      "type": "style_fingerprint",
+      "path": "style_fingerprint.json",
+      "description": "Design token fingerprint extracted from UI styles.",
+      "metadata": {
+        "bytes": 2123,
+        "modified_at": "2026-02-15T01:42:49.657Z"
+      }
+    },
+    {
+      "type": "surface_snapshot",
+      "path": "surface_snapshot.json",
+      "description": "Surface snapshot capturing DOM and visual context.",
+      "metadata": {
+        "bytes": 361,
+        "modified_at": "2026-02-15T01:42:49.658Z"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "neverssl-com-s8",
+      "name": "neverssl-com-s8",
+      "artifacts": []
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+metadata:
+  title: Dashboard Starter
+  description: A starter dashboard layout with header, stats cards, and data table
+  updatedAt: '2026-02-26T04:41:16.463Z'
+root:
+  nodeType: layout
+  layout:
+    type: stack
+    gap: 24
+  children:
+    - nodeType: component
+      id: header-banner
+      ref: oods:Banner
+      props:
+        title: Dashboard
+        subtitle: Welcome back! Here's an overview of your data.
+    - nodeType: layout
+      layout:
+        type: grid
+        columns: 3
+        gap: 16
+      children:
+        - nodeType: component
+          id: stat-card-1
+          ref: oods:Card
+          props:
+            title: Total Users
+            value: 12,543
+            variant: card
+        - nodeType: component
+          id: stat-card-2
+          ref: oods:Card
+          props:
+            title: Revenue
+            value: $84,320
+            variant: card
+        - nodeType: component
+          id: stat-card-3
+          ref: oods:Card
+          props:
+            title: Active Sessions
+            value: 1,429
+            variant: card
+    - nodeType: component
+      id: data-table
+      ref: oods:Table
+      props:
+        title: Recent Activity
+        variant: main
+        columns:
+          - Name
+          - Status
+          - Date
+          - Amount
+        rows:
+          - - Alice Johnson
+            - Completed
+            - '2024-01-15'
+            - $250.00
+          - - Bob Smith
+            - Pending
+            - '2024-01-14'
+            - $125.50
+          - - Carol Davis
+            - Completed
+            - '2024-01-13'
+            - $340.00

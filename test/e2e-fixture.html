@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Validation Fixture</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --surface-color: #ffffff;
+            --spacing-unit: 8px;
+        }
+        body {
+            font-family: sans-serif;
+            background-color: var(--surface-color);
+            padding: calc(var(--spacing-unit) * 4);
+        }
+        .nav-container {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 16px;
+        }
+        .primary-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .input-field {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container" id="main-nav">
+        <a href="#">Home</a>
+        <a href="#">Gallery</a>
+        <a href="#">About</a>
+    </nav>
+    <main>
+        <h1>Welcome to the E2E Test</h1>
+        <p>This is a simple fixture for design discovery.</p>
+        <div style="margin-top: 24px;">
+            <input type="text" class="input-field" placeholder="Enter name...">
+            <button class="primary-button" id="submit-btn">Submit Action</button>
+        </div>
+    </main>
+</body>
+</html>

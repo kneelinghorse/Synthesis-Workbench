@@ -1,0 +1,65 @@
+{
+  "kind": "component_clusters",
+  "version": "1.1.0",
+  "generated_at": "2026-01-08T17:15:31.304Z",
+  "clusters": [
+    {
+      "name": "Button",
+      "count": 12,
+      "confidence": 0.95,
+      "selectors": {
+        "css": "button, .btn, .Button",
+        "testId": "[data-testid*='button'], [data-testid*='btn']",
+        "role": "[role='button']"
+      },
+      "parent_cluster": null,
+      "variants": ["primary", "secondary", "ghost", "icon"]
+    },
+    {
+      "name": "Card",
+      "count": 6,
+      "confidence": 0.88,
+      "selectors": {
+        "css": ".card, [data-component='card'], article.card",
+        "testId": "[data-testid*='card']"
+      },
+      "parent_cluster": null,
+      "variants": ["elevated", "outlined", "filled"]
+    },
+    {
+      "name": "CardButton",
+      "count": 4,
+      "confidence": 0.72,
+      "selectors": {
+        "css": ".card button, .card .btn",
+        "testId": "[data-testid*='card'] [data-testid*='button']"
+      },
+      "parent_cluster": "Card",
+      "variants": []
+    },
+    {
+      "name": "Input",
+      "count": 8,
+      "confidence": 0.91,
+      "selectors": {
+        "css": "input[type='text'], input[type='email'], input[type='password'], .input-field",
+        "testId": "[data-testid*='input']",
+        "role": "[role='textbox']"
+      },
+      "parent_cluster": null,
+      "variants": ["default", "error", "disabled"]
+    },
+    {
+      "name": "NavLink",
+      "count": 15,
+      "confidence": 0.85,
+      "selectors": {
+        "css": "nav a, .nav-link, [data-nav-item]",
+        "testId": "[data-testid*='nav']",
+        "role": "[role='navigation'] a"
+      },
+      "parent_cluster": null,
+      "variants": ["active", "disabled"]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "kind": "network_trace_manifest",
+  "version": "1.0.0",
+  "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+  "captured_at": "2026-01-22T19:25:36.443Z",
+  "redaction": {
+    "applied": true,
+    "rules": [
+      "request/response headers: authorization, cookie, set-cookie, x-api-key",
+      "query params: access_token, token, api_key, session, password (case-insensitive)",
+      "cookies: redact all values"
+    ]
+  },
+  "pages": [
+    {
+      "route": "/",
+      "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "har_path": "evidence/network/har/e2e-fixture.har",
+      "entry_count": 1
+    }
+  ],
+  "endpoints": [
+    {
+      "method": "GET",
+      "origin": "null",
+      "path": "/Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "count": 1,
+      "statuses": {
+        "200": 1
+      }
+    }
+  ]
+}

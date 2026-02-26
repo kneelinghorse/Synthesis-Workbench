@@ -1,0 +1,18 @@
+{
+  "kind": "surface_snapshot",
+  "target": {
+    "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+    "seed_routes": [
+      "/"
+    ]
+  },
+  "pages": [
+    {
+      "route": "/",
+      "dom_path": "dom/e2e-fixture.html",
+      "screenshot_path": "screenshots/e2e-fixture.png"
+    }
+  ],
+  "style_fingerprint_ref": "style_fingerprint.json",
+  "baseline_metrics_ref": "baseline_metrics.json"
+}

@@ -1,0 +1,132 @@
+{
+  "kind": "style_fingerprint",
+  "version": "1.0.0",
+  "generated_at": "2026-02-15T01:58:15.206Z",
+  "sample_counts": {
+    "pages": 1,
+    "elements": 12
+  },
+  "type_scale": {
+    "font_families": [
+      {
+        "value": "Montserrat",
+        "count": 12
+      }
+    ],
+    "font_sizes": [
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 8,
+        "token": true
+      },
+      {
+        "px": 25.6,
+        "min": 25.6,
+        "max": 25.6,
+        "count": 3,
+        "token": true
+      },
+      {
+        "px": 70.4,
+        "min": 70.4,
+        "max": 70.4,
+        "count": 1,
+        "token": false
+      }
+    ],
+    "line_heights": [
+      {
+        "px": 25.6,
+        "min": 25.6,
+        "max": 25.6,
+        "count": 6,
+        "token": true
+      }
+    ]
+  },
+  "spacing_scale": {
+    "padding": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 48,
+        "token": true
+      }
+    ],
+    "margin": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 30,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 10,
+        "token": true
+      },
+      {
+        "px": 21.25,
+        "min": 21.25,
+        "max": 21.25,
+        "count": 3,
+        "token": true
+      },
+      {
+        "px": 30,
+        "min": 30,
+        "max": 30,
+        "count": 3,
+        "token": true
+      },
+      {
+        "px": 47.17,
+        "min": 47.17,
+        "max": 47.17,
+        "count": 2,
+        "token": false
+      }
+    ]
+  },
+  "colors": {
+    "text": [
+      {
+        "value": "#444444",
+        "count": 9,
+        "token": true
+      },
+      {
+        "value": "#0000ee",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#ffffff",
+        "count": 1,
+        "token": false
+      }
+    ],
+    "background": [
+      {
+        "value": "#00000000",
+        "count": 12,
+        "token": true
+      }
+    ]
+  },
+  "radii": [
+    {
+      "px": 0,
+      "min": 0,
+      "max": 0,
+      "count": 48,
+      "token": true
+    }
+  ]
+}

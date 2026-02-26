@@ -1,0 +1,84 @@
+metadata:
+  title: Dashboard Starter
+  description: Dashboard scaffold with status banner, KPI cards, and a summary table
+  createdAt: '2026-02-26T04:36:39.203Z'
+  updatedAt: '2026-02-26T04:36:40.160Z'
+root:
+  nodeType: layout
+  layout:
+    type: stack
+    gap: 16
+  children:
+    - nodeType: component
+      id: dash-banner
+      ref: oods:Banner
+      props:
+        title: Workbench Overview
+        message: Track pipeline health, adoption, and delivery metrics.
+        intent: info
+    - nodeType: component
+      id: dash-tabs
+      ref: oods:Tabs
+      props:
+        tabs:
+          - id: overview
+            label: Overview
+          - id: pipeline
+            label: Pipeline
+          - id: team
+            label: Team
+        activeTab: overview
+    - nodeType: layout
+      layout:
+        type: grid
+        columns: 3
+        gap: 16
+      children:
+        - nodeType: component
+          id: dash-kpi-users
+          ref: oods:Card
+          props:
+            title: Active users
+            value: 1,240
+            trend: +12%
+        - nodeType: component
+          id: dash-kpi-revenue
+          ref: oods:Card
+          props:
+            title: Revenue
+            value: $42k
+            trend: +8%
+        - nodeType: component
+          id: dash-kpi-conversion
+          ref: oods:Card
+          props:
+            title: Conversion
+            value: 3.8%
+            trend: +0.4%
+    - nodeType: component
+      id: dash-table
+      ref: oods:Table
+      props:
+        columns:
+          - key: metric
+            label: Metric
+          - key: value
+            label: Value
+          - key: delta
+            label: Delta
+        rows:
+          - metric: Sessions
+            value: 18,240
+            delta: +4.2%
+          - metric: Template applies
+            value: 1,032
+            delta: +9.8%
+          - metric: A11y pass rate
+            value: 97.4%
+            delta: +1.1%
+    - nodeType: component
+      id: dash-action
+      ref: oods:Button
+      props:
+        label: View full report
+        variant: primary

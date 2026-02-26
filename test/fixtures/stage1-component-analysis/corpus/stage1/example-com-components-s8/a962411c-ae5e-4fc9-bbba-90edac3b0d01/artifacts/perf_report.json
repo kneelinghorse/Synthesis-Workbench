@@ -1,0 +1,106 @@
+{
+  "kind": "perf_report",
+  "version": "1.0.0",
+  "generated_at": "2026-02-15T01:57:35.316Z",
+  "url": "https://example.com/",
+  "pages": [
+    {
+      "route": "/",
+      "url": "https://example.com/",
+      "evidence_ref": "evidence/perf/root.json",
+      "performance_score": 1,
+      "metrics": {
+        "fcp_ms": {
+          "value": 817.1215,
+          "budget": "good"
+        },
+        "lcp_ms": {
+          "value": 817.1215,
+          "budget": "good"
+        },
+        "cls": {
+          "value": 0,
+          "budget": "good"
+        },
+        "tbt_ms": {
+          "value": 0,
+          "budget": "good"
+        },
+        "speed_index_ms": {
+          "value": 817.1215,
+          "budget": "good"
+        },
+        "interactive_ms": {
+          "value": 817.1215,
+          "budget": "good"
+        }
+      },
+      "opportunities": [
+        {
+          "id": "server-response-time",
+          "title": "Initial server response time was short",
+          "savings_ms": 30.185000000000002
+        },
+        {
+          "id": "redirects",
+          "title": "Avoid multiple page redirects",
+          "savings_ms": 0
+        },
+        {
+          "id": "uses-rel-preload",
+          "title": "Preload key requests",
+          "savings_ms": 0
+        },
+        {
+          "id": "uses-rel-preconnect",
+          "title": "Preconnect to required origins",
+          "savings_ms": 0
+        },
+        {
+          "id": "offscreen-images",
+          "title": "Defer offscreen images",
+          "savings_ms": 0
+        },
+        {
+          "id": "render-blocking-resources",
+          "title": "Eliminate render-blocking resources",
+          "savings_ms": 0
+        }
+      ]
+    }
+  ],
+  "rollup": {
+    "page_count": 1,
+    "performance_score_avg": 1,
+    "metrics_median": {
+      "fcp_ms": {
+        "value": 817.1215,
+        "budget": "good"
+      },
+      "lcp_ms": {
+        "value": 817.1215,
+        "budget": "good"
+      },
+      "cls": {
+        "value": 0,
+        "budget": "good"
+      },
+      "tbt_ms": {
+        "value": 0,
+        "budget": "good"
+      },
+      "speed_index_ms": {
+        "value": 817.1215,
+        "budget": "good"
+      },
+      "interactive_ms": {
+        "value": 817.1215,
+        "budget": "good"
+      }
+    },
+    "opportunity_count": 6
+  },
+  "evidence": {
+    "perf_manifest_path": "evidence/perf/perf_manifest.json"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "kind": "computed_styles_manifest",
+  "version": "1.0.0",
+  "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+  "captured_at": "2026-01-22T19:25:38.852Z",
+  "pages": [
+    {
+      "route": "/",
+      "dom_path": "dom/e2e-fixture.html",
+      "computed_styles_path": "computed_styles/e2e-fixture.json",
+      "element_count": 10
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "kind": "web_crawl_manifest",
+  "version": "1.0.0",
+  "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+  "seeded_routes": [
+    "/"
+  ],
+  "max_depth": 2,
+  "captured_at": "2026-01-22T19:25:35.759Z",
+  "pages": [
+    {
+      "route": "/",
+      "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "depth": 0,
+      "screenshot_path": "screenshots/e2e-fixture.png",
+      "dom_path": "dom/e2e-fixture.html",
+      "captured_at": "2026-01-22T19:25:35.759Z"
+    }
+  ]
+}

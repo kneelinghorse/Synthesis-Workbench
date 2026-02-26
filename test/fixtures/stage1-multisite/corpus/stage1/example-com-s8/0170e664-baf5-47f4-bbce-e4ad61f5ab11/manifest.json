@@ -1,0 +1,69 @@
+{
+  "run_id": "0170e664-baf5-47f4-bbce-e4ad61f5ab11",
+  "mode": "surface",
+  "targets": [
+    {
+      "name": "example-com-s8",
+      "url": "https://example.com/"
+    }
+  ],
+  "project_id": "stage1-example.com-2026-02-15",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-v1-https://example.com/-2-/",
+      "status": "ok",
+      "ms": 1877
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-https://example.com/",
+      "status": "ok",
+      "ms": 224
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://example.com/",
+      "status": "ok",
+      "ms": 5
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "discovered": [
+        "/"
+      ]
+    },
+    "web_crawl": {
+      "seeded_routes": [
+        "/"
+      ],
+      "max_depth": 2,
+      "discovered_routes": [
+        "/"
+      ],
+      "evidence": {
+        "crawl_manifest_path": "evidence/web_crawl/crawl.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/example-com-s8/0170e664-baf5-47f4-bbce-e4ad61f5ab11/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/example-com-s8/0170e664-baf5-47f4-bbce-e4ad61f5ab11/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-02-15T01:42:43.304Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

@@ -1,0 +1,47 @@
+{
+  "kind": "report_index",
+  "version": "1.1.0",
+  "run_id": "52a5463d-ac13-4d07-9e66-fe85eb2eaa52",
+  "generated_at": "2026-02-15T01:43:59.804Z",
+  "artifacts": [
+    {
+      "type": "baseline_metrics",
+      "path": "baseline_metrics.json",
+      "description": "Baseline UX metrics derived from computed styles.",
+      "metadata": {
+        "bytes": 1362,
+        "modified_at": "2026-02-15T01:43:59.804Z"
+      }
+    },
+    {
+      "type": "report_index",
+      "path": "report-index.json",
+      "description": "Index of artifacts produced in this run."
+    },
+    {
+      "type": "style_fingerprint",
+      "path": "style_fingerprint.json",
+      "description": "Design token fingerprint extracted from UI styles.",
+      "metadata": {
+        "bytes": 1651,
+        "modified_at": "2026-02-15T01:43:59.804Z"
+      }
+    },
+    {
+      "type": "surface_snapshot",
+      "path": "surface_snapshot.json",
+      "description": "Surface snapshot capturing DOM and visual context.",
+      "metadata": {
+        "bytes": 361,
+        "modified_at": "2026-02-15T01:43:59.805Z"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "info-cern-ch-s8",
+      "name": "info-cern-ch-s8",
+      "artifacts": []
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "kind": "style_fingerprint",
+  "version": "1.0.0",
+  "generated_at": "2026-01-22T19:25:38.868Z",
+  "sample_counts": {
+    "pages": 1,
+    "elements": 10
+  },
+  "type_scale": {
+    "font_families": [
+      {
+        "value": "sans-serif",
+        "count": 8
+      },
+      {
+        "value": "Arial",
+        "count": 2
+      }
+    ],
+    "font_sizes": [
+      {
+        "px": 13.33,
+        "min": 13.33,
+        "max": 13.33,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 7,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 1,
+        "token": false
+      }
+    ],
+    "line_heights": []
+  },
+  "spacing_scale": {
+    "padding": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 27,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 6,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 3,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 4,
+        "token": true
+      }
+    ],
+    "margin": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 31,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 4,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 21.44,
+        "min": 21.44,
+        "max": 21.44,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "colors": {
+    "text": [
+      {
+        "value": "#000000",
+        "count": 6,
+        "token": true
+      },
+      {
+        "value": "#0000ee",
+        "count": 3,
+        "token": true
+      },
+      {
+        "value": "#ffffff",
+        "count": 1,
+        "token": false
+      }
+    ],
+    "background": [
+      {
+        "value": "#00000000",
+        "count": 7,
+        "token": true
+      },
+      {
+        "value": "#ffffff",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#007bff",
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "radii": [
+    {
+      "px": 0,
+      "min": 0,
+      "max": 0,
+      "count": 32,
+      "token": true
+    },
+    {
+      "px": 4,
+      "min": 4,
+      "max": 4,
+      "count": 8,
+      "token": true
+    }
+  ]
+}

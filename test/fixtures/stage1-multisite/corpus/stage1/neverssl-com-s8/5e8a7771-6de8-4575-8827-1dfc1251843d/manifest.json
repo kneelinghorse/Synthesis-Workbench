@@ -1,0 +1,69 @@
+{
+  "run_id": "5e8a7771-6de8-4575-8827-1dfc1251843d",
+  "mode": "surface",
+  "targets": [
+    {
+      "name": "neverssl-com-s8",
+      "url": "https://neverssl.com/"
+    }
+  ],
+  "project_id": "stage1-neverssl.com-2026-02-15",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-v1-https://neverssl.com/-2-/",
+      "status": "ok",
+      "ms": 3945
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 276
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://neverssl.com/",
+      "status": "ok",
+      "ms": 2
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "discovered": [
+        "/"
+      ]
+    },
+    "web_crawl": {
+      "seeded_routes": [
+        "/"
+      ],
+      "max_depth": 2,
+      "discovered_routes": [
+        "/"
+      ],
+      "evidence": {
+        "crawl_manifest_path": "evidence/web_crawl/crawl.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/neverssl-com-s8/5e8a7771-6de8-4575-8827-1dfc1251843d/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/neverssl-com-s8/5e8a7771-6de8-4575-8827-1dfc1251843d/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-02-15T01:42:45.434Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

@@ -1,0 +1,74 @@
+{
+  "kind": "report_index",
+  "version": "1.1.0",
+  "run_id": "1a657fa0-c3ed-4980-b59b-734076248806",
+  "generated_at": "2026-01-22T19:25:38.871Z",
+  "artifacts": [
+    {
+      "type": "a11y_report",
+      "path": "a11y_report.json",
+      "description": "Accessibility scan findings and compliance details.",
+      "metadata": {
+        "bytes": 840,
+        "modified_at": "2026-01-22T19:25:37.442Z"
+      }
+    },
+    {
+      "type": "app_profile",
+      "path": "app_profile.json",
+      "description": "App profile summary of routes and related artifacts.",
+      "metadata": {
+        "bytes": 706,
+        "modified_at": "2026-01-22T19:25:38.872Z"
+      }
+    },
+    {
+      "type": "baseline_metrics",
+      "path": "baseline_metrics.json",
+      "description": "Baseline UX metrics derived from computed styles.",
+      "metadata": {
+        "bytes": 1469,
+        "modified_at": "2026-01-22T19:25:38.869Z"
+      }
+    },
+    {
+      "type": "ia_outline",
+      "path": "ia_outline.json",
+      "description": "Information architecture outline with route taxonomy.",
+      "metadata": {
+        "bytes": 724,
+        "modified_at": "2026-01-22T19:25:38.871Z"
+      }
+    },
+    {
+      "type": "report_index",
+      "path": "report-index.json",
+      "description": "Index of artifacts produced in this run."
+    },
+    {
+      "type": "style_fingerprint",
+      "path": "style_fingerprint.json",
+      "description": "Design token fingerprint extracted from UI styles.",
+      "metadata": {
+        "bytes": 2660,
+        "modified_at": "2026-01-22T19:25:38.869Z"
+      }
+    },
+    {
+      "type": "surface_snapshot",
+      "path": "surface_snapshot.json",
+      "description": "Surface snapshot capturing DOM and visual context.",
+      "metadata": {
+        "bytes": 448,
+        "modified_at": "2026-01-22T19:25:38.869Z"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "e2e-validation-scan",
+      "name": "e2e-validation-scan",
+      "artifacts": []
+    }
+  ]
+}

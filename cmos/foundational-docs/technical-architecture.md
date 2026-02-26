@@ -1,0 +1,117 @@
+# Technical Architecture: Synthesis Workbench
+
+## 1. Executive Summary
+Synthesis Workbench is a **web-first** design orchestration tool enabling "Agent-Forward Design." It integrates a chat interface (Assistant-UI) with a live preview environment (OODS Foundry) and ingests Stage1 research bundles so users and AI agents can collaborate on design system tokens and component composition. The Workbench is the central integrator; Stage1 Inspector and OODS Foundry remain **standalone services** connected by stable contracts.
+
+## 2. Core Architecture
+
+### 2.1 Runtime Layer
+- **Framework**: Next.js 15 (App Router)
+- **State Management**: Zustand (local client state)
+- **Chat Runtime**: `LocalRuntime` from `@assistant-ui/react`
+    - **Backends**: 
+        - Primary: Ollama (Local) for privacy and zero-cost iteration.
+        - Fallback: Anthropic API for complex reasoning/codgen.
+    - **Adapter Pattern**: Custom `ChatModelAdapter` to abstract provider differences.
+
+### 2.2 UI Layer
+- **Component System**: Shadcn/UI + Tailwind CSS v4.
+- **Chat Interface**: Assistant-UI primitives (`Thread`, `Composer`, `MessageList`).
+- **Tool UI**: Custom React components rendered via `makeAssistantToolUI`.
+    - Allows the LLM to render interactive controls (phase transitions, token sliders, reviews) directly in the chat stream.
+
+### 2.3 Preview & Live Editing
+- **Mechanism**: `iframe` with `srcdoc` injection.
+- **Synchronization**: `postMessage` bridge between Workbench (Parent) and Preview (Child).
+- **Updates**:
+    - **TokenState**: CSS variables injected dynamically.
+    - **Render Contract (Sprint-12 reset)**:
+        - `useCompositionPreview` consumes a single `PreviewRenderer` abstraction (adapter boundary for migration).
+        - The preview pipeline builds one full-document Foundry schema per update (`version` + `screens[]`).
+        - Workbench sends a single `repl.render` call per preview cycle (`mode: "full"`, `apply: true` via client defaults).
+        - Returned HTML is injected directly into preview state (no per-component fragment composition in live mode).
+        - Static renderer fallback is used only when Foundry is unavailable (missing client/base URL, network/connectivity, timeout).
+
+### 2.4 Integration Layer (Contracts)
+- **Stage1 Intake (file-based)**:
+    - Workbench loads `design-research/stage1/manifest.json` and referenced artifacts.
+    - Unknown artifact types are treated as display-only unless required for a gate.
+- **Stage1 Invocation (optional)**:
+    - MVP: CLI invocation for Stage1 runs.
+    - Preferred: WebSocket bridge for progress events and file change notifications.
+- **Foundry MCP Proxy**:
+    - The LLM calls a "Workbench Tool" (e.g., `render_component`).
+    - The Workbench proxies to the **OODS Foundry MCP Server** via `@modelcontextprotocol/sdk`.
+    - Required tool surface (minimum): `repl.render`, `repl.validate`, `tokens.build`, `a11y.scan`.
+    - Results are returned to the LLM and/or rendered in the Tool UI.
+
+## 3. Data Model
+
+### 3.1 TokenState
+Represents the active design decisions.
+```typescript
+interface TokenState {
+  [tokenName: string]: string; // e.g., "color-primary": "hsl(220 90% 50%)"
+}
+```
+
+### 3.2 PhaseState
+Tracks the current stage of the design workflow.
+```typescript
+type DesignPhase = "ingest" | "explore" | "tune" | "review" | "done";
+type WorkflowMode = "strict" | "flexible";
+
+interface PhaseState {
+  currentPhase: DesignPhase;
+  workflowMode: WorkflowMode;
+}
+```
+
+- **Strict mode**: Preserves explicit tool gating by phase.
+- **Flexible mode**: Keeps the phase timeline but relaxes tool gating to support rapid iteration loops.
+
+### 3.3 Stage1 Bundle
+Contains the research context, evidence, and synthesis seeds detected from the target application (via Stage1 Inspector).
+
+**Minimum required**:
+- `design-research/stage1/manifest.json`
+- `design-research/stage1/synthesis/token-guess.json`
+- At least one evidence artifact (e.g., screenshot + computed-style summary)
+
+**Manifest requirements**:
+- `contractVersion`, `bundleVersion`, `toolVersion`, `generatedAt`
+- `targets[]`, `jobs[]`, typed `artifacts[]`
+
+### 3.4 Workspace Contract (Cross-Tool)
+Canonical layout for a design project workspace:
+```
+/.theia/                     # Workbench state + settings (or equivalent)
+/design-research/            # Stage1 outputs + research inputs
+/briefs/                     # Design brief artifacts
+/plans/                      # Design plan artifacts
+/phases/                     # Phase outputs and snapshots
+/output/                     # Final exports (ui-schema/tokens/validation)
+/.mcp-config.json            # Foundry MCP config (if needed)
+```
+
+## 4. Key Decisions
+1.  **LocalRuntime**: Chosen over `ExternalStoreRuntime` for simplicity and built-in state management.
+2.  **Iframe Preview**: Chosen over WebContainers/Sandpack for lower complexity, instant startup, and sufficient isolation for HTML/CSS previewing.
+3.  **MCP Proxy**: Decouples the frontend from direct MCP server management, allowing the workbench to mediate tool access.
+4.  **Web-First**: Electron is out of scope; the Workbench is a browser-based Next.js app.
+5.  **Standalone Tools**: Stage1 Inspector and Foundry are independent services connected by stable contracts.
+
+## 5. Security & Performance
+- **Isolation**: Preview runs in a sandboxed iframe.
+- **Local-First**: Defaulting to Ollama keeps sensitive design data local.
+- **Optimization**: React Server Components (RSC) for initial shell; Client Components for interactive chat and state.
+
+## 6. Runtime Configuration
+- **Ollama**: Base URL + model name via env vars.
+- **Anthropic**: API key via env vars.
+- **Foundry MCP**: Server connection config (local or remote).
+- **Stage1**: CLI or WebSocket bridge config for run + progress events.
+
+## 7. References
+- TraceLab: Tool Interface Contract (`1305bad8-6820-41d2-8795-e08d07e1db07`)
+- TraceLab: Governing Architecture (`39da94b0-cc86-40c6-ada1-d33837645d8f`)

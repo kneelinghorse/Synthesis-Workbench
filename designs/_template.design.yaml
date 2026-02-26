@@ -1,0 +1,58 @@
+# Design Document Template
+# This is a starter template for creating new design documents
+# Format: YAML for human-friendly editing and git diffs
+# Validated against DesignDocument schema on load
+
+metadata:
+  title: "Untitled Design"
+  description: "A new design document"
+  author: ""
+  version: "1.0.0"
+  createdAt: ""
+  updatedAt: ""
+  tags: []
+
+# Root node: can be either a layout node or a component node
+root:
+  nodeType: layout
+
+  # Layout configuration (stack or grid)
+  layout:
+    type: stack
+    gap: 16
+    align: start
+
+  # Children nodes (can be layout nodes or component nodes)
+  children:
+    - nodeType: component
+      id: example-header
+      ref: oods:Header
+      props:
+        title: "Example Header"
+        subtitle: "This is a template design"
+
+    - nodeType: layout
+      layout:
+        type: grid
+        columns: 2
+        gap: 16
+      children:
+        - nodeType: component
+          id: example-card-1
+          ref: oods:Card
+          props:
+            title: "Card 1"
+            content: "Example content"
+
+        - nodeType: component
+          id: example-card-2
+          ref: oods:Card
+          props:
+            title: "Card 2"
+            content: "More content"
+
+    - nodeType: component
+      id: example-footer
+      ref: oods:Footer
+      props:
+        text: "© 2024 Example"

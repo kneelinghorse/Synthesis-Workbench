@@ -1,0 +1,110 @@
+{
+  "kind": "style_fingerprint",
+  "version": "1.0.0",
+  "generated_at": "2026-02-15T01:42:45.407Z",
+  "sample_counts": {
+    "pages": 1,
+    "elements": 5
+  },
+  "type_scale": {
+    "font_families": [
+      {
+        "value": "system-ui",
+        "count": 5
+      }
+    ],
+    "font_sizes": [
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 4,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 1,
+        "token": false
+      }
+    ],
+    "line_heights": []
+  },
+  "spacing_scale": {
+    "padding": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 20,
+        "token": true
+      }
+    ],
+    "margin": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 10,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16.08,
+        "count": 6,
+        "token": true
+      },
+      {
+        "px": 108,
+        "min": 108,
+        "max": 108,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 256,
+        "min": 256,
+        "max": 256,
+        "count": 2,
+        "token": false
+      }
+    ]
+  },
+  "colors": {
+    "text": [
+      {
+        "value": "#000000",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "#334488",
+        "count": 1,
+        "token": false
+      }
+    ],
+    "background": [
+      {
+        "value": "#00000000",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "#eeeeee",
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "radii": [
+    {
+      "px": 0,
+      "min": 0,
+      "max": 0,
+      "count": 20,
+      "token": true
+    }
+  ]
+}

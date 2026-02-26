@@ -1,0 +1,51 @@
+{
+  "run_id": "4648cec9-d652-4ffd-8f4e-d5d50e38271a",
+  "mode": "surface",
+  "targets": [
+    {
+      "name": "iana-org-s8",
+      "url": "https://www.iana.org/"
+    }
+  ],
+  "project_id": "stage1-www.iana.org-2026-02-15",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "error",
+      "status": "failed",
+      "ms": 163570
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-https://www.iana.org/",
+      "status": "ok",
+      "ms": 15323
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://www.iana.org/",
+      "status": "ok",
+      "ms": 85
+    }
+  ],
+  "inputs": {},
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/iana-org-s8/4648cec9-d652-4ffd-8f4e-d5d50e38271a/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/iana-org-s8/4648cec9-d652-4ffd-8f4e-d5d50e38271a/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-02-15T01:42:49.668Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

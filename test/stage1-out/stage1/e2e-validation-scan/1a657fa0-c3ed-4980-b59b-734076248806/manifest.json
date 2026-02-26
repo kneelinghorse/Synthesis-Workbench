@@ -1,0 +1,126 @@
+{
+  "run_id": "1a657fa0-c3ed-4980-b59b-734076248806",
+  "mode": "app",
+  "targets": [
+    {
+      "name": "e2e-validation-scan",
+      "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html"
+    }
+  ],
+  "project_id": "stage1--2026-01-22",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html-2-/",
+      "status": "ok",
+      "ms": 1295
+    },
+    {
+      "id": "web.network_trace",
+      "version": "1.0.0",
+      "cache_key": "web.network_trace-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "status": "ok",
+      "ms": 682
+    },
+    {
+      "id": "a11y.scan",
+      "version": "1.0.0",
+      "cache_key": "a11y.scan-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "status": "ok",
+      "ms": 993
+    },
+    {
+      "id": "perf.scan",
+      "version": "1.0.0",
+      "cache_key": "error",
+      "status": "failed",
+      "ms": 1230
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "status": "ok",
+      "ms": 183
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "ia.outline",
+      "version": "1.0.0",
+      "cache_key": "ia.outline-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "app.profile",
+      "version": "1.0.0",
+      "cache_key": "app.profile-v1-file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "status": "ok",
+      "ms": 0
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "discovered": [
+        "/"
+      ],
+      "page_types": [
+        {
+          "type": "home",
+          "routes": [
+            "/"
+          ],
+          "confidence": 0.65
+        }
+      ]
+    },
+    "web_crawl": {
+      "seeded_routes": [
+        "/"
+      ],
+      "max_depth": 2,
+      "discovered_routes": [
+        "/"
+      ],
+      "evidence": {
+        "crawl_manifest_path": "evidence/web_crawl/crawl.json"
+      }
+    },
+    "ia_outline": {
+      "evidence": {
+        "ia_manifest_path": "evidence/ia/ia_manifest.json"
+      },
+      "artifact": {
+        "ia_outline_ref": "ia_outline.json"
+      }
+    },
+    "app_profile": {
+      "artifact": {
+        "app_profile_ref": "app_profile.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/stage1-out/stage1/e2e-validation-scan/1a657fa0-c3ed-4980-b59b-734076248806/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/stage1-out/stage1/e2e-validation-scan/1a657fa0-c3ed-4980-b59b-734076248806/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-01-22T19:25:34.483Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

@@ -1,0 +1,75 @@
+{
+  "kind": "perf_report",
+  "version": "1.0.0",
+  "generated_at": "2026-02-15T01:58:14.521Z",
+  "url": "https://neverssl.com/",
+  "pages": [
+    {
+      "route": "/",
+      "url": "https://neverssl.com/",
+      "evidence_ref": "evidence/perf/root.json",
+      "performance_score": null,
+      "metrics": {
+        "fcp_ms": {
+          "value": null,
+          "budget": "unknown"
+        },
+        "lcp_ms": {
+          "value": null,
+          "budget": "unknown"
+        },
+        "cls": {
+          "value": null,
+          "budget": "unknown"
+        },
+        "tbt_ms": {
+          "value": null,
+          "budget": "unknown"
+        },
+        "speed_index_ms": {
+          "value": null,
+          "budget": "unknown"
+        },
+        "interactive_ms": {
+          "value": null,
+          "budget": "unknown"
+        }
+      },
+      "opportunities": []
+    }
+  ],
+  "rollup": {
+    "page_count": 1,
+    "performance_score_avg": null,
+    "metrics_median": {
+      "fcp_ms": {
+        "value": null,
+        "budget": "unknown"
+      },
+      "lcp_ms": {
+        "value": null,
+        "budget": "unknown"
+      },
+      "cls": {
+        "value": null,
+        "budget": "unknown"
+      },
+      "tbt_ms": {
+        "value": null,
+        "budget": "unknown"
+      },
+      "speed_index_ms": {
+        "value": null,
+        "budget": "unknown"
+      },
+      "interactive_ms": {
+        "value": null,
+        "budget": "unknown"
+      }
+    },
+    "opportunity_count": 0
+  },
+  "evidence": {
+    "perf_manifest_path": "evidence/perf/perf_manifest.json"
+  }
+}

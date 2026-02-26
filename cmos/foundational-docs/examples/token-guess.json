@@ -1,0 +1,31 @@
+{
+  "kind": "token_guess",
+  "version": "1.0.0",
+  "generated_at": "2026-01-08T17:15:31.304Z",
+  "tokens": {
+    "colors.primary": "#3b82f6",
+    "colors.secondary": "#64748b",
+    "colors.accent": "#f59e0b",
+    "colors.background": "#ffffff",
+    "colors.surface": "#f8fafc",
+    "colors.text.primary": "#0f172a",
+    "colors.text.secondary": "#475569",
+    "colors.border": "#e2e8f0",
+    "colors.status.success": "#22c55e",
+    "colors.status.error": "#ef4444",
+    "typography.fontFamily.sans": "Inter, system-ui, sans-serif",
+    "typography.fontFamily.mono": "JetBrains Mono, monospace",
+    "typography.fontSize.sm": "0.875rem",
+    "typography.fontSize.base": "1rem",
+    "typography.fontSize.lg": "1.125rem",
+    "spacing.sm": "0.5rem",
+    "spacing.md": "1rem",
+    "spacing.lg": "1.5rem",
+    "radius.sm": "0.25rem",
+    "radius.md": "0.375rem",
+    "radius.lg": "0.5rem",
+    "shadow.sm": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    "shadow.md": "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+    "custom.brand-gradient": "linear-gradient(135deg, #3b82f6, #8b5cf6)"
+  }
+}

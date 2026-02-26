@@ -1,0 +1,80 @@
+{
+  "project": {
+    "id": "synthesis-workbench",
+    "name": "Synthesis Workbench",
+    "tracelabProjectId": "cbdd0d28-48ce-4459-8d18-937108421036"
+  },
+  "decisions": [
+    "Shift to web-first app (Next.js). Electron is overkill; keep runtime lightweight and browser-based.",
+    "Treat tools as standalone services with stable contracts; Synthesis Workbench is the central integrator with Stage1 Inspector and OODS Foundry MCP as independent peers.",
+    "Zustand stores follow consistent pattern: phase-state, token-state, stage1-bundle, preview. All use subscribeWithSelector middleware. Store actions are synchronous; async operations happen in tools/adapters.",
+    "Tool commands follow /<name> pattern: /tool, /phase, /review, /tokens, /bundle, /render. Each has corresponding tool UI via makeAssistantToolUI. withToolCommands handles parsing and result summaries.",
+    "MCP clients use JSON-RPC transport with singleton accessor pattern (getStage1Client, getFoundryClient). Env vars for server endpoints in .env.local.",
+    "Preview state store manages rendered HTML separate from TokenState. PreviewPanel in chat layout for inline display."
+  ],
+  "constraints": [
+    "Each stage must function independently while interoperating through file-based or MCP contracts; avoid tight coupling between tools."
+  ],
+  "learnings": [
+    "makeAssistantToolUI pattern established as standard for tool UI components. Registry maps tool names to React components with type-safe props.",
+    "ToolOutputCard shared component pattern for consistent tool UI styling. Supports title, status, body, and action slots.",
+    "withToolCommands pattern enables slash commands that are testable and integrate cleanly with runtime adapter layer.",
+    "TokenState store uses nested path access (e.g., 'colors.primary') with getNestedValue/setNestedValue helpers. toCssVariables() flattens to --colors-primary format.",
+    "PreviewPane uses iframe with srcdoc injection - no WebContainers or Sandpack needed. CSS variables injected into :root, sandbox='allow-scripts' for security.",
+    "PostMessage bridge: parent sends TOKEN_STATE_UPDATE and COMPONENT_UPDATE; iframe inject-script updates CSS variables without page reload. PREVIEW_READY confirms listening.",
+    "Stage1 bundle ingestion extracts component detections and token suggestions from style fingerprint. Bundle store supports seeding TokenState.",
+    "Stage1 fingerprint parsing: Extract colors from colors.text[].value and colors.background[].value, fonts from type_scale.font_families[].value, spacing from spacing_scale.padding/margin[].px. Items with token:true flag are prioritized.",
+    "MCP client pattern: JSON-RPC transport with callTool(name, args). Normalize responses, handle timeout/network/missing errors. Singleton accessor for shared instances.",
+    "Bundle loading: bundle-loader helper fetches report-index.json first for artifact paths, falls back to direct artifact names. BundlePicker groups runs by hostname.",
+    "RenderComponentTool flow: LLM calls render_component -> Workbench proxies to Foundry repl.render -> HTML stored in Preview store -> PreviewPane receives COMPONENT_UPDATE via postMessage."
+  ],
+  "codebaseContext": {
+    "fileStructure": {
+      "stores": "src/lib/stores/ - Zustand stores (phase-state, token-state, stage1-bundle, preview)",
+      "preview": "src/lib/preview/ - iframe bridge (inject-script, message-types)",
+      "tools": "src/lib/runtime/tools/ - tool contracts (phase-tools, token-tools, oods-tools, stage1-tools)",
+      "toolUIs": "src/components/tool-ui/ - tool UI components",
+      "workbench": "src/components/workbench/ - layout components (PreviewPane, BundlePicker, PreviewPanel)",
+      "mcp": "src/lib/mcp/ - MCP clients (stage1-client, foundry-client, bundle-loader)",
+      "types": "src/types/ - TypeScript interfaces"
+    },
+    "keyInterfaces": [
+      "TokenState (src/types/token-state.ts) - design token structure with DEFAULT_TOKEN_STATE",
+      "Stage1Bundle (src/types/stage1-bundle.ts) - research bundle format",
+      "PreviewMessage (src/lib/preview/message-types.ts) - TOKEN_STATE_UPDATE, COMPONENT_UPDATE, PREVIEW_READY",
+      "Stage1Run (src/lib/mcp/stage1-client.ts) - runId, hostname, timestamp, runDir",
+      "RenderOutput, ValidateOutput (src/lib/mcp/foundry-client.ts) - Foundry MCP responses"
+    ],
+    "slashCommands": ["/tool", "/phase", "/review", "/tokens", "/bundle", "/render"],
+    "mcpClients": {
+      "stage1": "getStage1Client() - listRuns(), getArtifact(runDir, name)",
+      "foundry": "getFoundryClient() - render(schema), validate(schema), buildTokens(brand, theme)"
+    }
+  },
+  "pendingExternalRequests": {
+    "stage1-enhancements": {
+      "spec": "cmos/foundational-docs/stage1-contract-enhancement-spec.md",
+      "requests": [
+        "token-guess.json with TokenState-compatible paths",
+        "project_id field in manifest.json",
+        "component_clusters.json with name/count/selector"
+      ],
+      "status": "implemented",
+      "resolvedAt": "2026-02-06",
+      "resolution": "All 3 requests fully implemented in Stage1. token-guess.json (v1.0.0) with dot-path tokens, manifest.json project_id with auto-generation fallback, component_clusters.json (v1.1.0) with confidence/selectors/nesting/variants. Artifacts tracked in report-index.json."
+    }
+  },
+  "nextSteps": [
+    "Sprint 05: End-to-end workflow testing (bundle -> tokens -> render)",
+    "ValidateSchemaTool for LLM schema validation before render",
+    "Export workflow for final token/component artifacts",
+    "Phase state enforcement with tool availability per phase",
+    "Verify Workbench bundle-loader ingests new Stage1 artifacts (token-guess.json, component_clusters.json) correctly"
+  ],
+  "sprintHistory": {
+    "sprint-01": "Foundation & Core Chat - project scaffold, chat UI, Ollama/Anthropic adapters",
+    "sprint-02": "Tool UI Infrastructure - makeAssistantToolUI, ToolOutputCard, PhaseTransitionTool, ReviewGateTool",
+    "sprint-03": "State & Live Preview - TokenState store, PreviewPane, postMessage bridge, TokenAdjustmentTool, Stage1 bundle ingestion",
+    "sprint-04": "OODS Deep Integration - Stage1 contract alignment, MCP clients (Stage1 + Foundry), BundlePicker UI, RenderComponentTool proxy, Stage1 enhancement spec"
+  }
+}

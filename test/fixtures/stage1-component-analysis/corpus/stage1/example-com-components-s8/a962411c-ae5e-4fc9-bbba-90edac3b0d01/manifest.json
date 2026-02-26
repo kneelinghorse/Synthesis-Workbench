@@ -1,0 +1,183 @@
+{
+  "run_id": "a962411c-ae5e-4fc9-bbba-90edac3b0d01",
+  "mode": "app",
+  "targets": [
+    {
+      "name": "example-com-components-s8",
+      "url": "https://example.com/"
+    }
+  ],
+  "project_id": "stage1-example.com-2026-02-15",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-v1-https://example.com/-1-/",
+      "status": "ok",
+      "ms": 1613
+    },
+    {
+      "id": "web.network_trace",
+      "version": "1.0.0",
+      "cache_key": "web.network_trace-v1-https://example.com/",
+      "status": "ok",
+      "ms": 916
+    },
+    {
+      "id": "a11y.scan",
+      "version": "1.0.0",
+      "cache_key": "a11y.scan-v1-https://example.com/",
+      "status": "ok",
+      "ms": 1223
+    },
+    {
+      "id": "perf.scan",
+      "version": "1.0.0",
+      "cache_key": "perf.scan-v1-https://example.com/-desktop-5",
+      "status": "ok",
+      "ms": 7827
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-https://example.com/",
+      "status": "ok",
+      "ms": 574
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://example.com/",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "ia.outline",
+      "version": "1.0.0",
+      "cache_key": "ia.outline-v1-https://example.com/",
+      "status": "ok",
+      "ms": 12
+    },
+    {
+      "id": "app.profile",
+      "version": "1.0.0",
+      "cache_key": "app.profile-v1-https://example.com/",
+      "status": "ok",
+      "ms": 2
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "discovered": [
+        "/"
+      ],
+      "page_types": [
+        {
+          "type": "home",
+          "routes": [
+            "/"
+          ],
+          "confidence": 0.65
+        }
+      ]
+    },
+    "web_crawl": {
+      "seeded_routes": [
+        "/"
+      ],
+      "max_depth": 1,
+      "discovered_routes": [
+        "/"
+      ],
+      "evidence": {
+        "crawl_manifest_path": "evidence/web_crawl/crawl.json"
+      }
+    },
+    "perf": {
+      "preset": "desktop",
+      "pages": [
+        {
+          "route": "/",
+          "url": "https://example.com/",
+          "performance_score": 1,
+          "metrics": {
+            "fcp_ms": 817.1215,
+            "lcp_ms": 817.1215,
+            "cls": 0,
+            "tbt_ms": 0,
+            "speed_index_ms": 817.1215,
+            "interactive_ms": 817.1215
+          },
+          "top_opportunities": [
+            {
+              "id": "server-response-time",
+              "title": "Initial server response time was short",
+              "savings_ms": 30.185000000000002
+            },
+            {
+              "id": "redirects",
+              "title": "Avoid multiple page redirects",
+              "savings_ms": 0
+            },
+            {
+              "id": "uses-rel-preload",
+              "title": "Preload key requests",
+              "savings_ms": 0
+            },
+            {
+              "id": "uses-rel-preconnect",
+              "title": "Preconnect to required origins",
+              "savings_ms": 0
+            },
+            {
+              "id": "offscreen-images",
+              "title": "Defer offscreen images",
+              "savings_ms": 0
+            },
+            {
+              "id": "render-blocking-resources",
+              "title": "Eliminate render-blocking resources",
+              "savings_ms": 0
+            }
+          ],
+          "evidence_ref": "evidence/perf/root.json"
+        }
+      ],
+      "evidence": {
+        "perf_manifest_path": "evidence/perf/perf_manifest.json"
+      },
+      "artifact": {
+        "perf_report_ref": "perf_report.json"
+      }
+    },
+    "ia_outline": {
+      "evidence": {
+        "ia_manifest_path": "evidence/ia/ia_manifest.json"
+      },
+      "artifact": {
+        "ia_outline_ref": "ia_outline.json"
+      }
+    },
+    "app_profile": {
+      "artifact": {
+        "app_profile_ref": "app_profile.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-component-analysis/raw/stage1/example-com-components-s8/a962411c-ae5e-4fc9-bbba-90edac3b0d01/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-component-analysis/raw/stage1/example-com-components-s8/a962411c-ae5e-4fc9-bbba-90edac3b0d01/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-02-15T01:57:23.737Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

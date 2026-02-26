@@ -1,0 +1,433 @@
+{
+  "kind": "surface_snapshot",
+  "target": {
+    "url": "https://www.iana.org/",
+    "seed_routes": [
+      "/"
+    ]
+  },
+  "pages": [
+    {
+      "route": "/about_audits--5e869786",
+      "screenshot_path": "screenshots/about_audits--5e869786.png",
+      "dom_path": "dom/about_audits--5e869786.html"
+    },
+    {
+      "route": "/about_excellence--e63bba8c",
+      "screenshot_path": "screenshots/about_excellence--e63bba8c.png",
+      "dom_path": "dom/about_excellence--e63bba8c.html"
+    },
+    {
+      "route": "/about--979bddc4",
+      "screenshot_path": "screenshots/about--979bddc4.png",
+      "dom_path": "dom/about--979bddc4.html"
+    },
+    {
+      "route": "/abuse_answers--59793355",
+      "screenshot_path": "screenshots/abuse_answers--59793355.png",
+      "dom_path": "dom/abuse_answers--59793355.html"
+    },
+    {
+      "route": "/abuse--5e12bdc9",
+      "screenshot_path": "screenshots/abuse--5e12bdc9.png",
+      "dom_path": "dom/abuse--5e12bdc9.html"
+    },
+    {
+      "route": "/archive_cctld-news--afe50f06",
+      "screenshot_path": "screenshots/archive_cctld-news--afe50f06.png",
+      "dom_path": "dom/archive_cctld-news--afe50f06.html"
+    },
+    {
+      "route": "/archive_internet-monthly-reports--2ba9e9d2",
+      "screenshot_path": "screenshots/archive_internet-monthly-reports--2ba9e9d2.png",
+      "dom_path": "dom/archive_internet-monthly-reports--2ba9e9d2.html"
+    },
+    {
+      "route": "/archive_ntia-contract--e913c0bd",
+      "screenshot_path": "screenshots/archive_ntia-contract--e913c0bd.png",
+      "dom_path": "dom/archive_ntia-contract--e913c0bd.html"
+    },
+    {
+      "route": "/archive_root-dnssec-launch--e4db503c",
+      "screenshot_path": "screenshots/archive_root-dnssec-launch--e4db503c.png",
+      "dom_path": "dom/archive_root-dnssec-launch--e4db503c.html"
+    },
+    {
+      "route": "/archive_root-ksk-rollover-2018--74242aef",
+      "screenshot_path": "screenshots/archive_root-ksk-rollover-2018--74242aef.png",
+      "dom_path": "dom/archive_root-ksk-rollover-2018--74242aef.html"
+    },
+    {
+      "route": "/archive--81c61971",
+      "screenshot_path": "screenshots/archive--81c61971.png",
+      "dom_path": "dom/archive--81c61971.html"
+    },
+    {
+      "route": "/contact--4eb95063",
+      "screenshot_path": "screenshots/contact--4eb95063.png",
+      "dom_path": "dom/contact--4eb95063.html"
+    },
+    {
+      "route": "/dnssec_ceremonies--e087ab11",
+      "screenshot_path": "screenshots/dnssec_ceremonies--e087ab11.png",
+      "dom_path": "dom/dnssec_ceremonies--e087ab11.html"
+    },
+    {
+      "route": "/dnssec_files--55f03438",
+      "screenshot_path": "screenshots/dnssec_files--55f03438.png",
+      "dom_path": "dom/dnssec_files--55f03438.html"
+    },
+    {
+      "route": "/dnssec_procedures--9bfae39a",
+      "screenshot_path": "screenshots/dnssec_procedures--9bfae39a.png",
+      "dom_path": "dom/dnssec_procedures--9bfae39a.html"
+    },
+    {
+      "route": "/dnssec_tcrs--4b3f837c",
+      "screenshot_path": "screenshots/dnssec_tcrs--4b3f837c.png",
+      "dom_path": "dom/dnssec_tcrs--4b3f837c.html"
+    },
+    {
+      "route": "/dnssec--531d6d21",
+      "screenshot_path": "screenshots/dnssec--531d6d21.png",
+      "dom_path": "dom/dnssec--531d6d21.html"
+    },
+    {
+      "route": "/domains_arpa--bf56d407",
+      "screenshot_path": "screenshots/domains_arpa--bf56d407.png",
+      "dom_path": "dom/domains_arpa--bf56d407.html"
+    },
+    {
+      "route": "/domains_idn-tables_archived-tables.html--478159bc",
+      "screenshot_path": "screenshots/domains_idn-tables_archived-tables.html--478159bc.png",
+      "dom_path": "dom/domains_idn-tables_archived-tables.html--478159bc.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_da_3.0.xml--c6b59039",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_da_3.0.xml--c6b59039.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_da_3.0.xml--c6b59039.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_de_3.0.xml--f0b27e79",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_de_3.0.xml--f0b27e79.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_de_3.0.xml--f0b27e79.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_es_3.0.xml--40acd839",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_es_3.0.xml--40acd839.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_es_3.0.xml--40acd839.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_fi_3.0.xml--73b7ff56",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_fi_3.0.xml--73b7ff56.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_fi_3.0.xml--73b7ff56.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_hu_3.0.xml--76e0aac2",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_hu_3.0.xml--76e0aac2.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_hu_3.0.xml--76e0aac2.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_is_3.0.xml--1a60a99f",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_is_3.0.xml--1a60a99f.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_is_3.0.xml--1a60a99f.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_ja_3.0.xml--c5d13fe9",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_ja_3.0.xml--c5d13fe9.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_ja_3.0.xml--c5d13fe9.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_ko_3.0.xml--3ccea604",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_ko_3.0.xml--3ccea604.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_ko_3.0.xml--3ccea604.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_lt_3.0.xml--3d7df433",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_lt_3.0.xml--3d7df433.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_lt_3.0.xml--3d7df433.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_lv_3.0.xml--6f76a8f0",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_lv_3.0.xml--6f76a8f0.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_lv_3.0.xml--6f76a8f0.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_no_3.0.xml--0a525ca7",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_no_3.0.xml--0a525ca7.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_no_3.0.xml--0a525ca7.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_pl_3.0.xml--f02594eb",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_pl_3.0.xml--f02594eb.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_pl_3.0.xml--f02594eb.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_pt_3.0.xml--530c3799",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_pt_3.0.xml--530c3799.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_pt_3.0.xml--530c3799.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_ru_3.0.xml--8056b368",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_ru_3.0.xml--8056b368.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_ru_3.0.xml--8056b368.html"
+    },
+    {
+      "route": "/domains_idn-tables_tables_aaa_sv_3.0.xml--a5c31fb9",
+      "screenshot_path": "screenshots/domains_idn-tables_tables_aaa_sv_3.0.xml--a5c31fb9.png",
+      "dom_path": "dom/domains_idn-tables_tables_aaa_sv_3.0.xml--a5c31fb9.html"
+    },
+    {
+      "route": "/domains_idn-tables--89cc12c3",
+      "screenshot_path": "screenshots/domains_idn-tables--89cc12c3.png",
+      "dom_path": "dom/domains_idn-tables--89cc12c3.html"
+    },
+    {
+      "route": "/domains_int_manage--bd0c0387",
+      "screenshot_path": "screenshots/domains_int_manage--bd0c0387.png",
+      "dom_path": "dom/domains_int_manage--bd0c0387.html"
+    },
+    {
+      "route": "/domains_int_policy--3212c51b",
+      "screenshot_path": "screenshots/domains_int_policy--3212c51b.png",
+      "dom_path": "dom/domains_int_policy--3212c51b.html"
+    },
+    {
+      "route": "/domains_int--b72054ff",
+      "screenshot_path": "screenshots/domains_int--b72054ff.png",
+      "dom_path": "dom/domains_int--b72054ff.html"
+    },
+    {
+      "route": "/domains_reserved--49bc685c",
+      "screenshot_path": "screenshots/domains_reserved--49bc685c.png",
+      "dom_path": "dom/domains_reserved--49bc685c.html"
+    },
+    {
+      "route": "/domains_root_db--1fc56935",
+      "screenshot_path": "screenshots/domains_root_db--1fc56935.png",
+      "dom_path": "dom/domains_root_db--1fc56935.html"
+    },
+    {
+      "route": "/domains_root_files--2b3c55e8",
+      "screenshot_path": "screenshots/domains_root_files--2b3c55e8.png",
+      "dom_path": "dom/domains_root_files--2b3c55e8.html"
+    },
+    {
+      "route": "/domains_root_help--9a2fb1ad",
+      "screenshot_path": "screenshots/domains_root_help--9a2fb1ad.png",
+      "dom_path": "dom/domains_root_help--9a2fb1ad.html"
+    },
+    {
+      "route": "/domains_root_manage--10cc20ad",
+      "screenshot_path": "screenshots/domains_root_manage--10cc20ad.png",
+      "dom_path": "dom/domains_root_manage--10cc20ad.html"
+    },
+    {
+      "route": "/domains_root_servers--4e3e673d",
+      "screenshot_path": "screenshots/domains_root_servers--4e3e673d.png",
+      "dom_path": "dom/domains_root_servers--4e3e673d.html"
+    },
+    {
+      "route": "/domains_root--8c724dcf",
+      "screenshot_path": "screenshots/domains_root--8c724dcf.png",
+      "dom_path": "dom/domains_root--8c724dcf.html"
+    },
+    {
+      "route": "/domains_special--45e98862",
+      "screenshot_path": "screenshots/domains_special--45e98862.png",
+      "dom_path": "dom/domains_special--45e98862.html"
+    },
+    {
+      "route": "/domains--d6ee6b20",
+      "screenshot_path": "screenshots/domains--d6ee6b20.png",
+      "dom_path": "dom/domains--d6ee6b20.html"
+    },
+    {
+      "route": "/go_draft-ietf-emu-eap-arpa-10--317937bf",
+      "screenshot_path": "screenshots/go_draft-ietf-emu-eap-arpa-10--317937bf.png",
+      "dom_path": "dom/go_draft-ietf-emu-eap-arpa-10--317937bf.html"
+    },
+    {
+      "route": "/go_rfc1035--40161ae4",
+      "screenshot_path": "screenshots/go_rfc1035--40161ae4.png",
+      "dom_path": "dom/go_rfc1035--40161ae4.html"
+    },
+    {
+      "route": "/go_rfc3152--ff6a8a27",
+      "screenshot_path": "screenshots/go_rfc3152--ff6a8a27.png",
+      "dom_path": "dom/go_rfc3152--ff6a8a27.html"
+    },
+    {
+      "route": "/go_rfc3172--d6af3156",
+      "screenshot_path": "screenshots/go_rfc3172--d6af3156.png",
+      "dom_path": "dom/go_rfc3172--d6af3156.html"
+    },
+    {
+      "route": "/go_rfc3405--a2e02c17",
+      "screenshot_path": "screenshots/go_rfc3405--a2e02c17.png",
+      "dom_path": "dom/go_rfc3405--a2e02c17.html"
+    },
+    {
+      "route": "/go_rfc4698--4e261061",
+      "screenshot_path": "screenshots/go_rfc4698--4e261061.png",
+      "dom_path": "dom/go_rfc4698--4e261061.html"
+    },
+    {
+      "route": "/go_rfc5855--61f278b9",
+      "screenshot_path": "screenshots/go_rfc5855--61f278b9.png",
+      "dom_path": "dom/go_rfc5855--61f278b9.html"
+    },
+    {
+      "route": "/go_rfc6116--6cdf62ab",
+      "screenshot_path": "screenshots/go_rfc6116--6cdf62ab.png",
+      "dom_path": "dom/go_rfc6116--6cdf62ab.html"
+    },
+    {
+      "route": "/go_rfc7050--48597fa6",
+      "screenshot_path": "screenshots/go_rfc7050--48597fa6.png",
+      "dom_path": "dom/go_rfc7050--48597fa6.html"
+    },
+    {
+      "route": "/go_rfc7535--a2b33ce9",
+      "screenshot_path": "screenshots/go_rfc7535--a2b33ce9.png",
+      "dom_path": "dom/go_rfc7535--a2b33ce9.html"
+    },
+    {
+      "route": "/go_rfc8375--3c0a1539",
+      "screenshot_path": "screenshots/go_rfc8375--3c0a1539.png",
+      "dom_path": "dom/go_rfc8375--3c0a1539.html"
+    },
+    {
+      "route": "/go_rfc8958--543f1c8e",
+      "screenshot_path": "screenshots/go_rfc8958--543f1c8e.png",
+      "dom_path": "dom/go_rfc8958--543f1c8e.html"
+    },
+    {
+      "route": "/go_rfc9031--63cdb37a",
+      "screenshot_path": "screenshots/go_rfc9031--63cdb37a.png",
+      "dom_path": "dom/go_rfc9031--63cdb37a.html"
+    },
+    {
+      "route": "/go_rfc9120--a3c3f71d",
+      "screenshot_path": "screenshots/go_rfc9120--a3c3f71d.png",
+      "dom_path": "dom/go_rfc9120--a3c3f71d.html"
+    },
+    {
+      "route": "/go_rfc9140--a4b29239",
+      "screenshot_path": "screenshots/go_rfc9140--a4b29239.png",
+      "dom_path": "dom/go_rfc9140--a4b29239.html"
+    },
+    {
+      "route": "/go_rfc9462--87474611",
+      "screenshot_path": "screenshots/go_rfc9462--87474611.png",
+      "dom_path": "dom/go_rfc9462--87474611.html"
+    },
+    {
+      "route": "/go_rfc9665--86533b30",
+      "screenshot_path": "screenshots/go_rfc9665--86533b30.png",
+      "dom_path": "dom/go_rfc9665--86533b30.html"
+    },
+    {
+      "route": "/help_abuse-answers--cf6bccf9",
+      "screenshot_path": "screenshots/help_abuse-answers--cf6bccf9.png",
+      "dom_path": "dom/help_abuse-answers--cf6bccf9.html"
+    },
+    {
+      "route": "/help_idn-repository-procedure--a4f54ffe",
+      "screenshot_path": "screenshots/help_idn-repository-procedure--a4f54ffe.png",
+      "dom_path": "dom/help_idn-repository-procedure--a4f54ffe.html"
+    },
+    {
+      "route": "/news--f46b16ed",
+      "screenshot_path": "screenshots/news--f46b16ed.png",
+      "dom_path": "dom/news--f46b16ed.html"
+    },
+    {
+      "route": "/numbers_allocations_afrinic_asn--fd076ac3",
+      "screenshot_path": "screenshots/numbers_allocations_afrinic_asn--fd076ac3.png",
+      "dom_path": "dom/numbers_allocations_afrinic_asn--fd076ac3.html"
+    },
+    {
+      "route": "/numbers_allocations_afrinic_ipv6--0fc5ada7",
+      "screenshot_path": "screenshots/numbers_allocations_afrinic_ipv6--0fc5ada7.png",
+      "dom_path": "dom/numbers_allocations_afrinic_ipv6--0fc5ada7.html"
+    },
+    {
+      "route": "/numbers_allocations_apnic_asn--2a8d0422",
+      "screenshot_path": "screenshots/numbers_allocations_apnic_asn--2a8d0422.png",
+      "dom_path": "dom/numbers_allocations_apnic_asn--2a8d0422.html"
+    },
+    {
+      "route": "/numbers_allocations_apnic_ipv6--5ce2c504",
+      "screenshot_path": "screenshots/numbers_allocations_apnic_ipv6--5ce2c504.png",
+      "dom_path": "dom/numbers_allocations_apnic_ipv6--5ce2c504.html"
+    },
+    {
+      "route": "/numbers_allocations_arin_asn--2ce924da",
+      "screenshot_path": "screenshots/numbers_allocations_arin_asn--2ce924da.png",
+      "dom_path": "dom/numbers_allocations_arin_asn--2ce924da.html"
+    },
+    {
+      "route": "/numbers_allocations_arin_ipv6--debe0763",
+      "screenshot_path": "screenshots/numbers_allocations_arin_ipv6--debe0763.png",
+      "dom_path": "dom/numbers_allocations_arin_ipv6--debe0763.html"
+    },
+    {
+      "route": "/numbers_allocations_lacnic_asn--a2ea6c9c",
+      "screenshot_path": "screenshots/numbers_allocations_lacnic_asn--a2ea6c9c.png",
+      "dom_path": "dom/numbers_allocations_lacnic_asn--a2ea6c9c.html"
+    },
+    {
+      "route": "/numbers_allocations_lacnic_ipv6--aee6e961",
+      "screenshot_path": "screenshots/numbers_allocations_lacnic_ipv6--aee6e961.png",
+      "dom_path": "dom/numbers_allocations_lacnic_ipv6--aee6e961.html"
+    },
+    {
+      "route": "/numbers_allocations_ripencc_asn--7a429303",
+      "screenshot_path": "screenshots/numbers_allocations_ripencc_asn--7a429303.png",
+      "dom_path": "dom/numbers_allocations_ripencc_asn--7a429303.html"
+    },
+    {
+      "route": "/numbers_allocations_ripencc_ipv6--5811e3cd",
+      "screenshot_path": "screenshots/numbers_allocations_ripencc_ipv6--5811e3cd.png",
+      "dom_path": "dom/numbers_allocations_ripencc_ipv6--5811e3cd.html"
+    },
+    {
+      "route": "/numbers_allocations--7d28c24f",
+      "screenshot_path": "screenshots/numbers_allocations--7d28c24f.png",
+      "dom_path": "dom/numbers_allocations--7d28c24f.html"
+    },
+    {
+      "route": "/numbers--83d15e8a",
+      "screenshot_path": "screenshots/numbers--83d15e8a.png",
+      "dom_path": "dom/numbers--83d15e8a.html"
+    },
+    {
+      "route": "/performance--11e44378",
+      "screenshot_path": "screenshots/performance--11e44378.png",
+      "dom_path": "dom/performance--11e44378.html"
+    },
+    {
+      "route": "/protocols_apply--1cc85545",
+      "screenshot_path": "screenshots/protocols_apply--1cc85545.png",
+      "dom_path": "dom/protocols_apply--1cc85545.html"
+    },
+    {
+      "route": "/protocols--7416be44",
+      "screenshot_path": "screenshots/protocols--7416be44.png",
+      "dom_path": "dom/protocols--7416be44.html"
+    },
+    {
+      "route": "/",
+      "screenshot_path": "screenshots/root.png",
+      "dom_path": "dom/root.html"
+    },
+    {
+      "route": "/time-zones--f05d71ee",
+      "screenshot_path": "screenshots/time-zones--f05d71ee.png",
+      "dom_path": "dom/time-zones--f05d71ee.html"
+    }
+  ],
+  "style_fingerprint_ref": "style_fingerprint.json",
+  "baseline_metrics_ref": "baseline_metrics.json"
+}

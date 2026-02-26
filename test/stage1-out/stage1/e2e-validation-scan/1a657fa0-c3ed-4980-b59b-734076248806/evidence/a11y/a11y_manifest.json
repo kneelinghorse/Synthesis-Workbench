@@ -1,0 +1,23 @@
+{
+  "kind": "a11y_evidence_manifest",
+  "version": "1.0.0",
+  "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+  "captured_at": "2026-01-22T19:25:37.441Z",
+  "pages": [
+    {
+      "route": "/",
+      "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "axe_results_path": "evidence/a11y/e2e-fixture.json",
+      "violations": {
+        "total": 1,
+        "by_severity": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        }
+      }
+    }
+  ]
+}

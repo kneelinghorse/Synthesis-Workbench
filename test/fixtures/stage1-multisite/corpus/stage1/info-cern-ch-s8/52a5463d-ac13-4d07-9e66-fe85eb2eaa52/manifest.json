@@ -1,0 +1,69 @@
+{
+  "run_id": "52a5463d-ac13-4d07-9e66-fe85eb2eaa52",
+  "mode": "surface",
+  "targets": [
+    {
+      "name": "info-cern-ch-s8",
+      "url": "https://info.cern.ch/"
+    }
+  ],
+  "project_id": "stage1-info.cern.ch-2026-02-15",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-v1-https://info.cern.ch/-2-/",
+      "status": "ok",
+      "ms": 1326
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-v1-https://info.cern.ch/",
+      "status": "ok",
+      "ms": 221
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://info.cern.ch/",
+      "status": "ok",
+      "ms": 4
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "discovered": [
+        "/"
+      ]
+    },
+    "web_crawl": {
+      "seeded_routes": [
+        "/"
+      ],
+      "max_depth": 2,
+      "discovered_routes": [
+        "/"
+      ],
+      "evidence": {
+        "crawl_manifest_path": "evidence/web_crawl/crawl.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/info-cern-ch-s8/52a5463d-ac13-4d07-9e66-fe85eb2eaa52/evidence",
+    "artifacts_dir": "/Users/systemsystems/portfolio/Design-Tools/Synthesis Workbench/test/fixtures/stage1-multisite/raw/stage1/info-cern-ch-s8/52a5463d-ac13-4d07-9e66-fe85eb2eaa52/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-02-15T01:43:58.252Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

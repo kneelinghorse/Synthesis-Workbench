@@ -1,0 +1,473 @@
+{
+  "kind": "style_fingerprint",
+  "version": "1.0.0",
+  "generated_at": "2026-02-15T01:45:48.623Z",
+  "sample_counts": {
+    "pages": 84,
+    "elements": 8379
+  },
+  "type_scale": {
+    "font_families": [
+      {
+        "value": "Times",
+        "count": 4790
+      },
+      {
+        "value": "Inter",
+        "count": 1683
+      },
+      {
+        "value": "Noto Sans Mono",
+        "count": 1150
+      },
+      {
+        "value": "monospace",
+        "count": 735
+      },
+      {
+        "value": "Arial",
+        "count": 9
+      },
+      {
+        "value": "system-ui",
+        "count": 9
+      },
+      {
+        "value": "arial",
+        "count": 3
+      }
+    ],
+    "font_sizes": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 3,
+        "token": true
+      },
+      {
+        "px": 14,
+        "min": 12,
+        "max": 14,
+        "count": 2247,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 5784,
+        "token": true
+      },
+      {
+        "px": 17.5,
+        "min": 17.5,
+        "max": 17.5,
+        "count": 16,
+        "token": true
+      },
+      {
+        "px": 18.72,
+        "min": 18.72,
+        "max": 18.72,
+        "count": 32,
+        "token": true
+      },
+      {
+        "px": 20,
+        "min": 20,
+        "max": 20,
+        "count": 16,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 227,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 53,
+        "token": true
+      },
+      {
+        "px": 40,
+        "min": 40,
+        "max": 40,
+        "count": 1,
+        "token": false
+      }
+    ],
+    "line_heights": [
+      {
+        "px": 12,
+        "min": 12,
+        "max": 12,
+        "count": 16,
+        "token": true
+      },
+      {
+        "px": 21,
+        "min": 17.5,
+        "max": 22,
+        "count": 2673,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 153,
+        "token": true
+      },
+      {
+        "px": 27,
+        "min": 27,
+        "max": 27,
+        "count": 1,
+        "token": false
+      },
+      {
+        "px": 30,
+        "min": 30,
+        "max": 30,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 50,
+        "min": 50,
+        "max": 50,
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "spacing_scale": {
+    "padding": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 1,
+        "count": 30676,
+        "token": true
+      },
+      {
+        "px": 4,
+        "min": 4,
+        "max": 4.2,
+        "count": 1310,
+        "token": true
+      },
+      {
+        "px": 6,
+        "min": 6,
+        "max": 6,
+        "count": 14,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 7.8,
+        "max": 8,
+        "count": 1295,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 158,
+        "token": true
+      },
+      {
+        "px": 19.2,
+        "min": 19.2,
+        "max": 19.2,
+        "count": 12,
+        "token": true
+      },
+      {
+        "px": 27,
+        "min": 27,
+        "max": 27,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 28.8,
+        "min": 28.8,
+        "max": 28.8,
+        "count": 19,
+        "token": true
+      },
+      {
+        "px": 36,
+        "min": 36,
+        "max": 36,
+        "count": 30,
+        "token": true
+      }
+    ],
+    "margin": [
+      {
+        "px": -10,
+        "min": -10,
+        "max": -9.6,
+        "count": 97,
+        "token": true
+      },
+      {
+        "px": 0,
+        "min": -1,
+        "max": 0,
+        "count": 31068,
+        "token": true
+      },
+      {
+        "px": 2,
+        "min": 2,
+        "max": 2,
+        "count": 1,
+        "token": false
+      },
+      {
+        "px": 4,
+        "min": 4,
+        "max": 4,
+        "count": 208,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 468,
+        "token": true
+      },
+      {
+        "px": 9.6,
+        "min": 9.6,
+        "max": 9.6,
+        "count": 4,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 537,
+        "token": true
+      },
+      {
+        "px": 18.72,
+        "min": 18.72,
+        "max": 18.72,
+        "count": 46,
+        "token": true
+      },
+      {
+        "px": 20.8,
+        "min": 19.92,
+        "max": 21.44,
+        "count": 968,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 80,
+        "token": true
+      },
+      {
+        "px": 28.8,
+        "min": 28.8,
+        "max": 28.8,
+        "count": 31,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 41.6,
+        "min": 41.6,
+        "max": 41.6,
+        "count": 6,
+        "token": true
+      }
+    ]
+  },
+  "colors": {
+    "text": [
+      {
+        "value": "#000000",
+        "count": 3505,
+        "token": true
+      },
+      {
+        "value": "#0000ee",
+        "count": 2250,
+        "token": true
+      },
+      {
+        "value": "#212529",
+        "count": 1552,
+        "token": true
+      },
+      {
+        "value": "#0d6efd",
+        "count": 772,
+        "token": true
+      },
+      {
+        "value": "#ffffff",
+        "count": 192,
+        "token": true
+      },
+      {
+        "value": "#000000a6",
+        "count": 32,
+        "token": true
+      },
+      {
+        "value": "#6c757d",
+        "count": 32,
+        "token": true
+      },
+      {
+        "value": "#198754",
+        "count": 18,
+        "token": true
+      },
+      {
+        "value": "#101010",
+        "count": 16,
+        "token": true
+      },
+      {
+        "value": "#313131",
+        "count": 7,
+        "token": true
+      },
+      {
+        "value": "#444746",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#a1b9ed",
+        "count": 1,
+        "token": false
+      }
+    ],
+    "background": [
+      {
+        "value": "#00000000",
+        "count": 7889,
+        "token": true
+      },
+      {
+        "value": "#ffffff",
+        "count": 233,
+        "token": true
+      },
+      {
+        "value": "#0d6efd",
+        "count": 185,
+        "token": true
+      },
+      {
+        "value": "#ffc107",
+        "count": 33,
+        "token": true
+      },
+      {
+        "value": "#fcfcfd",
+        "count": 16,
+        "token": true
+      },
+      {
+        "value": "#6ea8fe",
+        "count": 8,
+        "token": true
+      },
+      {
+        "value": "#efefef",
+        "count": 6,
+        "token": true
+      },
+      {
+        "value": "#d63384",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "#fd7e14",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#653208",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#a6e9d5",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#cecece",
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "radii": [
+    {
+      "px": 0,
+      "min": 0,
+      "max": 0,
+      "count": 31672,
+      "token": true
+    },
+    {
+      "px": 2,
+      "min": 2,
+      "max": 2,
+      "count": 4,
+      "token": true
+    },
+    {
+      "px": 4,
+      "min": 4,
+      "max": 4,
+      "count": 1616,
+      "token": true
+    },
+    {
+      "px": 6,
+      "min": 6,
+      "max": 6,
+      "count": 160,
+      "token": true
+    },
+    {
+      "px": 800,
+      "min": 800,
+      "max": 800,
+      "count": 64,
+      "token": true
+    }
+  ]
+}

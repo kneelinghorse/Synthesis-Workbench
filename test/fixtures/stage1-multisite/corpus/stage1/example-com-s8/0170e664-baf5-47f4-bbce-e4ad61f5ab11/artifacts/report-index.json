@@ -1,0 +1,47 @@
+{
+  "kind": "report_index",
+  "version": "1.1.0",
+  "run_id": "0170e664-baf5-47f4-bbce-e4ad61f5ab11",
+  "generated_at": "2026-02-15T01:42:45.412Z",
+  "artifacts": [
+    {
+      "type": "baseline_metrics",
+      "path": "baseline_metrics.json",
+      "description": "Baseline UX metrics derived from computed styles.",
+      "metadata": {
+        "bytes": 1372,
+        "modified_at": "2026-02-15T01:42:45.411Z"
+      }
+    },
+    {
+      "type": "report_index",
+      "path": "report-index.json",
+      "description": "Index of artifacts produced in this run."
+    },
+    {
+      "type": "style_fingerprint",
+      "path": "style_fingerprint.json",
+      "description": "Design token fingerprint extracted from UI styles.",
+      "metadata": {
+        "bytes": 1743,
+        "modified_at": "2026-02-15T01:42:45.411Z"
+      }
+    },
+    {
+      "type": "surface_snapshot",
+      "path": "surface_snapshot.json",
+      "description": "Surface snapshot capturing DOM and visual context.",
+      "metadata": {
+        "bytes": 360,
+        "modified_at": "2026-02-15T01:42:45.412Z"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "example-com-s8",
+      "name": "example-com-s8",
+      "artifacts": []
+    }
+  ]
+}

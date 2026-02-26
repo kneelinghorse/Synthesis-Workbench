@@ -1,0 +1,43 @@
+{
+  "kind": "ia_outline",
+  "version": "1.0.0",
+  "generated_at": "2026-02-15T01:57:35.905Z",
+  "url": "https://example.com/",
+  "routes": {
+    "discovered": [
+      "/"
+    ]
+  },
+  "taxonomy": {
+    "by_prefix": [
+      {
+        "prefix": "/",
+        "routes": [
+          "/"
+        ]
+      }
+    ]
+  },
+  "navigation": {
+    "items": []
+  },
+  "page_types": [
+    {
+      "type": "home",
+      "routes": [
+        "/"
+      ],
+      "confidence": 0.65
+    }
+  ],
+  "assignments": [
+    {
+      "route": "/",
+      "type": "home",
+      "confidence": 0.65
+    }
+  ],
+  "evidence": {
+    "ia_manifest_path": "evidence/ia/ia_manifest.json"
+  }
+}

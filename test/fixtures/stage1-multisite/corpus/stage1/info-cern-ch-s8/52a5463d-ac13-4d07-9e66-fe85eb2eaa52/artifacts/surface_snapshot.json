@@ -1,0 +1,18 @@
+{
+  "kind": "surface_snapshot",
+  "target": {
+    "url": "https://info.cern.ch/",
+    "seed_routes": [
+      "/"
+    ]
+  },
+  "pages": [
+    {
+      "route": "/",
+      "dom_path": "dom/root.html",
+      "screenshot_path": "screenshots/root.png"
+    }
+  ],
+  "style_fingerprint_ref": "style_fingerprint.json",
+  "baseline_metrics_ref": "baseline_metrics.json"
+}

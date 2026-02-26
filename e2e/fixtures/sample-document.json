@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "title": "Playwright Smoke Sample"
+  },
+  "root": {
+    "nodeType": "layout",
+    "layout": {
+      "type": "stack",
+      "gap": 16
+    },
+    "children": [
+      {
+        "nodeType": "component",
+        "id": "sample-heading",
+        "ref": "oods:Heading",
+        "props": {
+          "text": "Smoke Test Heading"
+        }
+      },
+      {
+        "nodeType": "component",
+        "id": "sample-text",
+        "ref": "oods:Text",
+        "props": {
+          "content": "Smoke test sample document payload."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "ia_evidence_manifest",
+  "version": "1.0.0",
+  "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+  "captured_at": "2026-01-22T19:25:38.871Z",
+  "pages": [
+    {
+      "route": "/",
+      "url": "file:///Users/systemsystems/portfolio/Design-Tools/Synthesis%20Workbench/test/e2e-fixture.html",
+      "dom_path": "dom/e2e-fixture.html",
+      "route_pattern": "/",
+      "template_signature": "form:0;table:0;list:0;inputs:1",
+      "nav_links": []
+    }
+  ]
+}

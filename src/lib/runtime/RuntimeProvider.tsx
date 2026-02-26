@@ -110,7 +110,7 @@ const RuntimeContent = ({ children }: PropsWithChildren) => {
     [researchPrompt]
   );
 
-  const runtime = useLocalRuntime(adapter, { initialMessages });
+  const runtime = useLocalRuntime(adapter, { initialMessages, maxSteps: 8 });
 
   return (
     <RuntimeErrorContext.Provider value={runtimeError}>

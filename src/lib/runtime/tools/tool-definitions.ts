@@ -2,6 +2,7 @@ import { COMPONENT_CATALOG_TOOL_NAME } from "@/lib/runtime/tools/component-catal
 import { PATCH_NODE_TOOL_NAME, SET_DATA_CONTEXT_TOOL_NAME, SET_DOCUMENT_TOOL_NAME } from "@/lib/runtime/tools/document-tools";
 import { EXPORT_DESIGN_TOOL_NAME } from "@/lib/runtime/tools/export-tools";
 import { RENDER_COMPONENT_TOOL_NAME } from "@/lib/runtime/tools/oods-tools";
+import { LOAD_BUNDLE_TOOL_NAME } from "@/lib/runtime/tools/stage1-tools";
 import { TOKEN_ADJUSTMENT_TOOL_NAME } from "@/lib/runtime/tools/token-tools";
 import { VALIDATE_SCHEMA_TOOL_NAME } from "@/lib/runtime/tools/validate-tools";
 
@@ -198,6 +199,37 @@ export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
         source: {
           type: "string",
           description: "Optional preferred source (foundry or fallback).",
+        },
+      },
+      required: ["requestId"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: LOAD_BUNDLE_TOOL_NAME,
+    description:
+      "Load a Stage1 discovery bundle into the Workbench. Populates component inventory and token suggestions from a prior Stage1 analysis run.",
+    input_schema: {
+      type: "object",
+      properties: {
+        requestId: REQUEST_ID_SCHEMA,
+        title: OPTIONAL_TEXT_SCHEMA,
+        prompt: OPTIONAL_TEXT_SCHEMA,
+        projectSlug: {
+          type: "string",
+          description:
+            "Project slug to scope bundle lookup. When omitted, the active project is used.",
+        },
+        bundleJson: {
+          type: "string",
+          description:
+            "Raw JSON string of a Stage1 bundle payload. Mutually exclusive with bundle.",
+        },
+        bundle: {
+          type: "object",
+          additionalProperties: true,
+          description:
+            "Parsed Stage1 bundle payload object. Mutually exclusive with bundleJson.",
         },
       },
       required: ["requestId"],

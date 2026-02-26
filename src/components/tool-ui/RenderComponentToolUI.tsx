@@ -1,7 +1,7 @@
 "use client";
 
 import { makeAssistantToolUI, type ToolCallMessagePartProps } from "@assistant-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   ToolOutputCard,
@@ -18,6 +18,7 @@ import {
 import { PreviewPane } from "@/components/workbench/PreviewPane";
 import {
   RENDER_COMPONENT_TOOL_NAME,
+  renderComponent,
   type RenderComponentToolArgs,
   type RenderComponentToolResult,
 } from "@/lib/runtime/tools/oods-tools";
@@ -28,10 +29,12 @@ const RenderComponentToolCard = ({
   result,
   status,
   isError,
+  addResult,
 }: ToolCallMessagePartProps<
   RenderComponentToolArgs,
   RenderComponentToolResult
 >) => {
+  const execTriggered = useRef(false);
   const livePreviewHtml = usePreviewStateStore((state) => state.html);
   const [previewHtml, setPreviewHtmlState] = useState<string>("");
 
@@ -42,6 +45,28 @@ const RenderComponentToolCard = ({
   const title = args?.title ?? "Render component";
   const prompt =
     args?.prompt ?? "Render a component preview using the Foundry MCP.";
+
+  // Auto-execute on mount
+  useEffect(() => {
+    if (execTriggered.current || resolved || isError || !args?.schema) {
+      return;
+    }
+    execTriggered.current = true;
+
+    let cancelled = false;
+    const run = async () => {
+      const execResult = await renderComponent(args);
+      if (!cancelled) {
+        addResult(execResult);
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [addResult, args, isError, resolved]);
 
   useEffect(() => {
     if (result?.html) {

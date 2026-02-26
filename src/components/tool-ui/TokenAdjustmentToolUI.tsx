@@ -1,7 +1,7 @@
 "use client";
 
 import { makeAssistantToolUI, type ToolCallMessagePartProps } from "@assistant-ui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ToolOutputCard,
@@ -115,12 +115,14 @@ const TokenAdjustmentToolCard = ({
     });
   }, [annotations, entries]);
 
+  const execTriggered = useRef(false);
+
   const requestId = args?.requestId ?? "unknown";
   const title = args?.title ?? "Token adjustments";
   const prompt =
     args?.prompt ?? "Review the proposed token updates and apply them to preview.";
 
-  const applyChanges = () => {
+  const applyChanges = useCallback(() => {
     if (resolved) return;
     if (!entries.length || invalidPaths.length > 0) return;
 
@@ -131,7 +133,15 @@ const TokenAdjustmentToolCard = ({
       invalidPaths,
       resolvedAt: new Date().toISOString(),
     });
-  };
+  }, [addResult, entries.length, invalidPaths, resolved, setTokens, validChanges]);
+
+  // Auto-execute on mount for agentic loop
+  useEffect(() => {
+    if (execTriggered.current || resolved || isError) return;
+    if (!entries.length || invalidPaths.length > 0) return;
+    execTriggered.current = true;
+    applyChanges();
+  }, [applyChanges, entries.length, invalidPaths.length, isError, resolved]);
 
   const handleResetToSource = (path: string, source: TokenValueSource) => {
     void resetTokenToSource(path, source);

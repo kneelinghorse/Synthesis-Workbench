@@ -23,31 +23,62 @@ import {
 const DOCUMENT_AUTHORING_PROMPT = `
 # DOCUMENT AUTHORING (WORKBENCH)
 
-This Workbench runtime executes authoring tools via **slash commands** in the chat UI.
-Do **not** output XML like \`<function_calls>...\` — it will not execute.
-Instead, tell the user which slash command to run.
+You have native tool-calling capabilities. Use **tool_use** to drive all design operations autonomously.
+Do NOT suggest slash commands — call tools directly to create, modify, and render designs.
 
 ## Available Tools
 
 ### set_document
-Creates or replaces the active design document. The document will be automatically rendered in the Preview Pane via the composition engine.
+Creates or replaces the active design document. Automatically rendered in the Preview Pane.
+**Call this tool** when the user asks you to create or update a design.
 
-**Args:**
-- slug (string): File name for persistence (alphanumeric, hyphens, underscores)
-- document (DesignDocument): The full document JSON
-- persist (boolean): Save to YAML on disk (optional)
-
-**How to run:**
-- \`/doc <json>\` (sets the active document)
-- \`/doc template <name>\` (applies a built-in template and persists it)
+Required: requestId (string), document (DesignDocument JSON)
+Optional: slug (string), projectSlug (string), persist (boolean), data (object)
 
 ### patch_node
-Modifies a specific ComponentNode by ID in the active document. Use this for targeted edits without rebuilding the entire document.
+Modifies a specific ComponentNode by ID in the active document. Use for targeted edits.
 
-**Args:**
-- nodeId (string): The ID of the ComponentNode to modify
-- props (object): Props to merge into the node
-- ref (string): New component ref (e.g. "oods:Button")
+Required: requestId (string), nodeId (string)
+Optional: props (object), ref (string, e.g. "oods:Button")
+
+### render_component
+Sets a single-component document from a schema and triggers preview rendering.
+
+Required: requestId (string), schema (object)
+Optional: validate (boolean)
+
+### validate_schema
+Validates a component schema against Foundry contracts.
+
+Required: requestId (string), schema (object)
+
+### export_design
+Exports the active design in html/json/yaml/spec/scss formats.
+
+Required: requestId (string), format (string)
+Optional: slug (string)
+
+### update_token_state
+Applies token path updates to the active preview state.
+
+Required: requestId (string), changes (object — map of dot-paths to values)
+
+### component_catalog
+Lists available components from the Foundry/fallback catalog.
+
+Required: requestId (string)
+
+### set_data_context
+Sets or merges runtime data context for $data bindings.
+
+Required: requestId (string), data (object)
+Optional: merge (boolean)
+
+### load_bundle
+Loads a Stage1 discovery bundle into the Workbench. Populates the component inventory and token suggestions from a prior Stage1 analysis run. Call this when the user wants to import discovery data or when no Stage1 context is present yet.
+
+Required: requestId (string)
+Optional: projectSlug (string), bundleJson (string), bundle (object)
 
 ## Document Model
 
@@ -80,14 +111,14 @@ For Workbench document composition, use only this S44 set:
 \`${WORKBENCH_S44_COMPONENTS.map((name) => `oods:${name}`).join(", ")}\`
 When catalog data is available, it will include traits, required props, and variants.
 
-## Guidelines
+## Workflow Guidelines
 - Every ComponentNode needs a unique "id" for AI-patching
 - Use LayoutNodes to arrange components (stack for vertical, grid for columns)
 - Nesting is supported: stack inside grid, grid inside stack, etc.
-- When the user describes a layout, either:
-  - Tell them to run \`/doc template <name>\`, or
-  - Provide the JSON and tell them to run \`/doc <json>\`.
-- For targeted edits to existing components, provide an updated document JSON and tell them to run \`/doc <json>\` again.
+- When the user describes a layout, call set_document with the full DesignDocument JSON
+- For targeted edits, call patch_node with the nodeId and changes
+- For single-component previews, call render_component with the component schema
+- Chain tool calls: e.g. set_document then render_component for a full workflow
 `;
 
 type ResearchContextValue = {

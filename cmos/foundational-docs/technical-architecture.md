@@ -118,6 +118,44 @@ Canonical layout for a design project workspace:
 - **Foundry MCP**: Server connection config (local or remote).
 - **Stage1**: CLI or WebSocket bridge config for run + progress events.
 
-## 7. References
+## 7. Development Startup
+
+### All-in-one
+```bash
+pnpm dev:services
+```
+Starts Next.js (:3000), Foundry bridge (:4466), and Stage1 bridge (:3200) in parallel with colored log prefixes. Press Ctrl+C to stop all.
+
+### Manual startup (each in a separate terminal)
+```bash
+# 1. Next.js dev server
+pnpm dev                                              # → http://localhost:3000
+
+# 2. Foundry MCP bridge
+cd ../OODS-Foundry-mcp/packages/mcp-bridge && pnpm dev  # → http://127.0.0.1:4466
+
+# 3. Stage1 MCP bridge
+cd ../Stage1/packages/mcp-bridge && pnpm dev             # → http://127.0.0.1:3200
+```
+
+### Health verification
+- **Foundry**: `curl -s -X POST http://127.0.0.1:4466/run -H "Content-Type: application/json" -d '{"tool":"repl.validate","input":{"mode":"full","schema":{"version":"2025.11","screens":[{"id":"test","component":"Button","props":{"label":"Test"}}]}}}'` — should return `{"ok":true,...}`
+- **Stage1**: `curl http://127.0.0.1:3200/health` — should return 200
+- **Preview panel**: FoundryStatusChip shows "Live Render" (green) when bridge is connected
+
+### Environment variables
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `OODS_FOUNDRY_MCP_URL` | `http://127.0.0.1:4466/run` | Foundry bridge endpoint |
+| `NEXT_PUBLIC_USE_TEST_ADAPTER` | — | Force test adapter (skip LLM) |
+| `ANTHROPIC_API_KEY` | — | Anthropic API key for Claude |
+| `OLLAMA_BASE_URL` / `OLLAMA_MODEL` | — | Ollama local LLM config |
+
+### Troubleshooting
+- **Foundry bridge not responding**: Kill any stale process on :4466, then restart with `pnpm dev` from the bridge directory. Schema is not hot-reloaded; restart required after registry changes.
+- **Grid component not in Foundry registry**: Grid layouts are bridge-mapped to Stack with `layoutType: "grid"` props. This is handled automatically.
+- **Preview shows "Offline (Static)"**: Foundry bridge is not reachable. Check that :4466 is running and `OODS_FOUNDRY_MCP_URL` is set correctly.
+
+## 8. References
 - TraceLab: Tool Interface Contract (`1305bad8-6820-41d2-8795-e08d07e1db07`)
 - TraceLab: Governing Architecture (`39da94b0-cc86-40c6-ada1-d33837645d8f`)

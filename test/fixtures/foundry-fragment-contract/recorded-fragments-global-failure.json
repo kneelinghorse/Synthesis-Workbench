@@ -1,0 +1,27 @@
+{
+  "name": "recorded-fragments-global-failure",
+  "description": "Recorded payload where validation fails before fragment isolation can occur.",
+  "payload": {
+    "status": "error",
+    "mode": "full",
+    "dslVersion": "2025.11",
+    "registryVersion": "2026-02-24",
+    "output": {
+      "format": "fragments",
+      "strict": false
+    },
+    "errors": [
+      {
+        "code": "UNKNOWN_COMPONENT",
+        "message": "Unknown component 'UnknownComponent'",
+        "path": "/screens/0/children/1/component",
+        "component": "UnknownComponent"
+      }
+    ],
+    "warnings": []
+  },
+  "expectation": {
+    "acceptedIsolationModes": ["global-failure"],
+    "expectedStrict": false
+  }
+}

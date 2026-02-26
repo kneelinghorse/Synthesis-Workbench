@@ -1,0 +1,40 @@
+{
+  "name": "recorded-fragments-partial-isolated",
+  "description": "Recorded strict=false payload showing fragment-scoped partial failure.",
+  "payload": {
+    "status": "ok",
+    "mode": "full",
+    "dslVersion": "2025.11",
+    "registryVersion": "2026-02-24",
+    "output": {
+      "format": "fragments",
+      "strict": false
+    },
+    "fragments": {
+      "dash-banner": {
+        "nodeId": "dash-banner",
+        "component": "Banner",
+        "html": "<section data-oods-component=\"Banner\">Overview</section>",
+        "cssRefs": ["css.base", "cmp.banner.base"]
+      }
+    },
+    "css": {
+      "css.base": "[data-oods-component]{box-sizing:border-box;}",
+      "cmp.banner.base": "[data-oods-component=\"Banner\"]{padding:16px;}"
+    },
+    "errors": [
+      {
+        "code": "FRAGMENT_RENDER_FAILED",
+        "message": "Fragment render failed for node 'dash-tabs': render failed",
+        "path": "/fragments/dash-tabs",
+        "component": "Tabs"
+      }
+    ],
+    "warnings": []
+  },
+  "expectation": {
+    "expectedNodeIds": ["dash-banner", "dash-tabs"],
+    "acceptedIsolationModes": ["isolated"],
+    "expectedStrict": false
+  }
+}

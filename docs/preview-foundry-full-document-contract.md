@@ -1,7 +1,7 @@
 # Preview Foundry Full-Document Contract
 
 ## Scope
-This document defines the Workbench live preview contract with Foundry for sprint-12 reset work.
+This document defines the Workbench live preview contract with Foundry across sprint-12 and sprint-13 migration work.
 
 ## Runtime Path
 - Hook entry: `src/hooks/useCompositionPreview.ts`
@@ -53,14 +53,16 @@ For every preview render cycle, Workbench sends exactly one Foundry render reque
   - Timeout
 - Non-availability errors (tool/validation failures) remain render errors and do not trigger static fallback.
 
-## Renderer Boundary (Sprint-12 / Sprint-13 Bridge)
+## Renderer Boundary (Sprint-13)
 - `PreviewRenderer` interface is the only live-preview render contract consumed by `useCompositionPreview`.
-- Active adapter: `full-document` (single Foundry render call per cycle).
-- Isolated adapter: `composition` (legacy per-component composition path behind the same interface).
-- Sprint-13 fragment migration plan:
-  - Add a `fragments` adapter behind `PreviewRenderer`.
-  - Switch adapter selection with config/feature flag.
-  - Keep `full-document` adapter as rollback path until fragment parity is proven.
+- Adapters:
+  - `fragments`: single render call with `output.format="fragments"`, pre-validated via `repl.validate`, then locally composed into layout HTML.
+  - `full-document`: rollback-safe fallback path.
+  - `composition`: compatibility alias that now routes to the `fragments` adapter (legacy per-component path deprecated).
+- Feature flag / selection:
+  - `NEXT_PUBLIC_PREVIEW_RENDERER_MODE` or `PREVIEW_RENDERER_MODE`
+  - Supported values: `fragments`, `composition`, `full-document`
+  - `composition` and `fragments` now share fragment-adapter behavior.
 
 ## Verification
 - Unit tests: `src/lib/engine/foundry-full-document.test.ts`

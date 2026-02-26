@@ -182,6 +182,106 @@ describe("foundry MCP client", () => {
     });
   });
 
+  it("forwards fragment output controls and preserves raw fragment payloads", async () => {
+    const fetcher = createMockFetch({
+      jsonPayload: {
+        ok: true,
+        result: {
+          status: "ok",
+          mode: "full",
+          output: { format: "fragments", strict: false },
+          fragments: {
+            "node-1": {
+              nodeId: "node-1",
+              component: "Text",
+              html: "<p data-oods-component=\"Text\">Alpha</p>",
+              cssRefs: ["css.base"],
+            },
+          },
+          css: {
+            "css.base": "[data-oods-component]{box-sizing:border-box;}",
+          },
+          errors: [],
+          warnings: [],
+        },
+      },
+    });
+    const fetchSpy = fetcher as unknown as ReturnType<typeof vi.fn>;
+
+    const client = createFoundryMcpClient({
+      baseUrl: "http://foundry.test/run",
+      fetcher,
+    });
+
+    const output = await client.render({
+      mode: "full",
+      output: {
+        format: "fragments",
+        strict: false,
+        includeCss: true,
+      },
+      schema: {
+        version: "2025.11",
+        screens: [
+          {
+            id: "screen-1",
+            component: "Stack",
+            children: [
+              {
+                id: "node-1",
+                component: "Text",
+                props: { text: "Alpha" },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(output.html).toContain("data-foundry-render=\"summary\"");
+    expect(output.raw).toMatchObject({
+      output: { format: "fragments", strict: false },
+      fragments: {
+        "node-1": {
+          nodeId: "node-1",
+          component: "Text",
+        },
+      },
+    });
+
+    const requestBody = JSON.parse(
+      String(fetchSpy.mock.calls[0]?.[1]?.body ?? "{}")
+    ) as Record<string, unknown>;
+    expect(requestBody).toEqual({
+      tool: "repl.render",
+      input: {
+        mode: "full",
+        apply: true,
+        output: {
+          format: "fragments",
+          strict: false,
+          includeCss: true,
+        },
+        schema: {
+          version: "2025.11",
+          screens: [
+            {
+              id: "screen-1",
+              component: "Stack",
+              children: [
+                {
+                  id: "node-1",
+                  component: "Text",
+                  props: { text: "Alpha" },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+  });
+
   it("parses apply-mode HTML responses from Foundry bridge", async () => {
     const html = "<!DOCTYPE html><html><body><main data-oods-component=\"Button\">OK</main></body></html>";
     const fetcher = createMockFetch({

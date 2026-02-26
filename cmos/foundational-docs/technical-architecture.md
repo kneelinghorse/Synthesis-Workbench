@@ -25,11 +25,17 @@ Synthesis Workbench is a **web-first** design orchestration tool enabling "Agent
 - **Synchronization**: `postMessage` bridge between Workbench (Parent) and Preview (Child).
 - **Updates**:
     - **TokenState**: CSS variables injected dynamically.
-    - **Render Contract (Sprint-12 reset)**:
-        - `useCompositionPreview` consumes a single `PreviewRenderer` abstraction (adapter boundary for migration).
-        - The preview pipeline builds one full-document Foundry schema per update (`version` + `screens[]`).
-        - Workbench sends a single `repl.render` call per preview cycle (`mode: "full"`, `apply: true` via client defaults).
-        - Returned HTML is injected directly into preview state (no per-component fragment composition in live mode).
+    - **Render Contract (Sprint-13 update)**:
+        - `useCompositionPreview` consumes a single `PreviewRenderer` abstraction with three adapters:
+          - `full-document` (rollback-safe path)
+          - `fragments` (active fragment adapter)
+          - `composition` (deprecated compatibility alias that now routes to fragment adapter)
+        - Feature flag: `NEXT_PUBLIC_PREVIEW_RENDERER_MODE` / `PREVIEW_RENDERER_MODE`.
+        - Fragment adapter flow:
+          - Pre-validates schema with `repl.validate` before requesting fragments.
+          - Sends one Foundry render call with `output.format="fragments"` (`strict=false`, `includeCss=true`).
+          - Composes returned per-node fragments into Workbench layout HTML and injects scoped Foundry CSS refs.
+          - Falls back to full-document adapter when fragment contract checks fail.
         - Static renderer fallback is used only when Foundry is unavailable (missing client/base URL, network/connectivity, timeout).
 
 ### 2.4 Integration Layer (Contracts)

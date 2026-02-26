@@ -1,0 +1,41 @@
+{
+  "name": "recorded-fragments-success",
+  "description": "Recorded payload with deterministic fragment keys and scoped CSS refs.",
+  "payload": {
+    "status": "ok",
+    "mode": "full",
+    "dslVersion": "2025.11",
+    "registryVersion": "2026-02-24",
+    "output": {
+      "format": "fragments",
+      "strict": false
+    },
+    "fragments": {
+      "dash-banner": {
+        "nodeId": "dash-banner",
+        "component": "Banner",
+        "html": "<section data-oods-component=\"Banner\">Overview</section>",
+        "cssRefs": ["css.base", "css.tokens", "cmp.banner.base"]
+      },
+      "dash-tabs": {
+        "nodeId": "dash-tabs",
+        "component": "Tabs",
+        "html": "<div data-oods-component=\"Tabs\">Overview</div>",
+        "cssRefs": ["css.base", "css.tokens", "cmp.tabs.base"]
+      }
+    },
+    "css": {
+      "css.base": "[data-oods-component]{box-sizing:border-box;}",
+      "css.tokens": ":root{--token-space-2:8px;}",
+      "cmp.banner.base": "[data-oods-component=\"Banner\"]{padding:var(--token-space-2);}",
+      "cmp.tabs.base": "[data-oods-component=\"Tabs\"]{display:flex;}"
+    },
+    "errors": [],
+    "warnings": []
+  },
+  "expectation": {
+    "expectedNodeIds": ["dash-banner", "dash-tabs"],
+    "acceptedIsolationModes": ["none"],
+    "expectedStrict": false
+  }
+}

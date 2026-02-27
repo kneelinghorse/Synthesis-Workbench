@@ -237,6 +237,10 @@ export const FirstRunOnboarding = ({ className }: { className?: string }) => {
     setStepIndex(0);
   }, []);
 
+  // Health gate: Foundry must be reachable on the services step to proceed.
+  const isServicesStep = currentStep.id === "services";
+  const foundryReachable = foundryHealth.status === "healthy";
+  const servicesGatePassed = !isServicesStep || foundryReachable;
   const primaryActionLabel = isFinalStep ? "Finish walkthrough" : "Next step";
 
   return (
@@ -354,6 +358,23 @@ export const FirstRunOnboarding = ({ className }: { className?: string }) => {
                     <div className="mt-1 opacity-85">{entry.state.message}</div>
                   </div>
                 ))}
+                <div className="flex items-center gap-2 pt-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+                    onClick={() => { void runHealthCheck(); }}
+                    disabled={checkingHealth}
+                  >
+                    {checkingHealth ? "Checking..." : "Re-check services"}
+                  </Button>
+                  {!foundryReachable && !checkingHealth && (
+                    <span className="text-[11px] text-amber-300/80">
+                      Foundry must be reachable to proceed.
+                    </span>
+                  )}
+                </div>
               </div>
             ) : null}
 
@@ -412,9 +433,28 @@ export const FirstRunOnboarding = ({ className }: { className?: string }) => {
                 >
                   Back
                 </Button>
+                {isServicesStep && !servicesGatePassed && !checkingHealth && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-amber-500/30 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                    onClick={() => {
+                      setStepIndex((current) =>
+                        Math.min(ONBOARDING_STEPS.length - 1, current + 1)
+                      );
+                      setCommandFeedback(null);
+                    }}
+                  >
+                    Continue anyway
+                  </Button>
+                )}
                 <Button
                   type="button"
-                  className="bg-white text-black hover:bg-white/90"
+                  className={cn(
+                    "bg-white text-black hover:bg-white/90",
+                    !servicesGatePassed && "opacity-50"
+                  )}
+                  disabled={!servicesGatePassed}
                   onClick={() => {
                     if (isFinalStep) {
                       closeAndDismiss();

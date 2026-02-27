@@ -1,36 +1,26 @@
 # Sprint-13 Fragment Rollout and Rollback
 
-## Current Deployment Posture (2026-02-26)
-- Fragment adapter is implemented behind `PreviewRenderer`.
-- `composition` mode is now a compatibility alias to fragment rendering.
-- `full-document` mode remains available as rollback.
+## Current Deployment Posture (2026-02-27)
+- Fragment adapter is the **sole** Foundry rendering path (sprint-16 migration).
+- `composition` mode is a compatibility alias to fragment rendering.
+- `full-document` adapter was **removed** in sprint-16 (s16-m03).
 - Contract gate status: **CONDITIONAL GO** (`docs/verification/s13-fragment-adoption-gate.md`).
-- Parity status on baseline templates (`dashboard`, `form-page`, `landing-page`): **PASS** (`docs/verification/s13-fragment-parity.md`).
+- Static renderer remains as offline fallback when Foundry is unavailable or fragment contract fails.
 
 ## Mode Controls
-- Primary flag: `NEXT_PUBLIC_PREVIEW_RENDERER_MODE` (client) / `PREVIEW_RENDERER_MODE` (server).
-- Allowed values:
-  - `fragments`: uses fragment adapter.
+- Fragment mode is always used. The `NEXT_PUBLIC_PREVIEW_RENDERER_MODE` env var is no longer read.
+- Allowed modes:
+  - `fragments`: default, uses fragment adapter.
   - `composition`: deprecated alias, also uses fragment adapter.
-  - `full-document`: explicit rollback mode.
 
-## Rollout Guidance
-1. Set `NEXT_PUBLIC_PREVIEW_RENDERER_MODE=fragments` for production rollout.
-2. Verify contract gate:
+## Verification
+1. Verify contract gate:
    - `pnpm verify:foundry-fragments`
-3. Verify baseline parity:
-   - `pnpm verify:fragment-parity`
-4. Confirm no elevated preview errors in runtime logs.
+2. Confirm no elevated preview errors in runtime logs.
 
-## Rollback Procedure
-1. Change mode flag to `full-document`:
-   - `NEXT_PUBLIC_PREVIEW_RENDERER_MODE=full-document`
-2. Redeploy/restart Workbench app.
-3. Re-run verification for regression tracking:
-   - `pnpm verify:fragment-parity` (documents divergence, if any)
-4. Keep fragment harness artifacts for root-cause analysis:
-   - `docs/verification/s13-fragment-adoption-gate.md`
-   - `docs/verification/s13-fragment-parity.md`
+## Rollback Note
+Full-document rollback is no longer available. If fragment rendering fails, the static
+renderer is used as the fallback (produces `data-static-preview="true"` markers, `dry-run` status).
 
 ## Known Constraint
 - Foundry unknown-component behavior can still produce global-failure semantics.

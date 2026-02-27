@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CompositionErrorOverlay } from "@/components/workbench/CompositionErrorOverlay";
 import { DesignExportButton } from "@/components/workbench/DesignExportButton";
+import { FoundryHealthBanner } from "@/components/workbench/FoundryHealthBanner";
 import { FoundryStatusChip } from "@/components/workbench/FoundryStatusChip";
 import { PreviewPane } from "@/components/workbench/PreviewPane";
+import { useFoundryHealth } from "@/hooks/useFoundryHealth";
 import { mapFoundryTokensToWorkbenchPaths } from "@/lib/foundry/token-bridge";
 import {
   getFoundryMcpClient,
@@ -134,6 +136,8 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
 
   useCompositionPreview(client);
   const isOfflineMode = client === null;
+
+  const foundryHealth = useFoundryHealth({ intervalMs: 30_000 });
 
   useEffect(() => {
     let cancelled = false;
@@ -325,6 +329,12 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
           </div>
         </div>
       </div>
+
+      <FoundryHealthBanner
+        status={foundryHealth.status}
+        checking={foundryHealth.checking}
+        onRetry={foundryHealth.check}
+      />
 
       {themeSyncMessage ? (
         <div

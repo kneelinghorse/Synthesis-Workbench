@@ -75,45 +75,58 @@ const MULTI_COMPONENT_DOC: DesignDocument = {
   },
 };
 
-type MockRenderNode = {
-  id?: string;
-  component?: string;
+type FragmentRenderChild = {
+  id: string;
+  component: string;
   props?: Record<string, unknown>;
-  children?: MockRenderNode[];
 };
 
-type MockRenderInput = {
+type FragmentRenderInput = {
   mode?: string;
+  output?: { format?: string };
   schema?: {
-    screens?: MockRenderNode[];
+    screens?: Array<{
+      id?: string;
+      component?: string;
+      children?: FragmentRenderChild[];
+    }>;
   };
 };
 
-const findFirstText = (
-  nodes: MockRenderNode[] | undefined
-): string | null => {
-  if (!nodes) return null;
-  for (const node of nodes) {
-    const text = node.props?.text;
-    if (typeof text === "string" && text.trim().length > 0) {
-      return text;
-    }
-    const fromChildren = findFirstText(node.children);
-    if (fromChildren) {
-      return fromChildren;
-    }
-  }
-  return null;
-};
-
+/**
+ * Creates a mock FoundryMcpClient that dynamically generates fragment responses.
+ * Reads the input schema's children and returns matching fragment entries so the
+ * fragment adapter's compose step produces meaningful HTML.
+ */
 const createClient = (): FoundryMcpClient => ({
   render: vi.fn(async (schema: unknown) => {
-    const input = schema as MockRenderInput;
-    const text = findFirstText(input.schema?.screens) ?? "";
+    const input = schema as FragmentRenderInput;
+    const children = input.schema?.screens?.[0]?.children ?? [];
+
+    const fragments: Record<
+      string,
+      { nodeId: string; component: string; html: string; cssRefs: string[] }
+    > = {};
+    for (const child of children) {
+      const text = (child.props?.text ?? child.props?.label ?? child.component) as string;
+      fragments[child.id] = {
+        nodeId: child.id,
+        component: child.component,
+        html: `<div data-oods-component="${child.component}">${text}</div>`,
+        cssRefs: ["css.base"],
+      };
+    }
+
     return {
-      html: `<div>${text}</div>`,
+      html: '<div data-foundry-render="summary">Fragment summary</div>',
       warnings: [],
-      raw: schema,
+      raw: {
+        status: "ok",
+        output: { format: "fragments", strict: false },
+        fragments,
+        css: { "css.base": "[data-oods-component]{box-sizing:border-box;}" },
+        errors: [],
+      },
     } satisfies FoundryRenderOutput;
   }),
   validate: vi.fn(async () => ({ errors: [], warnings: [], valid: true, raw: null })),
@@ -165,9 +178,9 @@ describe("useCompositionPreview", () => {
 
     const renderCalls = (client.render as ReturnType<typeof vi.fn>).mock.calls;
     expect(renderCalls.length).toBeGreaterThanOrEqual(2);
-    const finalCall = renderCalls[renderCalls.length - 1]?.[0] as MockRenderInput;
-    expect(finalCall.mode).toBe("full");
-    expect(finalCall.schema?.screens?.[0]).toEqual(
+    const finalCall = renderCalls[renderCalls.length - 1]?.[0] as FragmentRenderInput;
+    expect(finalCall.output?.format).toBe("fragments");
+    expect(finalCall.schema?.screens?.[0]?.children?.[0]).toEqual(
       expect.objectContaining({
         component: "Text",
         props: expect.objectContaining({ text: "Updated title" }),
@@ -219,24 +232,18 @@ describe("useCompositionPreview", () => {
 
     const renderMock = client.render as ReturnType<typeof vi.fn>;
     expect(renderMock).toHaveBeenCalledTimes(1);
-    const renderInput = renderMock.mock.calls[0]?.[0] as MockRenderInput;
-    expect(renderInput).toEqual(
+    const renderInput = renderMock.mock.calls[0]?.[0] as FragmentRenderInput;
+    expect(renderInput.output?.format).toBe("fragments");
+    expect(renderInput.schema?.screens?.[0]?.children?.[0]).toEqual(
       expect.objectContaining({
-        mode: "full",
-        schema: expect.objectContaining({
-          screens: expect.arrayContaining([
-            expect.objectContaining({
-              props: expect.objectContaining({
-                text: "Second render",
-              }),
-            }),
-          ]),
+        props: expect.objectContaining({
+          text: "Second render",
         }),
       }),
     );
   });
 
-  it("sends one full-document render call for multi-component documents", async () => {
+  it("sends one fragment render call for multi-component documents", async () => {
     const client = createClient();
     render(<HookHarness client={client} />);
 
@@ -248,15 +255,16 @@ describe("useCompositionPreview", () => {
       expect((client.render as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
     });
 
-    const input = (client.render as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as MockRenderInput;
-    expect(input.mode).toBe("full");
+    const input = (client.render as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as FragmentRenderInput;
+    expect(input.output?.format).toBe("fragments");
     expect(input.schema?.screens?.[0]).toEqual(
       expect.objectContaining({
         id: "screen-root",
         component: "Stack",
       }),
     );
-    expect(input.schema?.screens?.[0]?.children).toHaveLength(3);
+    // Fragment adapter flattens all component nodes (4 total: hero-title, hero-subtitle, cta-1, cta-2)
+    expect(input.schema?.screens?.[0]?.children).toHaveLength(4);
   });
 
   it("falls back to static preview rendering when Foundry client is unavailable", async () => {
@@ -332,7 +340,8 @@ describe("useCompositionPreview", () => {
     expect(usePreviewStateStore.getState().html).not.toContain('data-static-preview="true"');
   });
 
-  it("marks Foundry status as dry-run when summary HTML is returned", async () => {
+  it("falls back to static rendering when fragment contract check fails", async () => {
+    // Return a raw response without proper fragment structure
     const client: FoundryMcpClient = {
       render: vi.fn(async () => ({
         html: '<div data-foundry-render="summary">Dry-run summary</div>',
@@ -351,8 +360,10 @@ describe("useCompositionPreview", () => {
       );
     });
 
+    // Fragment contract fails → static fallback → "dry-run" status
     await waitFor(() => {
       expect(usePreviewStateStore.getState().foundryStatus).toBe("dry-run");
     });
+    expect(usePreviewStateStore.getState().html).toContain('data-static-preview="true"');
   });
 });

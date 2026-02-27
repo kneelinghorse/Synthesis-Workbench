@@ -5,17 +5,17 @@ import { useDocumentStateStore } from "@/lib/stores/document-state";
 import { usePreviewStateStore } from "@/lib/stores/preview-state";
 import { useDataContextStore } from "@/lib/stores/data-context";
 import {
+  getPreviewRenderer,
   isFoundryUnavailableError,
-} from "@/lib/engine/foundry-full-document";
-import { getPreviewRenderer } from "@/lib/engine/preview-renderer";
+} from "@/lib/engine/preview-renderer";
 import type { FoundryMcpClient } from "@/lib/mcp/foundry-client";
 import { renderStaticDocument } from "@/lib/preview/static-renderer";
 
 /**
- * Hook that bridges document state + data context → Foundry full-document render → preview state.
+ * Hook that bridges document state + data context → Foundry fragment render → preview state.
  *
  * Subscribes to both the document store (revision) and data context store (revision).
- * When either changes, builds a single full-document Foundry payload with active data context
+ * When either changes, builds a Foundry fragment payload with active data context
  * and pushes the resulting HTML to the preview state store.
  *
  * Handles:

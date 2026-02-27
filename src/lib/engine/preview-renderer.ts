@@ -7,12 +7,11 @@ import {
   mapFoundryValidationErrors,
   parseFoundryFragmentRenderOutput,
 } from "@/lib/engine/foundry-fragment-adapter";
-import { buildFoundryFullDocumentRenderInput } from "@/lib/engine/foundry-full-document";
 import type { FoundryMcpClient } from "@/lib/mcp/foundry-client";
+import { renderStaticDocument } from "@/lib/preview/static-renderer";
 import type { DesignDocument } from "@/types/document-model";
 
 export const PREVIEW_RENDERER_MODES = [
-  "full-document",
   "fragments",
   "composition",
 ] as const;
@@ -38,29 +37,6 @@ export interface PreviewRenderer {
   ) => Promise<PreviewRenderResult>;
 }
 
-const isDryRunSummaryHtml = (html: string): boolean =>
-  /data-foundry-render=(["'])summary\1/.test(html);
-
-const toLivePreviewStatus = (html: string): LivePreviewStatus =>
-  isDryRunSummaryHtml(html) ? "dry-run" : "live";
-
-const fullDocumentPreviewRenderer: PreviewRenderer = {
-  mode: "full-document",
-  async render(document, client, options) {
-    const input = buildFoundryFullDocumentRenderInput(document, {
-      dataContext: options?.dataContext,
-    });
-    const output = await client.render(input.input);
-
-    return {
-      html: output.html,
-      errors: input.bindingErrors,
-      foundryStatus: toLivePreviewStatus(output.html),
-      mode: "full-document",
-    };
-  },
-};
-
 const toContractErrors = (
   checks: ReturnType<typeof evaluateFoundryFragmentContract>["checks"],
 ): CompositionError[] =>
@@ -71,6 +47,17 @@ const toContractErrors = (
       componentRef: "_fragments",
       message: `${check.id}: ${check.detail}`,
     }));
+
+const staticFallback = (
+  document: DesignDocument,
+  errors: CompositionError[],
+  options?: { dataContext?: DataContext },
+): PreviewRenderResult => ({
+  html: renderStaticDocument(document, { dataContext: options?.dataContext }),
+  errors,
+  foundryStatus: "dry-run",
+  mode: "fragments",
+});
 
 const fragmentPreviewRenderer: PreviewRenderer = {
   mode: "fragments",
@@ -85,19 +72,10 @@ const fragmentPreviewRenderer: PreviewRenderer = {
         validation,
         prepared.componentIndex,
       );
-      const fallback = await fullDocumentPreviewRenderer.render(
-        document,
-        client,
-        options,
-      );
-      return {
-        ...fallback,
-        mode: "fragments",
-        errors: [
-          ...fallback.errors,
-          ...validationErrors,
-        ],
-      };
+      return staticFallback(document, [
+        ...prepared.bindingErrors,
+        ...validationErrors,
+      ], options);
     }
 
     const output = await client.render(prepared.renderInput);
@@ -109,19 +87,10 @@ const fragmentPreviewRenderer: PreviewRenderer = {
     });
 
     if (!contract.pass) {
-      const fallback = await fullDocumentPreviewRenderer.render(
-        document,
-        client,
-        options,
-      );
-      return {
-        ...fallback,
-        mode: "fragments",
-        errors: [
-          ...fallback.errors,
-          ...toContractErrors(contract.checks),
-        ],
-      };
+      return staticFallback(document, [
+        ...prepared.bindingErrors,
+        ...toContractErrors(contract.checks),
+      ], options);
     }
 
     const parsedOutput = parseFoundryFragmentRenderOutput(
@@ -150,26 +119,31 @@ const compositionAliasPreviewRenderer: PreviewRenderer = {
   },
 };
 
-const isPreviewRendererMode = (
-  value: string | undefined,
-): value is PreviewRendererMode =>
-  PREVIEW_RENDERER_MODES.some((mode) => mode === value);
-
-const readConfiguredRendererMode = (): PreviewRendererMode => {
-  const value =
-    process.env.NEXT_PUBLIC_PREVIEW_RENDERER_MODE ??
-    process.env.PREVIEW_RENDERER_MODE;
-  return isPreviewRendererMode(value) ? value : "full-document";
-};
-
 export const getPreviewRenderer = (
-  mode: PreviewRendererMode = readConfiguredRendererMode(),
+  mode: PreviewRendererMode = "fragments",
 ): PreviewRenderer => {
-  if (mode === "fragments") {
-    return fragmentPreviewRenderer;
-  }
   if (mode === "composition") {
     return compositionAliasPreviewRenderer;
   }
-  return fullDocumentPreviewRenderer;
+  return fragmentPreviewRenderer;
+};
+
+// ---------------------------------------------------------------------------
+// Foundry availability error detection
+// ---------------------------------------------------------------------------
+
+const UNAVAILABLE_ERROR_CODES = new Set([
+  "MISSING_BASE_URL",
+  "CONNECTION_FAILED",
+  "NETWORK_ERROR",
+  "TIMEOUT",
+]);
+
+export const isFoundryUnavailableError = (error: unknown): boolean => {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const code = (error as { code?: unknown }).code;
+  return typeof code === "string" && UNAVAILABLE_ERROR_CODES.has(code);
 };

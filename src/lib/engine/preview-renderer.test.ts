@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   getPreviewRenderer,
+  isFoundryUnavailableError,
   PREVIEW_RENDERER_MODES,
   type PreviewRendererMode,
 } from "./preview-renderer";
@@ -64,12 +65,27 @@ const UNKNOWN_COMPONENT_DOC: DesignDocument = {
   },
 };
 
+const makeFragmentResponse = (
+  fragments: Record<string, { nodeId: string; component: string; html: string; cssRefs: string[] }>,
+  css: Record<string, string> = { "css.base": "[data-oods-component]{box-sizing:border-box;}" },
+): FoundryRenderOutput => ({
+  html: '<div data-foundry-render="summary">Fragment summary</div>',
+  warnings: [],
+  raw: {
+    status: "ok",
+    output: { format: "fragments", strict: false },
+    fragments,
+    css,
+    errors: [],
+  },
+});
+
 const createClient = (
   renderImpl?: (schema: unknown) => Promise<FoundryRenderOutput>,
   overrides: Partial<FoundryMcpClient> = {},
 ): FoundryMcpClient => ({
   render:
-    vi.fn(renderImpl ?? (async () => ({ html: "<div>Rendered</div>", warnings: [], raw: null }))),
+    vi.fn(renderImpl ?? (async () => makeFragmentResponse({}))),
   validate: vi.fn(async () => ({ errors: [], warnings: [], valid: true, raw: null })),
   buildTokens: vi.fn(async () => ({ raw: null })),
   fetchStructuredData: vi.fn(),
@@ -77,74 +93,37 @@ const createClient = (
 });
 
 describe("preview renderer abstraction", () => {
-  it("uses full-document adapter by default and renders with one Foundry call", async () => {
-    const client = createClient(async (schema) => ({
-      html: "<div>Full document render</div>",
-      warnings: [],
-      raw: schema,
-    }));
-
-    const renderer = getPreviewRenderer();
-    const result = await renderer.render(SIMPLE_COMPONENT_DOC, client, {
-      dataContext: { content: { title: "Resolved from context" } },
-    });
-
-    expect(renderer.mode).toBe("full-document");
-    expect(result.mode).toBe("full-document");
-    expect(result.html).toContain("Full document render");
-    expect((client.render as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
-
-    const input = (client.render as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as {
-      mode?: string;
-      schema?: {
-        screens?: Array<{ component?: string; props?: Record<string, unknown> }>;
-      };
-    };
-    expect(input.mode).toBe("full");
-    expect(input.schema?.screens?.[0]).toEqual(
-      expect.objectContaining({
-        component: "Text",
-        props: expect.objectContaining({ text: "Resolved from context" }),
+  it("defaults to fragment adapter and renders via validate + render pipeline", async () => {
+    const client = createClient(
+      async () => makeFragmentResponse({
+        a: { nodeId: "a", component: "Text", html: '<p data-oods-component="Text">A</p>', cssRefs: ["css.base"] },
+        b: { nodeId: "b", component: "Text", html: '<p data-oods-component="Text">B</p>', cssRefs: ["css.base"] },
       }),
     );
+
+    const renderer = getPreviewRenderer();
+    const result = await renderer.render(MULTI_COMPONENT_DOC, client);
+
+    expect(renderer.mode).toBe("fragments");
+    expect(result.mode).toBe("fragments");
+    expect(result.foundryStatus).toBe("live");
+    expect(result.html).toContain('data-component-id="a"');
+    expect(result.html).toContain('data-component-id="b"');
+    expect((client.validate as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect((client.render as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+
+    const renderInput = (client.render as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as {
+      output?: { format?: string };
+    };
+    expect(renderInput.output?.format).toBe("fragments");
   });
 
   it("routes composition mode through the fragment adapter (deprecation alias)", async () => {
     const client = createClient(
-      async () => ({
-        html: '<div data-foundry-render="summary">Fragment summary</div>',
-        warnings: [],
-        raw: {
-          status: "ok",
-          output: { format: "fragments", strict: false },
-          fragments: {
-            a: {
-              nodeId: "a",
-              component: "Text",
-              html: "<p>A</p>",
-              cssRefs: ["css.base"],
-            },
-            b: {
-              nodeId: "b",
-              component: "Text",
-              html: "<p>B</p>",
-              cssRefs: ["css.base"],
-            },
-          },
-          css: {
-            "css.base": "[data-oods-component]{box-sizing:border-box;}",
-          },
-          errors: [],
-        },
+      async () => makeFragmentResponse({
+        a: { nodeId: "a", component: "Text", html: "<p>A</p>", cssRefs: ["css.base"] },
+        b: { nodeId: "b", component: "Text", html: "<p>B</p>", cssRefs: ["css.base"] },
       }),
-      {
-        validate: vi.fn(async () => ({
-          errors: [],
-          warnings: [],
-          valid: true,
-          raw: null,
-        })),
-      },
     );
 
     const renderer = getPreviewRenderer("composition");
@@ -157,50 +136,23 @@ describe("preview renderer abstraction", () => {
     expect((client.render as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
 
     const renderInput = (client.render as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as {
-      output?: {
-        format?: string;
-      };
+      output?: { format?: string };
     };
     expect(renderInput.output?.format).toBe("fragments");
   });
 
   it("renders fragment mode through a single fragment request with local composition", async () => {
     const client = createClient(
-      async (schema) => ({
-        html: '<div data-foundry-render="summary">Fragment summary</div>',
-        warnings: [],
-        raw: {
-          status: "ok",
-          output: { format: "fragments", strict: false },
-          fragments: {
-            a: {
-              nodeId: "a",
-              component: "Text",
-              html: '<p data-oods-component="Text">A</p>',
-              cssRefs: ["css.base", "cmp.text.base"],
-            },
-            b: {
-              nodeId: "b",
-              component: "Text",
-              html: '<p data-oods-component="Text">B</p>',
-              cssRefs: ["css.base", "cmp.text.base"],
-            },
-          },
-          css: {
-            "css.base": "[data-oods-component]{box-sizing:border-box;}",
-            "cmp.text.base": "[data-oods-component=\"Text\"]{color:#111827;}",
-          },
-          errors: [],
+      async () => makeFragmentResponse(
+        {
+          a: { nodeId: "a", component: "Text", html: '<p data-oods-component="Text">A</p>', cssRefs: ["css.base", "cmp.text.base"] },
+          b: { nodeId: "b", component: "Text", html: '<p data-oods-component="Text">B</p>', cssRefs: ["css.base", "cmp.text.base"] },
         },
-      }),
-      {
-        validate: vi.fn(async () => ({
-          errors: [],
-          warnings: [],
-          valid: true,
-          raw: null,
-        })),
-      },
+        {
+          "css.base": "[data-oods-component]{box-sizing:border-box;}",
+          "cmp.text.base": '[data-oods-component="Text"]{color:#111827;}',
+        },
+      ),
     );
 
     const renderer = getPreviewRenderer("fragments");
@@ -236,12 +188,8 @@ describe("preview renderer abstraction", () => {
     expect(renderInput.schema?.screens?.[0]?.children).toHaveLength(2);
   });
 
-  it("falls back to full-document rendering when fragment pre-validation fails", async () => {
-    const client = createClient(async () => ({
-      html: "<div>Full document fallback</div>",
-      warnings: [],
-      raw: null,
-    }), {
+  it("falls back to static rendering when fragment pre-validation fails", async () => {
+    const client = createClient(undefined, {
       validate: vi.fn(async () => ({
         valid: false,
         errors: [
@@ -256,7 +204,9 @@ describe("preview renderer abstraction", () => {
     const result = await renderer.render(UNKNOWN_COMPONENT_DOC, client);
 
     expect(result.mode).toBe("fragments");
-    expect(result.html).toContain("Full document fallback");
+    expect(result.foundryStatus).toBe("dry-run");
+    // Static fallback produces data-static-preview markers
+    expect(result.html).toContain('data-static-preview="true"');
     expect(result.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -266,21 +216,40 @@ describe("preview renderer abstraction", () => {
       ]),
     );
 
+    // Validate was called but render was NOT (validation failed → static fallback)
     expect((client.validate as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
-    expect((client.render as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect((client.render as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+  });
 
-    const fallbackRenderInput = (client.render as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as {
-      output?: unknown;
-      schema?: unknown;
-    };
-    expect(fallbackRenderInput.output).toBeUndefined();
-    expect(fallbackRenderInput.schema).toBeDefined();
+  it("falls back to static rendering when fragment contract check fails", async () => {
+    const client = createClient(async () => ({
+      html: "<div>Bad response</div>",
+      warnings: [],
+      raw: { status: "error" },
+    }));
+
+    const renderer = getPreviewRenderer("fragments");
+    const result = await renderer.render(MULTI_COMPONENT_DOC, client);
+
+    expect(result.mode).toBe("fragments");
+    expect(result.foundryStatus).toBe("dry-run");
+    expect(result.html).toContain('data-static-preview="true"');
+    expect(result.errors.length).toBeGreaterThan(0);
   });
 
   it("propagates binding issues through the renderer result contract", async () => {
-    const client = createClient();
-    const renderer = getPreviewRenderer("full-document");
+    const client = createClient(
+      async () => makeFragmentResponse({
+        "text-1": {
+          nodeId: "text-1",
+          component: "Text",
+          html: '<p data-oods-component="Text">content.title</p>',
+          cssRefs: ["css.base"],
+        },
+      }),
+    );
 
+    const renderer = getPreviewRenderer("fragments");
     const result = await renderer.render(SIMPLE_COMPONENT_DOC, client, {
       dataContext: {},
     });
@@ -295,5 +264,26 @@ describe("preview renderer abstraction", () => {
     for (const mode of modes) {
       expect(getPreviewRenderer(mode).mode).toBe(mode);
     }
+  });
+});
+
+describe("isFoundryUnavailableError", () => {
+  it("returns true for known unavailability error codes", () => {
+    expect(isFoundryUnavailableError({ code: "CONNECTION_FAILED" })).toBe(true);
+    expect(isFoundryUnavailableError({ code: "MISSING_BASE_URL" })).toBe(true);
+    expect(isFoundryUnavailableError({ code: "NETWORK_ERROR" })).toBe(true);
+    expect(isFoundryUnavailableError({ code: "TIMEOUT" })).toBe(true);
+  });
+
+  it("returns false for non-availability error codes", () => {
+    expect(isFoundryUnavailableError({ code: "TOOL_ERROR" })).toBe(false);
+    expect(isFoundryUnavailableError({ code: "VALIDATION_ERROR" })).toBe(false);
+  });
+
+  it("returns false for non-error values", () => {
+    expect(isFoundryUnavailableError(null)).toBe(false);
+    expect(isFoundryUnavailableError(undefined)).toBe(false);
+    expect(isFoundryUnavailableError("string")).toBe(false);
+    expect(isFoundryUnavailableError(42)).toBe(false);
   });
 });

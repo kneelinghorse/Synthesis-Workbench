@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dashboard scaffold with status banner, KPI cards, and a summary table">
+  <title>Dashboard Starter</title>
+  <style>
+    :root {
+    --colors-primary: #3b82f6;
+    --colors-secondary: #64748b;
+    --colors-accent: #f59e0b;
+    --colors-background: #ffffff;
+    --colors-surface: #f8fafc;
+    --colors-text-primary: #0f172a;
+    --colors-text-secondary: #475569;
+    --colors-text-disabled: #94a3b8;
+    --colors-status-success: #22c55e;
+    --colors-status-warning: #f59e0b;
+    --colors-status-error: #ef4444;
+    --colors-status-info: #3b82f6;
+    --colors-border: #e2e8f0;
+    --typography-fontFamily-sans: Inter, system-ui, sans-serif;
+    --typography-fontFamily-mono: JetBrains Mono, monospace;
+    --typography-fontSize-xs: 0.75rem;
+    --typography-fontSize-sm: 0.875rem;
+    --typography-fontSize-base: 1rem;
+    --typography-fontSize-lg: 1.125rem;
+    --typography-fontSize-xl: 1.25rem;
+    --typography-fontSize-2xl: 1.5rem;
+    --typography-fontSize-3xl: 1.875rem;
+    --typography-fontWeight-normal: 400;
+    --typography-fontWeight-medium: 500;
+    --typography-fontWeight-semibold: 600;
+    --typography-fontWeight-bold: 700;
+    --typography-lineHeight-tight: 1.25;
+    --typography-lineHeight-normal: 1.5;
+    --typography-lineHeight-relaxed: 1.75;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --radius-none: 0;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-full: 9999px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--typography-fontFamily-sans, system-ui, sans-serif);
+      font-size: var(--typography-fontSize-base, 1rem);
+      line-height: var(--typography-lineHeight-normal, 1.5);
+      color: var(--colors-text-primary, #111);
+      background: var(--colors-background, #fff);
+      padding: var(--spacing-lg, 1.5rem);
+    }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 1000;
+      padding: 0.5rem 0.75rem;
+      background: var(--colors-primary, #3b82f6);
+      color: #fff;
+      border-radius: 0.25rem;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+    }
+    main[role="main"] {
+      max-width: min(72rem, 100%);
+      margin: 0 auto;
+      padding: var(--spacing-xl, 2rem);
+      border-radius: var(--radius-lg, 0.5rem);
+      background: var(--colors-surface, #f8fafc);
+      box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 48rem) {
+      body {
+        padding: var(--spacing-md, 1rem);
+      }
+      main[role="main"] {
+        padding: var(--spacing-lg, 1.5rem);
+        border-radius: var(--radius-md, 0.375rem);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" role="main" aria-label="Dashboard Starter">
+    <div data-static-preview="true" style="min-height:100%;background:linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);padding:22px 24px;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <div style="max-width:72rem;margin:0 auto;display:flex;flex-direction:column;gap:14px;">
+          <div style="border-radius:16px;border:1px solid #dbe3ee;background:#ffffff;padding:14px 16px;box-shadow:0 2px 8px rgba(15,23,42,0.06);">
+            <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#64748b;">Static Preview</div>
+            <div style="margin-top:6px;font-size:18px;font-weight:600;color:#0f172a;">Dashboard Starter</div>
+          </div>
+          <div data-static-layout="stack" style="display:flex;flex-direction:column;gap:16px;"><div data-component-id="dash-banner" data-component-ref="oods:Banner"><section data-static-component="banner" data-static-intent="info" style="border-radius:12px;border:1px solid #93c5fd;background:#dbeafe;padding:12px 14px;width:100%;">
+        <div style="font-size:12px;font-weight:700;color:#1e3a8a;">Workbench Overview</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.45;color:#1e3a8a;opacity:0.9;">Track pipeline health, adoption, and delivery metrics.</div>
+      </section></div><div data-component-id="dash-tabs" data-component-ref="oods:Tabs"><div data-static-component="tabs" style="border:1px solid #dbe3ee;border-radius:14px;background:#ffffff;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.05);">
+        <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#64748b;">Tabs</div>
+        <div role="tablist" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;"><div data-tab-id="overview" data-active="true" style="border-radius:999px;padding:6px 10px;font-size:12px;border:1px solid #2563eb;background:#eff6ff;color:#1d4ed8;font-weight:600;">Overview</div><div data-tab-id="pipeline" data-active="false" style="border-radius:999px;padding:6px 10px;font-size:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;font-weight:500;">Pipeline</div><div data-tab-id="team" data-active="false" style="border-radius:999px;padding:6px 10px;font-size:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;font-weight:500;">Team</div></div>
+      </div></div><div data-static-layout="grid" style="display:grid;gap:16px;grid-template-columns:repeat(3, minmax(0, 1fr));"><div data-component-id="dash-kpi-users" data-component-ref="oods:Card"><article data-static-component="card" style="border:1px solid #dbe3ee;border-radius:14px;background:#ffffff;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.05);">
+        <div data-static-card-title="true" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">Active users</div>
+        <div data-static-card-body="true" style="margin-top:8px;font-size:15px;line-height:1.5;color:#334155;">1,240</div>
+        <div style="margin-top:10px;display:inline-flex;border-radius:999px;border:1px solid #bfdbfe;background:#eff6ff;padding:2px 8px;font-size:11px;color:#1d4ed8;">+12%</div>
+      </article></div><div data-component-id="dash-kpi-revenue" data-component-ref="oods:Card"><article data-static-component="card" style="border:1px solid #dbe3ee;border-radius:14px;background:#ffffff;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.05);">
+        <div data-static-card-title="true" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">Revenue</div>
+        <div data-static-card-body="true" style="margin-top:8px;font-size:15px;line-height:1.5;color:#334155;">$42k</div>
+        <div style="margin-top:10px;display:inline-flex;border-radius:999px;border:1px solid #bfdbfe;background:#eff6ff;padding:2px 8px;font-size:11px;color:#1d4ed8;">+8%</div>
+      </article></div><div data-component-id="dash-kpi-conversion" data-component-ref="oods:Card"><article data-static-component="card" style="border:1px solid #dbe3ee;border-radius:14px;background:#ffffff;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.05);">
+        <div data-static-card-title="true" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">Conversion</div>
+        <div data-static-card-body="true" style="margin-top:8px;font-size:15px;line-height:1.5;color:#334155;">3.8%</div>
+        <div style="margin-top:10px;display:inline-flex;border-radius:999px;border:1px solid #bfdbfe;background:#eff6ff;padding:2px 8px;font-size:11px;color:#1d4ed8;">+0.4%</div>
+      </article></div></div><div data-component-id="dash-table" data-component-ref="oods:Table"><div data-static-component="table" style="border:1px solid #dbe3ee;border-radius:14px;background:#ffffff;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.05);">
+        <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#64748b;">Table</div>
+        <div style="margin-top:8px;overflow:hidden;border:1px solid #dbe3ee;border-radius:10px;">
+          <table style="width:100%;border-collapse:collapse;background:#ffffff;">
+            <thead style="background:#f8fafc;"><tr><th style="border-bottom:1px solid #cbd5e1;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;">Metric</th><th style="border-bottom:1px solid #cbd5e1;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;">Value</th><th style="border-bottom:1px solid #cbd5e1;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;">Delta</th></tr></thead>
+            <tbody><tr><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">Sessions</td><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">18,240</td><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">+4.2%</td></tr><tr><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">Template applies</td><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">1,032</td><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">+9.8%</td></tr><tr><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">A11y pass rate</td><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">97.4%</td><td style="border-bottom:1px solid #e2e8f0;padding:8px 10px;font-size:13px;color:#334155;">+1.1%</td></tr></tbody>
+          </table>
+        </div>
+      </div></div><div data-component-id="dash-action" data-component-ref="oods:Button"><div data-static-component="button" data-static-variant="primary" style="border:1px solid #dbe3ee;border-radius:14px;background:#ffffff;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.05);">
+        <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#64748b;">Button</div>
+        <div style="margin-top:10px;"><button type="button" disabled aria-disabled="true" style="display:inline-flex;align-items:center;justify-content:center;border:1px solid #1d4ed8;border-radius:10px;background:#2563eb;color:#ffffff;padding:9px 14px;font-size:13px;font-weight:600;">View full report</button></div>
+      </div></div></div>
+        </div>
+      </div>
+  </main>
+</body>
+</html>

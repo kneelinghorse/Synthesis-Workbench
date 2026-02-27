@@ -138,4 +138,72 @@ describe("FirstRunOnboarding", () => {
       expect(screen.getByText("Foundry: Issue")).toBeTruthy();
     });
   });
+
+  it("disables Next step on services step when Foundry is unhealthy", async () => {
+    mockProjectsResponse(0);
+    mockServiceClients({ foundryReject: true });
+
+    render(<FirstRunOnboarding />);
+
+    await screen.findByRole("dialog", { name: "First-run onboarding" });
+
+    await waitFor(() => {
+      // Both main section and dialog render health badges — use getAllByText.
+      expect(screen.getAllByText("Foundry: Issue").length).toBeGreaterThanOrEqual(1);
+    });
+
+    const nextButton = screen.getByRole("button", { name: "Next step" });
+    expect((nextButton as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("enables Next step on services step when Foundry is healthy", async () => {
+    mockProjectsResponse(0);
+    mockServiceClients();
+
+    render(<FirstRunOnboarding />);
+
+    await screen.findByRole("dialog", { name: "First-run onboarding" });
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Foundry: Healthy").length).toBeGreaterThanOrEqual(1);
+    });
+
+    const nextButton = screen.getByRole("button", { name: "Next step" });
+    expect((nextButton as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("shows Continue anyway button when Foundry is unhealthy", async () => {
+    mockProjectsResponse(0);
+    mockServiceClients({ foundryReject: true });
+
+    render(<FirstRunOnboarding />);
+
+    await screen.findByRole("dialog", { name: "First-run onboarding" });
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Foundry: Issue").length).toBeGreaterThanOrEqual(1);
+    });
+
+    const continueAnyway = screen.getByRole("button", { name: "Continue anyway" });
+    expect(continueAnyway).toBeTruthy();
+
+    fireEvent.click(continueAnyway);
+
+    await waitFor(() => {
+      expect(screen.getByText("Load a Stage1 bundle")).toBeTruthy();
+    });
+  });
+
+  it("shows Foundry must be reachable hint when services step is blocked", async () => {
+    mockProjectsResponse(0);
+    mockServiceClients({ foundryReject: true });
+
+    render(<FirstRunOnboarding />);
+
+    await screen.findByRole("dialog", { name: "First-run onboarding" });
+
+    await waitFor(() => {
+      expect(screen.getByText("Foundry must be reachable to proceed.")).toBeTruthy();
+    });
+  });
 });

@@ -12,7 +12,11 @@ import { SIGNAL_TOOL_NAME } from "./signal-tool";
 import { PHASE_TRANSITION_TOOL_NAME } from "./phase-transition-tool";
 import { REVIEW_GATE_TOOL_NAME } from "./review-gate-tool";
 import { TOKEN_ADJUSTMENT_TOOL_NAME } from "./token-tools";
-import { LOAD_BUNDLE_TOOL_NAME } from "./stage1-tools";
+import {
+  LOAD_BUNDLE_TOOL_NAME,
+  INSPECT_APP_TOOL_NAME,
+  INSPECT_SURFACE_TOOL_NAME,
+} from "./stage1-tools";
 import { RENDER_COMPONENT_TOOL_NAME } from "./oods-tools";
 import {
   SET_DOCUMENT_TOOL_NAME,
@@ -44,6 +48,14 @@ describe("PHASE_TOOL_MAP", () => {
 
   it("maps load_bundle only to ingest", () => {
     expect(PHASE_TOOL_MAP[LOAD_BUNDLE_TOOL_NAME]).toEqual(["ingest"]);
+  });
+
+  it("maps inspect_app only to ingest", () => {
+    expect(PHASE_TOOL_MAP[INSPECT_APP_TOOL_NAME]).toEqual(["ingest"]);
+  });
+
+  it("maps inspect_surface only to ingest", () => {
+    expect(PHASE_TOOL_MAP[INSPECT_SURFACE_TOOL_NAME]).toEqual(["ingest"]);
   });
 
   it("maps render_component to explore and tune", () => {
@@ -102,6 +114,8 @@ describe("getToolsForPhase", () => {
   it("returns correct tools for ingest phase", () => {
     const tools = getToolsForPhase("ingest");
     expect(tools).toContain(LOAD_BUNDLE_TOOL_NAME);
+    expect(tools).toContain(INSPECT_APP_TOOL_NAME);
+    expect(tools).toContain(INSPECT_SURFACE_TOOL_NAME);
     expect(tools).toContain(SET_DOCUMENT_TOOL_NAME);
     expect(tools).toContain(PATCH_NODE_TOOL_NAME);
     expect(tools).toContain(SET_DATA_CONTEXT_TOOL_NAME);
@@ -121,6 +135,8 @@ describe("getToolsForPhase", () => {
     expect(tools).toContain(SET_DATA_CONTEXT_TOOL_NAME);
     expect(tools).toContain(PHASE_TRANSITION_TOOL_NAME);
     expect(tools).not.toContain(LOAD_BUNDLE_TOOL_NAME);
+    expect(tools).not.toContain(INSPECT_APP_TOOL_NAME);
+    expect(tools).not.toContain(INSPECT_SURFACE_TOOL_NAME);
     expect(tools).not.toContain(REVIEW_GATE_TOOL_NAME);
     expect(tools).not.toContain(TOKEN_ADJUSTMENT_TOOL_NAME);
   });

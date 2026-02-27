@@ -2,7 +2,11 @@ import { COMPONENT_CATALOG_TOOL_NAME } from "@/lib/runtime/tools/component-catal
 import { PATCH_NODE_TOOL_NAME, SET_DATA_CONTEXT_TOOL_NAME, SET_DOCUMENT_TOOL_NAME } from "@/lib/runtime/tools/document-tools";
 import { EXPORT_DESIGN_TOOL_NAME } from "@/lib/runtime/tools/export-tools";
 import { RENDER_COMPONENT_TOOL_NAME } from "@/lib/runtime/tools/oods-tools";
-import { LOAD_BUNDLE_TOOL_NAME } from "@/lib/runtime/tools/stage1-tools";
+import {
+  LOAD_BUNDLE_TOOL_NAME,
+  INSPECT_APP_TOOL_NAME,
+  INSPECT_SURFACE_TOOL_NAME,
+} from "@/lib/runtime/tools/stage1-tools";
 import { TOKEN_ADJUSTMENT_TOOL_NAME } from "@/lib/runtime/tools/token-tools";
 import { VALIDATE_SCHEMA_TOOL_NAME } from "@/lib/runtime/tools/validate-tools";
 
@@ -233,6 +237,84 @@ export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
         },
       },
       required: ["requestId"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: INSPECT_APP_TOOL_NAME,
+    description:
+      "Run a Stage1 App Profile inspection on a URL. Performs route discovery, accessibility scan, performance analysis, and network trace. Returns a run reference that can be used with load_bundle to import discovered components and token suggestions.",
+    input_schema: {
+      type: "object",
+      properties: {
+        requestId: REQUEST_ID_SCHEMA,
+        title: OPTIONAL_TEXT_SCHEMA,
+        prompt: OPTIONAL_TEXT_SCHEMA,
+        url: {
+          type: "string",
+          description: "The URL to inspect (e.g. https://example.com).",
+        },
+        name: {
+          type: "string",
+          description:
+            "Optional override name for the inspection target (defaults to hostname).",
+        },
+        crawlDepth: {
+          type: "number",
+          description: "How many link-levels deep to crawl (default: 2).",
+        },
+        include: {
+          type: "array",
+          items: { type: "string" },
+          description: "Pass groups to include: a11y, perf, network, all.",
+        },
+        components: {
+          type: "boolean",
+          description:
+            "Enable DOM component analysis (produces component_clusters.json).",
+        },
+        seedRoutes: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "Seed routes to start crawling from (disables discovery when provided).",
+        },
+      },
+      required: ["requestId", "url"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: INSPECT_SURFACE_TOOL_NAME,
+    description:
+      "Run a Stage1 Surface Snapshot on a URL. Captures DOM structure, screenshots, computed styles, and generates a style fingerprint. Returns a run reference for loading results via load_bundle.",
+    input_schema: {
+      type: "object",
+      properties: {
+        requestId: REQUEST_ID_SCHEMA,
+        title: OPTIONAL_TEXT_SCHEMA,
+        prompt: OPTIONAL_TEXT_SCHEMA,
+        url: {
+          type: "string",
+          description: "The URL or local file path to inspect.",
+        },
+        name: {
+          type: "string",
+          description:
+            "Optional override name for the target (defaults to hostname or file basename).",
+        },
+        passes: {
+          type: "array",
+          items: { type: "string" },
+          description: "Pass IDs to run (defaults to style.fingerprint).",
+        },
+        seedRoutes: {
+          type: "array",
+          items: { type: "string" },
+          description: "Seed routes for crawling.",
+        },
+      },
+      required: ["requestId", "url"],
       additionalProperties: false,
     },
   },

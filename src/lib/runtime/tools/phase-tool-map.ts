@@ -6,7 +6,11 @@ import { SIGNAL_TOOL_NAME } from "./signal-tool";
 import { PHASE_TRANSITION_TOOL_NAME } from "./phase-transition-tool";
 import { REVIEW_GATE_TOOL_NAME } from "./review-gate-tool";
 import { TOKEN_ADJUSTMENT_TOOL_NAME } from "./token-tools";
-import { LOAD_BUNDLE_TOOL_NAME } from "./stage1-tools";
+import {
+  LOAD_BUNDLE_TOOL_NAME,
+  INSPECT_APP_TOOL_NAME,
+  INSPECT_SURFACE_TOOL_NAME,
+} from "./stage1-tools";
 import { RENDER_COMPONENT_TOOL_NAME } from "./oods-tools";
 import { VALIDATE_SCHEMA_TOOL_NAME } from "./validate-tools";
 import {
@@ -45,6 +49,8 @@ export const PHASE_TOOL_MAP: Record<string, readonly PhaseId[]> = {
 
   // Ingest phase
   [LOAD_BUNDLE_TOOL_NAME]: ["ingest"],
+  [INSPECT_APP_TOOL_NAME]: ["ingest"],
+  [INSPECT_SURFACE_TOOL_NAME]: ["ingest"],
 
   // Explore + Tune phases
   [RENDER_COMPONENT_TOOL_NAME]: ["explore", "tune"],

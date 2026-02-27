@@ -310,4 +310,193 @@ describe("stage1 MCP client", () => {
       })
     ).toThrow("Stage1 MCP base URL is invalid");
   });
+
+  it("accepts relative proxy paths without throwing", async () => {
+    const fetcher = createMockFetch({
+      jsonPayload: {
+        jsonrpc: "2.0",
+        id: "1",
+        result: { content: [{ type: "text", text: "[]" }] },
+      },
+    });
+
+    // Relative paths like /api/stage1/mcp are valid same-origin proxy routes
+    const client = createStage1McpClient({
+      baseUrl: "/api/stage1/mcp",
+      fetcher,
+    });
+
+    const runs = await client.listRuns();
+    expect(runs).toEqual([]);
+    expect(fetcher).toHaveBeenCalledWith(
+      "/api/stage1/mcp",
+      expect.objectContaining({ method: "POST" })
+    );
+  });
+
+  describe("inspectApp", () => {
+    it("calls stage1_inspect_app and normalizes the result", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          jsonrpc: "2.0",
+          id: "inspect-1",
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  runId: "abc-123",
+                  hostname: "example.com",
+                  runDir: "/tmp/out/example.com/abc-123",
+                  timestamp: "2026-02-27T10:00:00.000Z",
+                  message: "App profile completed",
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://example.com" });
+
+      expect(result.run).not.toBeNull();
+      expect(result.run?.runId).toBe("abc-123");
+      expect(result.run?.hostname).toBe("example.com");
+      expect(result.run?.runDir).toBe("/tmp/out/example.com/abc-123");
+      expect(result.message).toBe("App profile completed");
+    });
+
+    it("sends correct MCP tool name and args", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              { type: "text", text: JSON.stringify({ message: "ok" }) },
+            ],
+          },
+        },
+      });
+      const fetchSpy = fetcher as unknown as ReturnType<typeof vi.fn>;
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      await client.inspectApp({
+        url: "https://example.com",
+        crawlDepth: 3,
+        components: true,
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      const body = JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string);
+      expect(body.params.name).toBe("stage1_inspect_app");
+      expect(body.params.arguments).toEqual({
+        url: "https://example.com",
+        crawlDepth: 3,
+        components: true,
+      });
+    });
+
+    it("returns null run when inspection fails", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  error: { message: "Connection refused" },
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://unreachable.test" });
+
+      expect(result.run).toBeNull();
+      expect(result.message).toBe("Connection refused");
+    });
+  });
+
+  describe("inspectSurface", () => {
+    it("calls stage1_inspect_surface and normalizes the result", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          jsonrpc: "2.0",
+          id: "inspect-2",
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  runId: "surf-456",
+                  hostname: "design.test",
+                  runDir: "/tmp/out/design.test/surf-456",
+                  timestamp: "2026-02-27T11:00:00.000Z",
+                  message: "Surface snapshot captured",
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectSurface({ url: "https://design.test" });
+
+      expect(result.run).not.toBeNull();
+      expect(result.run?.runId).toBe("surf-456");
+      expect(result.run?.hostname).toBe("design.test");
+      expect(result.message).toBe("Surface snapshot captured");
+    });
+
+    it("sends correct MCP tool name and args", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              { type: "text", text: JSON.stringify({ message: "ok" }) },
+            ],
+          },
+        },
+      });
+      const fetchSpy = fetcher as unknown as ReturnType<typeof vi.fn>;
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      await client.inspectSurface({
+        url: "https://design.test",
+        passes: ["style.fingerprint"],
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      const body = JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string);
+      expect(body.params.name).toBe("stage1_inspect_surface");
+      expect(body.params.arguments).toEqual({
+        url: "https://design.test",
+        passes: ["style.fingerprint"],
+      });
+    });
+  });
 });

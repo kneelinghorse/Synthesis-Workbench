@@ -172,10 +172,10 @@ function resetAllStores() {
 // ============================================================================
 
 describe("Cross-Service Integration: Tool Definitions", () => {
-  it("should export all 9 tool definitions for the Anthropic adapter", () => {
+  it("should export all 11 tool definitions for the Anthropic adapter", () => {
     const tools = getAnthropicToolDefinitions();
 
-    expect(tools).toHaveLength(9);
+    expect(tools).toHaveLength(11);
 
     const toolNames = tools.map((t) => t.name);
     expect(toolNames).toContain("render_component");
@@ -187,6 +187,8 @@ describe("Cross-Service Integration: Tool Definitions", () => {
     expect(toolNames).toContain("export_design");
     expect(toolNames).toContain("component_catalog");
     expect(toolNames).toContain("load_bundle");
+    expect(toolNames).toContain("inspect_app");
+    expect(toolNames).toContain("inspect_surface");
   });
 
   it("each tool definition should have valid input_schema with requestId required", () => {

@@ -15,9 +15,48 @@ export type Stage1ListRunsResult = {
   message?: string;
 };
 
+export type Stage1InspectAppArgs = {
+  url: string;
+  name?: string;
+  outDir?: string;
+  crawlDepth?: number;
+  include?: string[];
+  components?: boolean;
+  repoPath?: string;
+  seedRoutes?: string[];
+  authStorageStatePath?: string;
+  api?: {
+    baseUrl: string;
+    type?: string;
+    graphqlEndpoint?: string;
+    auth?: {
+      type: string;
+      credentials: Record<string, unknown>;
+    };
+  };
+};
+
+export type Stage1InspectSurfaceArgs = {
+  url: string;
+  name?: string;
+  outDir?: string;
+  passes?: string[];
+  seedRoutes?: string[];
+};
+
+export type Stage1InspectionResult = {
+  run: Stage1RunSummary | null;
+  payload: unknown;
+  message?: string;
+};
+
 export type Stage1McpClient = {
   listRuns: () => Promise<Stage1RunSummary[]>;
   getArtifact: <T = unknown>(runDir: string, artifactName: string) => Promise<T>;
+  inspectApp: (args: Stage1InspectAppArgs) => Promise<Stage1InspectionResult>;
+  inspectSurface: (
+    args: Stage1InspectSurfaceArgs
+  ) => Promise<Stage1InspectionResult>;
 };
 
 export type Stage1McpClientOptions = {
@@ -110,10 +149,26 @@ const parseStage1RunDir = (value: string | undefined) => {
   return { runId, hostname };
 };
 
+const parseHostnameFromUrl = (value: string | undefined): string | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return new URL(value).hostname || undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 const normalizeRunEntry = (entry: Record<string, unknown>): Stage1RunSummary | null => {
   const runDir =
     toStringValue(entry.runDir) ??
     toStringValue(entry.run_dir) ??
+    toStringValue(entry.outputDir) ??
+    toStringValue(entry.output_dir) ??
+    toStringValue(entry.outDir) ??
+    toStringValue(entry.out_dir) ??
     toStringValue(entry.path);
   const parsedFromDir = parseStage1RunDir(runDir);
 
@@ -126,8 +181,16 @@ const normalizeRunEntry = (entry: Record<string, unknown>): Stage1RunSummary | n
     toStringValue(entry.hostname) ??
     toStringValue(entry.host) ??
     toStringValue(entry.target) ??
+    toStringValue(entry.targetHost) ??
+    toStringValue(entry.target_host) ??
     toStringValue(entry.targetName) ??
+    toStringValue(entry.target_name) ??
     toStringValue(entry.name) ??
+    parseHostnameFromUrl(
+      toStringValue(entry.url) ??
+        toStringValue(entry.targetUrl) ??
+        toStringValue(entry.target_url)
+    ) ??
     parsedFromDir.hostname;
   const timestamp =
     toStringValue(entry.timestamp) ??
@@ -161,6 +224,80 @@ const normalizeRunEntry = (entry: Record<string, unknown>): Stage1RunSummary | n
     targetCount,
   };
 };
+
+const extractFirstRunFromList = (payload: unknown) => {
+  const runs = extractRuns(payload);
+  if (!runs.length) {
+    return null;
+  }
+
+  return [...runs].sort((left, right) => {
+    const leftTime = left.timestamp ? Date.parse(left.timestamp) : 0;
+    const rightTime = right.timestamp ? Date.parse(right.timestamp) : 0;
+    return rightTime - leftTime;
+  })[0] ?? null;
+};
+
+const extractInspectionRun = (
+  payload: unknown,
+  depth = 0
+): Stage1RunSummary | null => {
+  if (depth > 2) {
+    return null;
+  }
+
+  if (isRecord(payload)) {
+    const normalized = normalizeRunEntry(payload);
+    if (normalized) {
+      return normalized;
+    }
+
+    const nestedKeys = ["run", "summary", "payload", "data", "result"] as const;
+    for (const key of nestedKeys) {
+      const nested = payload[key];
+      if (!nested) {
+        continue;
+      }
+      const match = extractInspectionRun(nested, depth + 1);
+      if (match) {
+        return match;
+      }
+    }
+  }
+
+  return extractFirstRunFromList(payload);
+};
+
+const extractInspectionMessage = (payload: unknown): string | undefined => {
+  if (typeof payload === "string") {
+    const trimmed = payload.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  if (!isRecord(payload)) {
+    return undefined;
+  }
+
+  const direct =
+    toStringValue(payload.message) ??
+    toStringValue(payload.detail) ??
+    toStringValue(payload.status);
+  if (direct) {
+    return direct;
+  }
+
+  if (isRecord(payload.error)) {
+    return toStringValue(payload.error.message);
+  }
+
+  return undefined;
+};
+
+const normalizeInspectionResult = (payload: unknown): Stage1InspectionResult => ({
+  run: extractInspectionRun(payload),
+  payload,
+  message: extractInspectionMessage(payload),
+});
 
 const extractRuns = (payload: unknown): Stage1RunSummary[] => {
   if (!isRecord(payload)) {
@@ -303,6 +440,12 @@ const readStage1McpBaseUrl = () => {
 };
 
 const normalizeStage1McpBaseUrl = (value: string) => {
+  // Relative paths are valid same-origin proxy routes (e.g. "/api/stage1/mcp").
+  // Pass through without new URL() validation — the browser fetch API handles them.
+  if (value.startsWith("/") || value.startsWith("./") || value.startsWith("../")) {
+    return value;
+  }
+
   try {
     const parsed = new URL(value);
     if (!parsed.pathname || parsed.pathname === "/") {
@@ -460,6 +603,26 @@ export const createStage1McpClient = (
         `loading artifact ${artifactName} from run ${runDir.split("/").pop() ?? runDir}`
       );
     },
+    async inspectApp(args: Stage1InspectAppArgs) {
+      return addBreadcrumb(
+        () =>
+          retryWithBackoff(async () => {
+            const payload = await callTool<unknown>("stage1_inspect_app", args);
+            return normalizeInspectionResult(payload);
+          }, retryOptions),
+        `running inspect_app for ${args.url}`
+      );
+    },
+    async inspectSurface(args: Stage1InspectSurfaceArgs) {
+      return addBreadcrumb(
+        () =>
+          retryWithBackoff(async () => {
+            const payload = await callTool<unknown>("stage1_inspect_surface", args);
+            return normalizeInspectionResult(payload);
+          }, retryOptions),
+        `running inspect_surface for ${args.url}`
+      );
+    },
   };
 };
 
@@ -502,6 +665,10 @@ export const getStage1McpClient = () => {
     listRuns: () => executeWithRecovery((client) => client.listRuns()),
     getArtifact: <T = unknown>(runDir: string, artifactName: string) =>
       executeWithRecovery((client) => client.getArtifact<T>(runDir, artifactName)),
+    inspectApp: (args: Stage1InspectAppArgs) =>
+      executeWithRecovery((client) => client.inspectApp(args)),
+    inspectSurface: (args: Stage1InspectSurfaceArgs) =>
+      executeWithRecovery((client) => client.inspectSurface(args)),
   };
 };
 

@@ -51,26 +51,8 @@
       "foundry": "getFoundryClient() - render(schema), validate(schema), buildTokens(brand, theme)"
     }
   },
-  "pendingExternalRequests": {
-    "stage1-enhancements": {
-      "spec": "cmos/foundational-docs/stage1-contract-enhancement-spec.md",
-      "requests": [
-        "token-guess.json with TokenState-compatible paths",
-        "project_id field in manifest.json",
-        "component_clusters.json with name/count/selector"
-      ],
-      "status": "implemented",
-      "resolvedAt": "2026-02-06",
-      "resolution": "All 3 requests fully implemented in Stage1. token-guess.json (v1.0.0) with dot-path tokens, manifest.json project_id with auto-generation fallback, component_clusters.json (v1.1.0) with confidence/selectors/nesting/variants. Artifacts tracked in report-index.json."
-    }
-  },
-  "nextSteps": [
-    "Sprint 05: End-to-end workflow testing (bundle -> tokens -> render)",
-    "ValidateSchemaTool for LLM schema validation before render",
-    "Export workflow for final token/component artifacts",
-    "Phase state enforcement with tool availability per phase",
-    "Verify Workbench bundle-loader ingests new Stage1 artifacts (token-guess.json, component_clusters.json) correctly"
-  ],
+  "pendingExternalRequests": {},
+  "nextSteps": [],
   "sprintHistory": {
     "sprint-01": "Foundation & Core Chat - project scaffold, chat UI, Ollama/Anthropic adapters",
     "sprint-02": "Tool UI Infrastructure - makeAssistantToolUI, ToolOutputCard, PhaseTransitionTool, ReviewGateTool",

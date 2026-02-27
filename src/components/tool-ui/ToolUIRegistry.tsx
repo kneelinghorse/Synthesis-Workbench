@@ -13,6 +13,8 @@ import { SetDataContextToolUI } from "./SetDataContextToolUI";
 import { ValidateSchemaToolUI } from "./ValidateSchemaToolUI";
 import { ExportDesignToolUI } from "./ExportDesignToolUI";
 import { ComponentCatalogToolUI } from "./ComponentCatalogToolUI";
+import { InspectAppToolUI } from "./InspectAppToolUI";
+import { InspectSurfaceToolUI } from "./InspectSurfaceToolUI";
 import { ToolErrorBoundary } from "./ToolErrorBoundary";
 
 // Add new tool UI registrations here so they are available in the chat runtime.
@@ -59,6 +61,12 @@ export const ToolUIRegistry = () => (
     </ToolErrorBoundary>
     <ToolErrorBoundary>
       <ComponentCatalogToolUI />
+    </ToolErrorBoundary>
+    <ToolErrorBoundary>
+      <InspectAppToolUI />
+    </ToolErrorBoundary>
+    <ToolErrorBoundary>
+      <InspectSurfaceToolUI />
     </ToolErrorBoundary>
   </>
 );

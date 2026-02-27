@@ -1,0 +1,26 @@
+{
+  "component": "VizAreaPreview",
+  "displayName": "VizAreaPreview",
+  "classification": "partial",
+  "nodeId": "probe-vizareapreview",
+  "attempts": 1,
+  "probeProps": {
+    "baselineField": "VizAreaPreview baselineField",
+    "curveField": "VizAreaPreview curveField",
+    "opacityField": "VizAreaPreview opacityField"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: div; text: \"Area preview (640 x 360)\"",
+  "dataPropAttributes": [
+    "data-prop-baseline-field",
+    "data-prop-curve-field",
+    "data-prop-opacity-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-vizareapreview\" data-oods-component=\"VizAreaPreview\" data-oods-node-id=\"probe-vizareapreview\" data-viz-preview-type=\"area\" data-viz-width=\"640\" data-viz-height=\"360\" data-prop-baseline-field=\"VizAreaPreview baselineField\" data-prop-curve-field=\"VizAreaPreview curveField\" data-prop-opacity-field=\"VizAreaPreview opacityField\"><div data-viz-preview-placeholder=\"true\">Area preview (640 x 360)</div></div>"
+}

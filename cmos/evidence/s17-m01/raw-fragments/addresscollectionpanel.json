@@ -1,0 +1,28 @@
+{
+  "component": "AddressCollectionPanel",
+  "displayName": "AddressCollectionPanel",
+  "classification": "partial",
+  "nodeId": "probe-addresscollectionpanel",
+  "attempts": 1,
+  "probeProps": {
+    "defaultRoleField": "AddressCollectionPanel defaultRoleField",
+    "field": "AddressCollectionPanel field",
+    "roleField": "AddressCollectionPanel roleField",
+    "roleParameter": "AddressCollectionPanel roleParameter"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: header, h3, div; text: \"Addresses\"",
+  "dataPropAttributes": [
+    "data-prop-default-role-field",
+    "data-prop-field",
+    "data-prop-role-field",
+    "data-prop-role-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-addresscollectionpanel\" data-oods-component=\"AddressCollectionPanel\" data-oods-node-id=\"probe-addresscollectionpanel\" data-panel-type=\"address\" data-prop-default-role-field=\"AddressCollectionPanel defaultRoleField\" data-prop-field=\"AddressCollectionPanel field\" data-prop-role-field=\"AddressCollectionPanel roleField\" data-prop-role-parameter=\"AddressCollectionPanel roleParameter\"><header data-panel-header=\"true\"><h3>Addresses</h3></header><div data-panel-content=\"true\"></div></section>"
+}

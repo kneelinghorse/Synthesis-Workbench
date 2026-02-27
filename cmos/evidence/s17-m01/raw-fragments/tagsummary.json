@@ -1,0 +1,24 @@
+{
+  "component": "TagSummary",
+  "displayName": "TagSummary",
+  "classification": "partial",
+  "nodeId": "probe-tagsummary",
+  "attempts": 1,
+  "probeProps": {
+    "countField": 42,
+    "field": "TagSummary field"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Tag Summary Tag Count 42 Tags TagSummary field\"",
+  "dataPropAttributes": [
+    "data-prop-count-field",
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-tagsummary\" data-oods-component=\"TagSummary\" data-oods-node-id=\"probe-tagsummary\" data-summary-type=\"tags\" data-prop-count-field=\"42\" data-prop-field=\"TagSummary field\"><h3 data-summary-title=\"true\">Tag Summary</h3><dl><div data-summary-item=\"true\"><dt>Tag Count</dt><dd>42</dd></div><div data-summary-item=\"true\"><dt>Tags</dt><dd>TagSummary field</dd></div></dl></section>"
+}

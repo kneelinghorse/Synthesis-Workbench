@@ -1,0 +1,28 @@
+{
+  "component": "VizAxisSummary",
+  "displayName": "VizAxisSummary",
+  "classification": "partial",
+  "nodeId": "probe-vizaxissummary",
+  "attempts": 1,
+  "probeProps": {
+    "axis": "VizAxisSummary axis",
+    "scaleField": "VizAxisSummary scaleField",
+    "titleField": "VizAxisSummary titleField",
+    "zeroField": "VizAxisSummary zeroField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Viz Axis Summary Axis VizAxisSummary axis\"",
+  "dataPropAttributes": [
+    "data-prop-axis",
+    "data-prop-scale-field",
+    "data-prop-title-field",
+    "data-prop-zero-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-vizaxissummary\" data-oods-component=\"VizAxisSummary\" data-oods-node-id=\"probe-vizaxissummary\" data-summary-type=\"viz-axis-summary\" data-prop-axis=\"VizAxisSummary axis\" data-prop-scale-field=\"VizAxisSummary scaleField\" data-prop-title-field=\"VizAxisSummary titleField\" data-prop-zero-field=\"VizAxisSummary zeroField\"><h3 data-summary-title=\"true\">Viz Axis Summary</h3><dl><div data-summary-item=\"true\"><dt>Axis</dt><dd>VizAxisSummary axis</dd></div></dl></section>"
+}

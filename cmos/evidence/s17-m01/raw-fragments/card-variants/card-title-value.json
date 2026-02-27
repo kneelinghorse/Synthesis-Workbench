@@ -1,0 +1,10 @@
+{
+  "variant": "title-value",
+  "classification": "empty-shell",
+  "html": "<article id=\"probe-card-title-value\" title=\"Active users\" data-oods-component=\"Card\" data-oods-node-id=\"probe-card-title-value\" data-prop-value=\"1,240\"></article>",
+  "dataPropAttributes": [
+    "data-prop-value"
+  ],
+  "structureSummary": "article (no inner HTML)",
+  "errors": []
+}

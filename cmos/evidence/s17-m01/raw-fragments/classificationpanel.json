@@ -1,0 +1,31 @@
+{
+  "component": "ClassificationPanel",
+  "displayName": "ClassificationPanel",
+  "classification": "partial",
+  "nodeId": "probe-classificationpanel",
+  "attempts": 1,
+  "probeProps": {
+    "categoriesField": "ClassificationPanel categoriesField",
+    "metadataField": "ClassificationPanel metadataField",
+    "modeParameter": "default",
+    "tagsField": [
+      "one",
+      "two"
+    ]
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: header, h3, div; text: \"Classification\"",
+  "dataPropAttributes": [
+    "data-prop-categories-field",
+    "data-prop-metadata-field",
+    "data-prop-mode-parameter",
+    "data-prop-tags-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-classificationpanel\" data-oods-component=\"ClassificationPanel\" data-oods-node-id=\"probe-classificationpanel\" data-panel-type=\"classification\" data-prop-categories-field=\"ClassificationPanel categoriesField\" data-prop-metadata-field=\"ClassificationPanel metadataField\" data-prop-mode-parameter=\"default\" data-prop-tags-field=\"[&quot;one&quot;,&quot;two&quot;]\"><header data-panel-header=\"true\"><h3>Classification</h3></header><div data-panel-content=\"true\"></div></section>"
+}

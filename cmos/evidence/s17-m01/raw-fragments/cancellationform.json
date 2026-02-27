@@ -1,0 +1,30 @@
+{
+  "component": "CancellationForm",
+  "displayName": "CancellationForm",
+  "classification": "partial",
+  "nodeId": "probe-cancellationform",
+  "attempts": 1,
+  "probeProps": {
+    "allowedReasonsParameter": true,
+    "codeField": "CancellationForm codeField",
+    "reasonField": "CancellationForm reasonField",
+    "requireReasonParameter": true,
+    "windowParameter": "CancellationForm windowParameter"
+  },
+  "rootTag": "form",
+  "structureSummary": "form -> children: header, h3, div, label, span, select; text: \"Cancellation Form Reason Code no_longer_needed budget duplic\"",
+  "dataPropAttributes": [
+    "data-prop-allowed-reasons-parameter",
+    "data-prop-code-field",
+    "data-prop-reason-field",
+    "data-prop-require-reason-parameter",
+    "data-prop-window-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<form id=\"probe-cancellationform\" data-oods-component=\"CancellationForm\" data-oods-node-id=\"probe-cancellationform\" data-form-type=\"cancellation\" data-prop-allowed-reasons-parameter=\"true\" data-prop-code-field=\"CancellationForm codeField\" data-prop-reason-field=\"CancellationForm reasonField\" data-prop-require-reason-parameter=\"true\" data-prop-window-parameter=\"CancellationForm windowParameter\"><header data-form-header=\"true\"><h3>Cancellation Form</h3></header><div data-form-content=\"true\"><label data-form-control=\"select\"><span>Reason Code</span><select name=\"reasonCode\"><option value=\"no_longer_needed\">no_longer_needed</option><option value=\"budget\">budget</option><option value=\"duplicate\">duplicate</option></select></label><label data-form-control=\"textarea\"><span>Reason</span><textarea name=\"reason\"></textarea></label></div></form>"
+}

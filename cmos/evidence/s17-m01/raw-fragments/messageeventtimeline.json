@@ -1,0 +1,24 @@
+{
+  "component": "MessageEventTimeline",
+  "displayName": "MessageEventTimeline",
+  "classification": "partial",
+  "nodeId": "probe-messageeventtimeline",
+  "attempts": 1,
+  "probeProps": {
+    "messagesField": "MessageEventTimeline messagesField",
+    "statusesField": "active"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: h3, ol, li; text: \"Message Timeline No events\"",
+  "dataPropAttributes": [
+    "data-prop-messages-field",
+    "data-prop-statuses-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-messageeventtimeline\" role=\"log\" data-oods-component=\"MessageEventTimeline\" data-oods-node-id=\"probe-messageeventtimeline\" data-timeline-type=\"message\" data-prop-messages-field=\"MessageEventTimeline messagesField\" data-prop-statuses-field=\"active\"><h3 data-timeline-title=\"true\">Message Timeline</h3><ol data-timeline-events=\"true\"><li data-timeline-empty=\"true\">No events</li></ol></div>"
+}

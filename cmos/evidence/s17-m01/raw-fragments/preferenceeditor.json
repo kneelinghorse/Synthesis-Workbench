@@ -1,0 +1,26 @@
+{
+  "component": "PreferenceEditor",
+  "displayName": "PreferenceEditor",
+  "classification": "partial",
+  "nodeId": "probe-preferenceeditor",
+  "attempts": 1,
+  "probeProps": {
+    "documentField": "PreferenceEditor documentField",
+    "namespacesField": "PreferenceEditor namespacesField",
+    "registryNamespaceParameter": "PreferenceEditor registryNamespaceParameter"
+  },
+  "rootTag": "form",
+  "structureSummary": "form -> children: header, h3, div, label, span, select; text: \"Preference Editor Namespace default Preference Document\"",
+  "dataPropAttributes": [
+    "data-prop-document-field",
+    "data-prop-namespaces-field",
+    "data-prop-registry-namespace-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<form id=\"probe-preferenceeditor\" data-oods-component=\"PreferenceEditor\" data-oods-node-id=\"probe-preferenceeditor\" data-form-type=\"preference-editor\" data-prop-document-field=\"PreferenceEditor documentField\" data-prop-namespaces-field=\"PreferenceEditor namespacesField\" data-prop-registry-namespace-parameter=\"PreferenceEditor registryNamespaceParameter\"><header data-form-header=\"true\"><h3>Preference Editor</h3></header><div data-form-content=\"true\"><label data-form-control=\"select\"><span>Namespace</span><select name=\"namespace\"><option value=\"default\">default</option></select></label><label data-form-control=\"textarea\"><span>Preference Document</span><textarea name=\"preferenceDocument\"></textarea></label></div></form>"
+}

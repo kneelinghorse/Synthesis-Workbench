@@ -1,0 +1,29 @@
+{
+  "component": "StatusSelector",
+  "displayName": "StatusSelector",
+  "classification": "partial",
+  "nodeId": "probe-statusselector",
+  "attempts": 1,
+  "probeProps": {
+    "field": "StatusSelector field",
+    "initialParameter": "StatusSelector initialParameter",
+    "optionsParameter": [
+      "alpha",
+      "beta"
+    ]
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: label, span, select, option; text: \"Status draft active inactive\"",
+  "dataPropAttributes": [
+    "data-prop-field",
+    "data-prop-initial-parameter",
+    "data-prop-options-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-statusselector\" data-oods-component=\"StatusSelector\" data-oods-node-id=\"probe-statusselector\" data-summary-type=\"status-selector\" data-prop-field=\"StatusSelector field\" data-prop-initial-parameter=\"StatusSelector initialParameter\" data-prop-options-parameter=\"[&quot;alpha&quot;,&quot;beta&quot;]\"><label data-form-control=\"select\"><span>Status</span><select name=\"status\"><option value=\"draft\">draft</option><option value=\"active\">active</option><option value=\"inactive\">inactive</option></select></label></div>"
+}

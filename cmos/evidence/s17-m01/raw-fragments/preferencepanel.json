@@ -1,0 +1,26 @@
+{
+  "component": "PreferencePanel",
+  "displayName": "PreferencePanel",
+  "classification": "partial",
+  "nodeId": "probe-preferencepanel",
+  "attempts": 1,
+  "probeProps": {
+    "metadataField": "PreferencePanel metadataField",
+    "namespaceField": "PreferencePanel namespaceField",
+    "preferencesField": "PreferencePanel preferencesField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: header, h3, div; text: \"Preferences\"",
+  "dataPropAttributes": [
+    "data-prop-metadata-field",
+    "data-prop-namespace-field",
+    "data-prop-preferences-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-preferencepanel\" data-oods-component=\"PreferencePanel\" data-oods-node-id=\"probe-preferencepanel\" data-panel-type=\"preference\" data-prop-metadata-field=\"PreferencePanel metadataField\" data-prop-namespace-field=\"PreferencePanel namespaceField\" data-prop-preferences-field=\"PreferencePanel preferencesField\"><header data-panel-header=\"true\"><h3>Preferences</h3></header><div data-panel-content=\"true\"></div></section>"
+}

@@ -1,0 +1,24 @@
+{
+  "component": "Input",
+  "displayName": "Input",
+  "classification": "partial",
+  "nodeId": "probe-input",
+  "attempts": 1,
+  "probeProps": {
+    "label": "Search",
+    "placeholder": "Search metrics",
+    "value": "Q1"
+  },
+  "rootTag": "input",
+  "structureSummary": "input -> children: input; text: none",
+  "dataPropAttributes": [
+    "data-prop-label"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<input id=\"probe-input\" type=\"text\" placeholder=\"Search metrics\" value=\"Q1\" data-oods-component=\"Input\" data-oods-node-id=\"probe-input\" data-prop-label=\"Search\" />"
+}

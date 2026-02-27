@@ -1,0 +1,24 @@
+{
+  "component": "DetailHeader",
+  "displayName": "DetailHeader",
+  "classification": "partial",
+  "nodeId": "probe-detailheader",
+  "attempts": 1,
+  "probeProps": {
+    "subtitleField": "DetailHeader subtitleField",
+    "titleField": "DetailHeader titleField"
+  },
+  "rootTag": "header",
+  "structureSummary": "header -> children: h2; text: \"Details\"",
+  "dataPropAttributes": [
+    "data-prop-subtitle-field",
+    "data-prop-title-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<header id=\"probe-detailheader\" data-oods-component=\"DetailHeader\" data-oods-node-id=\"probe-detailheader\" data-prop-subtitle-field=\"DetailHeader subtitleField\" data-prop-title-field=\"DetailHeader titleField\"><h2>Details</h2></header>"
+}

@@ -1,0 +1,8 @@
+{
+  "variant": "title-only",
+  "classification": "empty-shell",
+  "html": "<article id=\"probe-card-title-only\" title=\"Active users\" data-oods-component=\"Card\" data-oods-node-id=\"probe-card-title-only\"></article>",
+  "dataPropAttributes": [],
+  "structureSummary": "article (no inner HTML)",
+  "errors": []
+}

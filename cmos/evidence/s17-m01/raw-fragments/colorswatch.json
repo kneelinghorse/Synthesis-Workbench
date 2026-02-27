@@ -1,0 +1,24 @@
+{
+  "component": "ColorSwatch",
+  "displayName": "ColorSwatch",
+  "classification": "partial",
+  "nodeId": "probe-colorswatch",
+  "attempts": 1,
+  "probeProps": {
+    "field": "ColorSwatch field",
+    "size": "ColorSwatch size"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"default\"",
+  "dataPropAttributes": [
+    "data-prop-field",
+    "data-prop-size"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-colorswatch\" data-oods-component=\"ColorSwatch\" data-oods-node-id=\"probe-colorswatch\" data-summary-type=\"color-swatch\" data-swatch-color=\"default\" data-prop-field=\"ColorSwatch field\" data-prop-size=\"ColorSwatch size\">default</span>"
+}

@@ -1,0 +1,23 @@
+{
+  "component": "ColorizedBadge",
+  "displayName": "ColorizedBadge",
+  "classification": "partial",
+  "nodeId": "probe-colorizedbadge",
+  "attempts": 1,
+  "probeProps": {
+    "field": "ColorizedBadge field",
+    "tone": "ColorizedBadge tone"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Color\"",
+  "dataPropAttributes": [
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-colorizedbadge\" data-oods-component=\"ColorizedBadge\" data-oods-node-id=\"probe-colorizedbadge\" data-badge-variant=\"ColorizedBadge tone\" data-prop-field=\"ColorizedBadge field\">Color</span>"
+}

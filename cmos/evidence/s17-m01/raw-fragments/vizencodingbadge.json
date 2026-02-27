@@ -1,0 +1,23 @@
+{
+  "component": "VizEncodingBadge",
+  "displayName": "VizEncodingBadge",
+  "classification": "partial",
+  "nodeId": "probe-vizencodingbadge",
+  "attempts": 1,
+  "probeProps": {
+    "axis": "VizEncodingBadge axis",
+    "fieldField": "VizEncodingBadge fieldField"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"VizEncodingBadge axis\"",
+  "dataPropAttributes": [
+    "data-prop-field-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-vizencodingbadge\" data-oods-component=\"VizEncodingBadge\" data-oods-node-id=\"probe-vizencodingbadge\" data-badge-status=\"VizEncodingBadge axis\" data-badge-variant=\"viz-encoding\" data-prop-field-field=\"VizEncodingBadge fieldField\">VizEncodingBadge axis</span>"
+}

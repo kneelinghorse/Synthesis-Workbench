@@ -1,0 +1,31 @@
+{
+  "component": "TagManager",
+  "displayName": "TagManager",
+  "classification": "partial",
+  "nodeId": "probe-tagmanager",
+  "attempts": 1,
+  "probeProps": {
+    "allowCustomParameter": true,
+    "allowListParameter": true,
+    "field": "TagManager field",
+    "maxTagsParameter": [
+      "one",
+      "two"
+    ]
+  },
+  "rootTag": "form",
+  "structureSummary": "form -> children: header, h3, div, label, span, input; text: \"Tag Manager Add Tag\"",
+  "dataPropAttributes": [
+    "data-prop-allow-custom-parameter",
+    "data-prop-allow-list-parameter",
+    "data-prop-field",
+    "data-prop-max-tags-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<form id=\"probe-tagmanager\" data-oods-component=\"TagManager\" data-oods-node-id=\"probe-tagmanager\" data-form-type=\"tag-manager\" data-prop-allow-custom-parameter=\"true\" data-prop-allow-list-parameter=\"true\" data-prop-field=\"TagManager field\" data-prop-max-tags-parameter=\"[&quot;one&quot;,&quot;two&quot;]\"><header data-form-header=\"true\"><h3>Tag Manager</h3></header><div data-form-content=\"true\"><div data-tag-list=\"true\"></div><label data-form-control=\"input\"><span>Add Tag</span><input type=\"text\" name=\"newTag\" placeholder=\"Type a tag\" /></label></div></form>"
+}

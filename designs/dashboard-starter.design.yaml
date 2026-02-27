@@ -1,8 +1,8 @@
 metadata:
   title: Dashboard Starter
   description: Dashboard scaffold with status banner, KPI cards, and a summary table
-  createdAt: '2026-02-27T03:34:16.413Z'
-  updatedAt: '2026-02-27T03:34:16.518Z'
+  createdAt: '2026-02-27T14:14:01.281Z'
+  updatedAt: '2026-02-27T14:14:01.306Z'
 root:
   nodeType: layout
   layout:

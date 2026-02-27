@@ -1,0 +1,32 @@
+{
+  "component": "ArchiveSummary",
+  "displayName": "ArchiveSummary",
+  "classification": "partial",
+  "nodeId": "probe-archivesummary",
+  "attempts": 1,
+  "probeProps": {
+    "archivedAtField": "ArchiveSummary archivedAtField",
+    "archivedField": "ArchiveSummary archivedField",
+    "reasonField": "ArchiveSummary reasonField",
+    "restoredAtField": "ArchiveSummary restoredAtField",
+    "restoreWindowParameter": "ArchiveSummary restoreWindowParameter",
+    "retainHistoryParameter": "ArchiveSummary retainHistoryParameter"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Archive Summary Archived At ArchiveSummary archivedAtField R\"",
+  "dataPropAttributes": [
+    "data-prop-archived-at-field",
+    "data-prop-archived-field",
+    "data-prop-reason-field",
+    "data-prop-restore-window-parameter",
+    "data-prop-restored-at-field",
+    "data-prop-retain-history-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-archivesummary\" data-oods-component=\"ArchiveSummary\" data-oods-node-id=\"probe-archivesummary\" data-summary-type=\"archive\" data-prop-archived-at-field=\"ArchiveSummary archivedAtField\" data-prop-archived-field=\"ArchiveSummary archivedField\" data-prop-reason-field=\"ArchiveSummary reasonField\" data-prop-restored-at-field=\"ArchiveSummary restoredAtField\" data-prop-restore-window-parameter=\"ArchiveSummary restoreWindowParameter\" data-prop-retain-history-parameter=\"ArchiveSummary retainHistoryParameter\"><h3 data-summary-title=\"true\">Archive Summary</h3><dl><div data-summary-item=\"true\"><dt>Archived At</dt><dd>ArchiveSummary archivedAtField</dd></div><div data-summary-item=\"true\"><dt>Reason</dt><dd>ArchiveSummary reasonField</dd></div></dl></section>"
+}

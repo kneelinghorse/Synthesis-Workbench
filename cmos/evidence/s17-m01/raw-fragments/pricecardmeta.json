@@ -1,0 +1,24 @@
+{
+  "component": "PriceCardMeta",
+  "displayName": "PriceCardMeta",
+  "classification": "partial",
+  "nodeId": "probe-pricecardmeta",
+  "attempts": 1,
+  "probeProps": {
+    "intervalField": "PriceCardMeta intervalField",
+    "modelField": "default"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: span, strong; text: \"Price Model: default Interval: PriceCardMeta intervalField\"",
+  "dataPropAttributes": [
+    "data-prop-interval-field",
+    "data-prop-model-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-pricecardmeta\" data-oods-component=\"PriceCardMeta\" data-oods-node-id=\"probe-pricecardmeta\" data-meta-type=\"price\" data-prop-interval-field=\"PriceCardMeta intervalField\" data-prop-model-field=\"default\"><span data-meta-title=\"true\">Price</span><span data-meta-item=\"true\"><strong>Model:</strong> default</span><span data-meta-item=\"true\"><strong>Interval:</strong> PriceCardMeta intervalField</span></div>"
+}

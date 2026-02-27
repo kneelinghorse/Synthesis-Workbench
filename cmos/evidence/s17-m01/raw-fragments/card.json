@@ -1,0 +1,26 @@
+{
+  "component": "Card",
+  "displayName": "Card",
+  "classification": "empty-shell",
+  "nodeId": "probe-card",
+  "attempts": 1,
+  "probeProps": {
+    "title": "Active users",
+    "value": "1,240",
+    "trend": "+12%"
+  },
+  "rootTag": "article",
+  "structureSummary": "article (no inner HTML)",
+  "dataPropAttributes": [
+    "data-prop-trend",
+    "data-prop-value"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens",
+    "cmp.card.base"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<article id=\"probe-card\" title=\"Active users\" data-oods-component=\"Card\" data-oods-node-id=\"probe-card\" data-prop-value=\"1,240\" data-prop-trend=\"+12%\"></article>"
+}

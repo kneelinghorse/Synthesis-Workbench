@@ -1,0 +1,34 @@
+{
+  "component": "Select",
+  "displayName": "Select",
+  "classification": "partial",
+  "nodeId": "probe-select",
+  "attempts": 1,
+  "probeProps": {
+    "label": "Period",
+    "options": [
+      {
+        "label": "Weekly",
+        "value": "weekly"
+      },
+      {
+        "label": "Monthly",
+        "value": "monthly"
+      }
+    ],
+    "value": "weekly"
+  },
+  "rootTag": "select",
+  "structureSummary": "select -> children: option; text: \"Weekly Monthly\"",
+  "dataPropAttributes": [
+    "data-prop-label",
+    "data-prop-value"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<select id=\"probe-select\" data-oods-component=\"Select\" data-oods-node-id=\"probe-select\" data-prop-label=\"Period\" data-prop-value=\"weekly\"><option value=\"weekly\" selected>Weekly</option><option value=\"monthly\">Monthly</option></select>"
+}

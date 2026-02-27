@@ -1,0 +1,29 @@
+{
+  "component": "StatusTimeline",
+  "displayName": "StatusTimeline",
+  "classification": "partial",
+  "nodeId": "probe-statustimeline",
+  "attempts": 1,
+  "probeProps": {
+    "field": "StatusTimeline field",
+    "historyField": "StatusTimeline historyField",
+    "statesParameter": [
+      "one",
+      "two"
+    ]
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: h3, ol, li; text: \"Status Timeline No events\"",
+  "dataPropAttributes": [
+    "data-prop-field",
+    "data-prop-history-field",
+    "data-prop-states-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-statustimeline\" role=\"log\" data-oods-component=\"StatusTimeline\" data-oods-node-id=\"probe-statustimeline\" data-timeline-type=\"status\" data-prop-field=\"StatusTimeline field\" data-prop-history-field=\"StatusTimeline historyField\" data-prop-states-parameter=\"[&quot;one&quot;,&quot;two&quot;]\"><h3 data-timeline-title=\"true\">Status Timeline</h3><ol data-timeline-events=\"true\"><li data-timeline-empty=\"true\">No events</li></ol></div>"
+}

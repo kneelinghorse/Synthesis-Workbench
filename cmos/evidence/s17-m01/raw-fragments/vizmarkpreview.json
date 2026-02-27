@@ -1,0 +1,26 @@
+{
+  "component": "VizMarkPreview",
+  "displayName": "VizMarkPreview",
+  "classification": "partial",
+  "nodeId": "probe-vizmarkpreview",
+  "attempts": 1,
+  "probeProps": {
+    "orientationField": "VizMarkPreview orientationField",
+    "stackingField": "VizMarkPreview stackingField",
+    "typeField": "VizMarkPreview typeField"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: div; text: \"Mark preview (640 x 360)\"",
+  "dataPropAttributes": [
+    "data-prop-orientation-field",
+    "data-prop-stacking-field",
+    "data-prop-type-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-vizmarkpreview\" data-oods-component=\"VizMarkPreview\" data-oods-node-id=\"probe-vizmarkpreview\" data-viz-preview-type=\"mark\" data-viz-width=\"640\" data-viz-height=\"360\" data-prop-orientation-field=\"VizMarkPreview orientationField\" data-prop-stacking-field=\"VizMarkPreview stackingField\" data-prop-type-field=\"VizMarkPreview typeField\"><div data-viz-preview-placeholder=\"true\">Mark preview (640 x 360)</div></div>"
+}

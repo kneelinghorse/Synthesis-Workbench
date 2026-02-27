@@ -1,0 +1,29 @@
+{
+  "component": "GeocodablePreview",
+  "displayName": "GeocodablePreview",
+  "classification": "partial",
+  "nodeId": "probe-geocodablepreview",
+  "attempts": 1,
+  "probeProps": {
+    "detectedFieldsField": [
+      "one",
+      "two"
+    ],
+    "requiresLookupField": true,
+    "resolutionField": "GeocodablePreview resolutionField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Geocodable Preview Resolution GeocodablePreview resolutionFi\"",
+  "dataPropAttributes": [
+    "data-prop-detected-fields-field",
+    "data-prop-requires-lookup-field",
+    "data-prop-resolution-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-geocodablepreview\" data-oods-component=\"GeocodablePreview\" data-oods-node-id=\"probe-geocodablepreview\" data-summary-type=\"geocodable\" data-prop-detected-fields-field=\"[&quot;one&quot;,&quot;two&quot;]\" data-prop-requires-lookup-field=\"true\" data-prop-resolution-field=\"GeocodablePreview resolutionField\"><h3 data-summary-title=\"true\">Geocodable Preview</h3><dl><div data-summary-item=\"true\"><dt>Resolution</dt><dd>GeocodablePreview resolutionField</dd></div><div data-summary-item=\"true\"><dt>Requires Lookup</dt><dd>true</dd></div></dl></section>"
+}

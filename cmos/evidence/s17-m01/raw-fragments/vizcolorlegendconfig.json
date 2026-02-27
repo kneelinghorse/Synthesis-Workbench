@@ -1,0 +1,26 @@
+{
+  "component": "VizColorLegendConfig",
+  "displayName": "VizColorLegendConfig",
+  "classification": "partial",
+  "nodeId": "probe-vizcolorlegendconfig",
+  "attempts": 1,
+  "probeProps": {
+    "field": "VizColorLegendConfig field",
+    "redundancyField": "VizColorLegendConfig redundancyField",
+    "schemeField": "VizColorLegendConfig schemeField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Viz Color Legend Field VizColorLegendConfig field\"",
+  "dataPropAttributes": [
+    "data-prop-field",
+    "data-prop-redundancy-field",
+    "data-prop-scheme-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-vizcolorlegendconfig\" data-oods-component=\"VizColorLegendConfig\" data-oods-node-id=\"probe-vizcolorlegendconfig\" data-summary-type=\"viz-color-legend\" data-prop-field=\"VizColorLegendConfig field\" data-prop-redundancy-field=\"VizColorLegendConfig redundancyField\" data-prop-scheme-field=\"VizColorLegendConfig schemeField\"><h3 data-summary-title=\"true\">Viz Color Legend</h3><dl><div data-summary-item=\"true\"><dt>Field</dt><dd>VizColorLegendConfig field</dd></div></dl></section>"
+}

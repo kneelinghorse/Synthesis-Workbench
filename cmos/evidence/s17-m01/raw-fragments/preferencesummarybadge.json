@@ -1,0 +1,24 @@
+{
+  "component": "PreferenceSummaryBadge",
+  "displayName": "PreferenceSummaryBadge",
+  "classification": "partial",
+  "nodeId": "probe-preferencesummarybadge",
+  "attempts": 1,
+  "probeProps": {
+    "namespacesField": "PreferenceSummaryBadge namespacesField",
+    "versionField": "PreferenceSummaryBadge versionField"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Preferences\"",
+  "dataPropAttributes": [
+    "data-prop-namespaces-field",
+    "data-prop-version-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-preferencesummarybadge\" data-oods-component=\"PreferenceSummaryBadge\" data-oods-node-id=\"probe-preferencesummarybadge\" data-badge-variant=\"preference\" data-prop-namespaces-field=\"PreferenceSummaryBadge namespacesField\" data-prop-version-field=\"PreferenceSummaryBadge versionField\">Preferences</span>"
+}

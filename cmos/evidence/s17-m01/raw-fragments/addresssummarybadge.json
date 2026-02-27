@@ -1,0 +1,22 @@
+{
+  "component": "AddressSummaryBadge",
+  "displayName": "AddressSummaryBadge",
+  "classification": "partial",
+  "nodeId": "probe-addresssummarybadge",
+  "attempts": 1,
+  "probeProps": {
+    "field": "AddressSummaryBadge field"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Address\"",
+  "dataPropAttributes": [
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-addresssummarybadge\" data-oods-component=\"AddressSummaryBadge\" data-oods-node-id=\"probe-addresssummarybadge\" data-badge-variant=\"address\" data-prop-field=\"AddressSummaryBadge field\">Address</span>"
+}

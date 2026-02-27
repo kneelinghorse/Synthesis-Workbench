@@ -1,0 +1,28 @@
+{
+  "component": "CancellationSummary",
+  "displayName": "CancellationSummary",
+  "classification": "partial",
+  "nodeId": "probe-cancellationsummary",
+  "attempts": 1,
+  "probeProps": {
+    "cancelAtPeriodEndField": "CancellationSummary cancelAtPeriodEndField",
+    "codeField": "CancellationSummary codeField",
+    "reasonField": "CancellationSummary reasonField",
+    "requestedAtField": "CancellationSummary requestedAtField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Cancellation Summary Cancel at Period End CancellationSummar\"",
+  "dataPropAttributes": [
+    "data-prop-cancel-at-period-end-field",
+    "data-prop-code-field",
+    "data-prop-reason-field",
+    "data-prop-requested-at-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-cancellationsummary\" data-oods-component=\"CancellationSummary\" data-oods-node-id=\"probe-cancellationsummary\" data-summary-type=\"cancellation\" data-prop-cancel-at-period-end-field=\"CancellationSummary cancelAtPeriodEndField\" data-prop-code-field=\"CancellationSummary codeField\" data-prop-reason-field=\"CancellationSummary reasonField\" data-prop-requested-at-field=\"CancellationSummary requestedAtField\"><h3 data-summary-title=\"true\">Cancellation Summary</h3><dl><div data-summary-item=\"true\"><dt>Cancel at Period End</dt><dd>CancellationSummary cancelAtPeriodEndField</dd></div><div data-summary-item=\"true\"><dt>Requested At</dt><dd>CancellationSummary requestedAtField</dd></div><div data-summary-item=\"true\"><dt>Reason</dt><dd>CancellationSummary reasonField</dd></div></dl></section>"
+}

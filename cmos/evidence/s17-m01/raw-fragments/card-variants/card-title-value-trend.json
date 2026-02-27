@@ -1,0 +1,11 @@
+{
+  "variant": "title-value-trend",
+  "classification": "empty-shell",
+  "html": "<article id=\"probe-card-title-value-trend\" title=\"Active users\" data-oods-component=\"Card\" data-oods-node-id=\"probe-card-title-value-trend\" data-prop-value=\"1,240\" data-prop-trend=\"+12%\"></article>",
+  "dataPropAttributes": [
+    "data-prop-trend",
+    "data-prop-value"
+  ],
+  "structureSummary": "article (no inner HTML)",
+  "errors": []
+}

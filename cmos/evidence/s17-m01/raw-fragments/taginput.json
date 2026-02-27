@@ -1,0 +1,31 @@
+{
+  "component": "TagInput",
+  "displayName": "TagInput",
+  "classification": "partial",
+  "nodeId": "probe-taginput",
+  "attempts": 1,
+  "probeProps": {
+    "allowCustomParameter": true,
+    "allowListParameter": true,
+    "field": "TagInput field",
+    "maxTagsParameter": [
+      "one",
+      "two"
+    ]
+  },
+  "rootTag": "fieldset",
+  "structureSummary": "fieldset -> children: legend, div, label, span, input; text: \"Tag Input Tag\"",
+  "dataPropAttributes": [
+    "data-prop-allow-custom-parameter",
+    "data-prop-allow-list-parameter",
+    "data-prop-field",
+    "data-prop-max-tags-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<fieldset id=\"probe-taginput\" data-oods-component=\"TagInput\" data-oods-node-id=\"probe-taginput\" data-form-type=\"tag-input\" data-prop-allow-custom-parameter=\"true\" data-prop-allow-list-parameter=\"true\" data-prop-field=\"TagInput field\" data-prop-max-tags-parameter=\"[&quot;one&quot;,&quot;two&quot;]\"><legend>Tag Input</legend><div data-form-content=\"true\"><label data-form-control=\"input\"><span>Tag</span><input type=\"text\" name=\"tag\" /></label></div></fieldset>"
+}

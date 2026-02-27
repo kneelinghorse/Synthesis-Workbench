@@ -1,0 +1,24 @@
+{
+  "component": "PriceBadge",
+  "displayName": "PriceBadge",
+  "classification": "partial",
+  "nodeId": "probe-pricebadge",
+  "attempts": 1,
+  "probeProps": {
+    "amountField": 42,
+    "currencyField": "USD"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Price\"",
+  "dataPropAttributes": [
+    "data-prop-amount-field",
+    "data-prop-currency-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-pricebadge\" data-oods-component=\"PriceBadge\" data-oods-node-id=\"probe-pricebadge\" data-badge-variant=\"price\" data-prop-amount-field=\"42\" data-prop-currency-field=\"USD\">Price</span>"
+}

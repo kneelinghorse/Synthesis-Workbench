@@ -1,0 +1,28 @@
+{
+  "component": "MembershipPanel",
+  "displayName": "MembershipPanel",
+  "classification": "partial",
+  "nodeId": "probe-membershippanel",
+  "attempts": 1,
+  "probeProps": {
+    "hierarchyField": "MembershipPanel hierarchyField",
+    "membershipsField": "MembershipPanel membershipsField",
+    "permissionField": "MembershipPanel permissionField",
+    "roleField": "MembershipPanel roleField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: header, h3, div; text: \"Membership\"",
+  "dataPropAttributes": [
+    "data-prop-hierarchy-field",
+    "data-prop-memberships-field",
+    "data-prop-permission-field",
+    "data-prop-role-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-membershippanel\" data-oods-component=\"MembershipPanel\" data-oods-node-id=\"probe-membershippanel\" data-panel-type=\"membership\" data-prop-hierarchy-field=\"MembershipPanel hierarchyField\" data-prop-memberships-field=\"MembershipPanel membershipsField\" data-prop-permission-field=\"MembershipPanel permissionField\" data-prop-role-field=\"MembershipPanel roleField\"><header data-panel-header=\"true\"><h3>Membership</h3></header><div data-panel-content=\"true\"></div></section>"
+}

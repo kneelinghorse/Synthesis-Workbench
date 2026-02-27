@@ -260,6 +260,74 @@ describe("PreviewPanel error actions", () => {
     ).toBeTruthy();
   });
 
+  it("suppresses canonical token warning when preview transitions to live mode", async () => {
+    process.env.NEXT_PUBLIC_OODS_FOUNDRY_MCP_URL = "http://foundry.test/run";
+
+    const buildTokens = vi.fn().mockResolvedValue({
+      tokens: {},
+      raw: {},
+    });
+
+    vi.mocked(getFoundryMcpClient).mockReturnValue({
+      buildTokens,
+      render: vi.fn(),
+      validate: vi.fn(),
+      fetchStructuredData: vi.fn(),
+    } as any);
+
+    render(<PreviewPanel />);
+
+    await waitFor(() => {
+      expect(buildTokens).toHaveBeenCalledTimes(1);
+    });
+    expect(
+      screen.getByText(
+        "Foundry did not return canonical tokens for this theme (skipping sync)."
+      )
+    ).toBeTruthy();
+
+    usePreviewStateStore.getState().setFoundryStatus("live");
+    await waitFor(() => {
+      expect(screen.getByText("Live Render")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          "Foundry did not return canonical tokens for this theme (skipping sync)."
+        )
+      ).toBeNull();
+    });
+  });
+
+  it("shows canonical token warning when preview is not live (fallback mode)", async () => {
+    process.env.NEXT_PUBLIC_OODS_FOUNDRY_MCP_URL = "http://foundry.test/run";
+
+    const buildTokens = vi.fn().mockResolvedValue({
+      tokens: {},
+      raw: {},
+    });
+
+    vi.mocked(getFoundryMcpClient).mockReturnValue({
+      buildTokens,
+      render: vi.fn(),
+      validate: vi.fn(),
+      fetchStructuredData: vi.fn(),
+    } as any);
+
+    usePreviewStateStore.getState().setFoundryStatus("dry-run");
+
+    render(<PreviewPanel />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Foundry did not return canonical tokens for this theme (skipping sync)."
+        )
+      ).toBeTruthy();
+    });
+  });
+
   it("shows offline empty state when Foundry is offline and no document is loaded", () => {
     vi.mocked(getFoundryMcpClient).mockReturnValue(null as any);
     useDocumentStateStore.getState().reset();

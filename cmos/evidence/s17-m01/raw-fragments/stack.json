@@ -1,0 +1,24 @@
+{
+  "component": "Stack",
+  "displayName": "Stack",
+  "classification": "empty-shell",
+  "nodeId": "probe-stack",
+  "attempts": 1,
+  "probeProps": {
+    "direction": "column",
+    "gap": 16
+  },
+  "rootTag": "div",
+  "structureSummary": "div (no inner HTML)",
+  "dataPropAttributes": [
+    "data-prop-direction",
+    "data-prop-gap"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-stack\" data-oods-component=\"Stack\" data-oods-node-id=\"probe-stack\" data-layout=\"stack\" data-prop-direction=\"column\" data-prop-gap=\"16\"></div>"
+}

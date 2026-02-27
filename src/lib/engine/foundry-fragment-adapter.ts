@@ -5,6 +5,7 @@ import {
 } from "@/lib/engine/data-binding";
 import type { CompositionError } from "@/lib/engine/composition-renderer";
 import { collectComponents } from "@/lib/engine/composition-renderer";
+import { enhanceFragment } from "@/lib/engine/fragment-enhancer";
 import { renderGrid, renderStack } from "@/lib/engine/layout-engine";
 import type { FoundryValidateOutput } from "@/lib/mcp/foundry-client";
 import type {
@@ -97,6 +98,8 @@ type ComposeFoundryFragmentOptions = {
   useInlineStyles?: boolean;
   classPrefix?: string;
 };
+
+const FOUNDRY_PREVIEW_ROOT_ID = "oods-preview-root";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -443,7 +446,11 @@ const composeNode = (
     }
 
     const html = fragment
-      ? fragment.html
+      ? enhanceFragment(
+          fragment.html,
+          normalizeComponentName(node.ref),
+          node.props,
+        )
       : renderErrorFallback(
           node,
           nodeIssues[0] ?? "Fragment missing from Foundry response.",
@@ -551,7 +558,7 @@ export const composeDocumentFromFoundryFragments = (
       : "";
 
   return {
-    html: `${cssBlock}${composedBody}`,
+    html: `${cssBlock}<div id="${FOUNDRY_PREVIEW_ROOT_ID}">${composedBody}</div>`,
     errors,
   };
 };

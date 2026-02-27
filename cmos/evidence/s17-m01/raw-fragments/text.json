@@ -1,0 +1,20 @@
+{
+  "component": "Text",
+  "displayName": "Text",
+  "classification": "full-content",
+  "nodeId": "probe-text",
+  "attempts": 1,
+  "probeProps": {
+    "text": "Fragment fidelity probe text."
+  },
+  "rootTag": "p",
+  "structureSummary": "p -> children: none; text: \"Fragment fidelity probe text.\"",
+  "dataPropAttributes": [],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<p id=\"probe-text\" data-oods-component=\"Text\" data-oods-node-id=\"probe-text\">Fragment fidelity probe text.</p>"
+}

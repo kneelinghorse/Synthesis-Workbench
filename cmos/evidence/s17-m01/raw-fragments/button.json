@@ -1,0 +1,21 @@
+{
+  "component": "Button",
+  "displayName": "Button",
+  "classification": "full-content",
+  "nodeId": "probe-button",
+  "attempts": 1,
+  "probeProps": {
+    "label": "Primary action"
+  },
+  "rootTag": "button",
+  "structureSummary": "button -> children: none; text: \"Primary action\"",
+  "dataPropAttributes": [],
+  "cssRefs": [
+    "css.base",
+    "css.tokens",
+    "cmp.button.base"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<button id=\"probe-button\" type=\"button\" data-oods-component=\"Button\" data-oods-node-id=\"probe-button\">Primary action</button>"
+}

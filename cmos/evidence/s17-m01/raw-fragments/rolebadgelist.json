@@ -1,0 +1,27 @@
+{
+  "component": "RoleBadgeList",
+  "displayName": "RoleBadgeList",
+  "classification": "partial",
+  "nodeId": "probe-rolebadgelist",
+  "attempts": 1,
+  "probeProps": {
+    "fallbackRoleParameter": "RoleBadgeList fallbackRoleParameter",
+    "rolesField": [
+      "one",
+      "two"
+    ]
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Roles\"",
+  "dataPropAttributes": [
+    "data-prop-fallback-role-parameter",
+    "data-prop-roles-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-rolebadgelist\" data-oods-component=\"RoleBadgeList\" data-oods-node-id=\"probe-rolebadgelist\" data-badge-variant=\"roles\" data-prop-fallback-role-parameter=\"RoleBadgeList fallbackRoleParameter\" data-prop-roles-field=\"[&quot;one&quot;,&quot;two&quot;]\">Roles</span>"
+}

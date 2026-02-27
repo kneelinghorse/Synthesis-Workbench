@@ -1,0 +1,24 @@
+{
+  "component": "StatusColorLegend",
+  "displayName": "StatusColorLegend",
+  "classification": "partial",
+  "nodeId": "probe-statuscolorlegend",
+  "attempts": 1,
+  "probeProps": {
+    "badgeField": "StatusColorLegend badgeField",
+    "parameter": "StatusColorLegend parameter"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl; text: \"Status Color Legend\"",
+  "dataPropAttributes": [
+    "data-prop-badge-field",
+    "data-prop-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-statuscolorlegend\" data-oods-component=\"StatusColorLegend\" data-oods-node-id=\"probe-statuscolorlegend\" data-summary-type=\"status-color-legend\" data-prop-badge-field=\"StatusColorLegend badgeField\" data-prop-parameter=\"StatusColorLegend parameter\"><h3 data-summary-title=\"true\">Status Color Legend</h3><dl></dl></section>"
+}

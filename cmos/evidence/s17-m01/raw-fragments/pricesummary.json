@@ -1,0 +1,30 @@
+{
+  "component": "PriceSummary",
+  "displayName": "PriceSummary",
+  "classification": "partial",
+  "nodeId": "probe-pricesummary",
+  "attempts": 1,
+  "probeProps": {
+    "amountField": 42,
+    "currencyField": "USD",
+    "intervalField": "PriceSummary intervalField",
+    "modelField": "default",
+    "taxBehaviorField": "PriceSummary taxBehaviorField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Price Summary Amount 42 Currency USD Model default Interval \"",
+  "dataPropAttributes": [
+    "data-prop-amount-field",
+    "data-prop-currency-field",
+    "data-prop-interval-field",
+    "data-prop-model-field",
+    "data-prop-tax-behavior-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-pricesummary\" data-oods-component=\"PriceSummary\" data-oods-node-id=\"probe-pricesummary\" data-summary-type=\"price\" data-prop-amount-field=\"42\" data-prop-currency-field=\"USD\" data-prop-interval-field=\"PriceSummary intervalField\" data-prop-model-field=\"default\" data-prop-tax-behavior-field=\"PriceSummary taxBehaviorField\"><h3 data-summary-title=\"true\">Price Summary</h3><dl><div data-summary-item=\"true\"><dt>Amount</dt><dd>42</dd></div><div data-summary-item=\"true\"><dt>Currency</dt><dd>USD</dd></div><div data-summary-item=\"true\"><dt>Model</dt><dd>default</dd></div><div data-summary-item=\"true\"><dt>Interval</dt><dd>PriceSummary intervalField</dd></div></dl></section>"
+}

@@ -1,0 +1,30 @@
+{
+  "component": "OwnershipSummary",
+  "displayName": "OwnershipSummary",
+  "classification": "partial",
+  "nodeId": "probe-ownershipsummary",
+  "attempts": 1,
+  "probeProps": {
+    "allowTransferParameter": true,
+    "ownerIdField": "OwnershipSummary ownerIdField",
+    "ownerTypeField": "OwnershipSummary ownerTypeField",
+    "roleField": "OwnershipSummary roleField",
+    "transferredAtField": "OwnershipSummary transferredAtField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Ownership Summary Owner ID OwnershipSummary ownerIdField Own\"",
+  "dataPropAttributes": [
+    "data-prop-allow-transfer-parameter",
+    "data-prop-owner-id-field",
+    "data-prop-owner-type-field",
+    "data-prop-role-field",
+    "data-prop-transferred-at-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-ownershipsummary\" data-oods-component=\"OwnershipSummary\" data-oods-node-id=\"probe-ownershipsummary\" data-summary-type=\"ownership\" data-prop-allow-transfer-parameter=\"true\" data-prop-owner-id-field=\"OwnershipSummary ownerIdField\" data-prop-owner-type-field=\"OwnershipSummary ownerTypeField\" data-prop-role-field=\"OwnershipSummary roleField\" data-prop-transferred-at-field=\"OwnershipSummary transferredAtField\"><h3 data-summary-title=\"true\">Ownership Summary</h3><dl><div data-summary-item=\"true\"><dt>Owner ID</dt><dd>OwnershipSummary ownerIdField</dd></div><div data-summary-item=\"true\"><dt>Owner Type</dt><dd>OwnershipSummary ownerTypeField</dd></div><div data-summary-item=\"true\"><dt>Role</dt><dd>OwnershipSummary roleField</dd></div></dl></section>"
+}

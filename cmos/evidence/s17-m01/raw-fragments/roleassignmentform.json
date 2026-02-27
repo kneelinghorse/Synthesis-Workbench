@@ -1,0 +1,29 @@
+{
+  "component": "RoleAssignmentForm",
+  "displayName": "RoleAssignmentForm",
+  "classification": "partial",
+  "nodeId": "probe-roleassignmentform",
+  "attempts": 1,
+  "probeProps": {
+    "availableRolesField": [
+      "one",
+      "two"
+    ],
+    "defaultRoleParameter": "RoleAssignmentForm defaultRoleParameter",
+    "membershipField": "RoleAssignmentForm membershipField"
+  },
+  "rootTag": "form",
+  "structureSummary": "form -> children: header, h3, div, label, span, select; text: \"Role Assignment Role Select... Assignee\"",
+  "dataPropAttributes": [
+    "data-prop-available-roles-field",
+    "data-prop-default-role-parameter",
+    "data-prop-membership-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<form id=\"probe-roleassignmentform\" data-oods-component=\"RoleAssignmentForm\" data-oods-node-id=\"probe-roleassignmentform\" data-form-type=\"role-assignment\" data-prop-available-roles-field=\"[&quot;one&quot;,&quot;two&quot;]\" data-prop-default-role-parameter=\"RoleAssignmentForm defaultRoleParameter\" data-prop-membership-field=\"RoleAssignmentForm membershipField\"><header data-form-header=\"true\"><h3>Role Assignment</h3></header><div data-form-content=\"true\"><label data-form-control=\"select\"><span>Role</span><select name=\"role\"><option value=\"\">Select...</option></select></label><label data-form-control=\"input\"><span>Assignee</span><input type=\"text\" name=\"assignee\" /></label></div></form>"
+}

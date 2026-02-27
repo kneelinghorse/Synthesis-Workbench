@@ -1,0 +1,25 @@
+{
+  "component": "Banner",
+  "displayName": "Banner",
+  "classification": "partial",
+  "nodeId": "probe-banner",
+  "attempts": 1,
+  "probeProps": {
+    "title": "Workbench Overview",
+    "message": "Track pipeline health and delivery metrics.",
+    "intent": "info"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: none; text: \"Track pipeline health and delivery metrics.\"",
+  "dataPropAttributes": [
+    "data-prop-intent"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens",
+    "cmp.banner.base"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-banner\" role=\"status\" title=\"Workbench Overview\" data-oods-component=\"Banner\" data-oods-node-id=\"probe-banner\" data-prop-intent=\"info\">Track pipeline health and delivery metrics.</section>"
+}

@@ -1,0 +1,33 @@
+{
+  "component": "AuditTimeline",
+  "displayName": "AuditTimeline",
+  "classification": "partial",
+  "nodeId": "probe-audittimeline",
+  "attempts": 1,
+  "probeProps": {
+    "createdField": "AuditTimeline createdField",
+    "eventField": "AuditTimeline eventField",
+    "eventOptionsParameter": [
+      "alpha",
+      "beta"
+    ],
+    "eventTimestampField": "AuditTimeline eventTimestampField",
+    "updatedField": "2026-02-27T00:00:00Z"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: h3, ol, li; text: \"Audit Timeline No events\"",
+  "dataPropAttributes": [
+    "data-prop-created-field",
+    "data-prop-event-field",
+    "data-prop-event-options-parameter",
+    "data-prop-event-timestamp-field",
+    "data-prop-updated-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-audittimeline\" role=\"log\" data-oods-component=\"AuditTimeline\" data-oods-node-id=\"probe-audittimeline\" data-timeline-type=\"audit\" data-prop-created-field=\"AuditTimeline createdField\" data-prop-event-field=\"AuditTimeline eventField\" data-prop-event-options-parameter=\"[&quot;alpha&quot;,&quot;beta&quot;]\" data-prop-event-timestamp-field=\"AuditTimeline eventTimestampField\" data-prop-updated-field=\"2026-02-27T00:00:00Z\"><h3 data-timeline-title=\"true\">Audit Timeline</h3><ol data-timeline-events=\"true\"><li data-timeline-empty=\"true\">No events</li></ol></div>"
+}

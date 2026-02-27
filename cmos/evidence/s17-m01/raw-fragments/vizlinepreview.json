@@ -1,0 +1,26 @@
+{
+  "component": "VizLinePreview",
+  "displayName": "VizLinePreview",
+  "classification": "partial",
+  "nodeId": "probe-vizlinepreview",
+  "attempts": 1,
+  "probeProps": {
+    "curveField": "VizLinePreview curveField",
+    "markersField": "VizLinePreview markersField",
+    "strokeWidthField": "VizLinePreview strokeWidthField"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: div; text: \"Line preview (640 x 360)\"",
+  "dataPropAttributes": [
+    "data-prop-curve-field",
+    "data-prop-markers-field",
+    "data-prop-stroke-width-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-vizlinepreview\" data-oods-component=\"VizLinePreview\" data-oods-node-id=\"probe-vizlinepreview\" data-viz-preview-type=\"line\" data-viz-width=\"640\" data-viz-height=\"360\" data-prop-curve-field=\"VizLinePreview curveField\" data-prop-markers-field=\"VizLinePreview markersField\" data-prop-stroke-width-field=\"VizLinePreview strokeWidthField\"><div data-viz-preview-placeholder=\"true\">Line preview (640 x 360)</div></div>"
+}

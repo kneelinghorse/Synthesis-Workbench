@@ -1,0 +1,23 @@
+{
+  "component": "InlineLabel",
+  "displayName": "InlineLabel",
+  "classification": "empty-shell",
+  "nodeId": "probe-inlinelabel",
+  "attempts": 1,
+  "probeProps": {
+    "field": "InlineLabel field",
+    "maxLength": "InlineLabel maxLength"
+  },
+  "rootTag": "span",
+  "structureSummary": "span (no inner HTML)",
+  "dataPropAttributes": [
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-inlinelabel\" data-oods-component=\"InlineLabel\" data-oods-node-id=\"probe-inlinelabel\" data-prop-field=\"InlineLabel field\"></span>"
+}

@@ -1,0 +1,24 @@
+{
+  "component": "StateTransitionEvent",
+  "displayName": "StateTransitionEvent",
+  "classification": "partial",
+  "nodeId": "probe-statetransitionevent",
+  "attempts": 1,
+  "probeProps": {
+    "historyField": "StateTransitionEvent historyField",
+    "labelField": "StateTransitionEvent labelField"
+  },
+  "rootTag": "article",
+  "structureSummary": "article -> children: p; text: \"State Transition\"",
+  "dataPropAttributes": [
+    "data-prop-history-field",
+    "data-prop-label-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<article id=\"probe-statetransitionevent\" data-oods-component=\"StateTransitionEvent\" data-oods-node-id=\"probe-statetransitionevent\" data-event-type=\"state-transition\" data-prop-history-field=\"StateTransitionEvent historyField\" data-prop-label-field=\"StateTransitionEvent labelField\"><p data-event-label=\"true\">State Transition</p></article>"
+}

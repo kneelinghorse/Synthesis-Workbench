@@ -1,0 +1,28 @@
+{
+  "component": "VizSizeSummary",
+  "displayName": "VizSizeSummary",
+  "classification": "partial",
+  "nodeId": "probe-vizsizesummary",
+  "attempts": 1,
+  "probeProps": {
+    "field": "VizSizeSummary field",
+    "maxField": "VizSizeSummary maxField",
+    "minField": "VizSizeSummary minField",
+    "strategyField": "VizSizeSummary strategyField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Viz Size Summary Field VizSizeSummary field\"",
+  "dataPropAttributes": [
+    "data-prop-field",
+    "data-prop-max-field",
+    "data-prop-min-field",
+    "data-prop-strategy-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-vizsizesummary\" data-oods-component=\"VizSizeSummary\" data-oods-node-id=\"probe-vizsizesummary\" data-summary-type=\"viz-size-summary\" data-prop-field=\"VizSizeSummary field\" data-prop-max-field=\"VizSizeSummary maxField\" data-prop-min-field=\"VizSizeSummary minField\" data-prop-strategy-field=\"VizSizeSummary strategyField\"><h3 data-summary-title=\"true\">Viz Size Summary</h3><dl><div data-summary-item=\"true\"><dt>Field</dt><dd>VizSizeSummary field</dd></div></dl></section>"
+}

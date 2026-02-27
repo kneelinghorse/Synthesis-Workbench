@@ -1,0 +1,24 @@
+{
+  "component": "OwnerBadge",
+  "displayName": "OwnerBadge",
+  "classification": "partial",
+  "nodeId": "probe-ownerbadge",
+  "attempts": 1,
+  "probeProps": {
+    "ownerIdField": "OwnerBadge ownerIdField",
+    "ownerTypeField": "OwnerBadge ownerTypeField"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Owner\"",
+  "dataPropAttributes": [
+    "data-prop-owner-id-field",
+    "data-prop-owner-type-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-ownerbadge\" data-oods-component=\"OwnerBadge\" data-oods-node-id=\"probe-ownerbadge\" data-badge-variant=\"owner\" data-prop-owner-id-field=\"OwnerBadge ownerIdField\" data-prop-owner-type-field=\"OwnerBadge ownerTypeField\">Owner</span>"
+}

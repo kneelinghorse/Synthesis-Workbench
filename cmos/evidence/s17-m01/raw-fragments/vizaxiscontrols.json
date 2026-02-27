@@ -1,0 +1,36 @@
+{
+  "component": "VizAxisControls",
+  "displayName": "VizAxisControls",
+  "classification": "partial",
+  "nodeId": "probe-vizaxiscontrols",
+  "attempts": 1,
+  "probeProps": {
+    "aggregateField": "VizAxisControls aggregateField",
+    "axis": "VizAxisControls axis",
+    "fieldField": "VizAxisControls fieldField",
+    "kindField": "VizAxisControls kindField",
+    "scaleField": "VizAxisControls scaleField",
+    "sortField": "VizAxisControls sortField",
+    "titleField": "VizAxisControls titleField",
+    "zeroField": "VizAxisControls zeroField"
+  },
+  "rootTag": "fieldset",
+  "structureSummary": "fieldset -> children: legend, div, label, span, input, select; text: \"Viz Axis Controls X Field Y Field Scale linear band temporal\"",
+  "dataPropAttributes": [
+    "data-prop-aggregate-field",
+    "data-prop-axis",
+    "data-prop-field-field",
+    "data-prop-kind-field",
+    "data-prop-scale-field",
+    "data-prop-sort-field",
+    "data-prop-title-field",
+    "data-prop-zero-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<fieldset id=\"probe-vizaxiscontrols\" data-oods-component=\"VizAxisControls\" data-oods-node-id=\"probe-vizaxiscontrols\" data-form-type=\"viz-axis-controls\" data-prop-aggregate-field=\"VizAxisControls aggregateField\" data-prop-axis=\"VizAxisControls axis\" data-prop-field-field=\"VizAxisControls fieldField\" data-prop-kind-field=\"VizAxisControls kindField\" data-prop-scale-field=\"VizAxisControls scaleField\" data-prop-sort-field=\"VizAxisControls sortField\" data-prop-title-field=\"VizAxisControls titleField\" data-prop-zero-field=\"VizAxisControls zeroField\"><legend>Viz Axis Controls</legend><div data-form-content=\"true\"><label data-form-control=\"input\"><span>X Field</span><input type=\"text\" name=\"xField\" /></label><label data-form-control=\"input\"><span>Y Field</span><input type=\"text\" name=\"yField\" /></label><label data-form-control=\"select\"><span>Scale</span><select name=\"scale\"><option value=\"linear\">linear</option><option value=\"band\">band</option><option value=\"temporal\">temporal</option></select></label><label data-form-control=\"input\"><span>Axis Title</span><input type=\"text\" name=\"axisTitle\" /></label></div></fieldset>"
+}

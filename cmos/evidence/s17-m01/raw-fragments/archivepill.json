@@ -1,0 +1,24 @@
+{
+  "component": "ArchivePill",
+  "displayName": "ArchivePill",
+  "classification": "partial",
+  "nodeId": "probe-archivepill",
+  "attempts": 1,
+  "probeProps": {
+    "archivedAtField": "ArchivePill archivedAtField",
+    "field": "ArchivePill field"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Archive\"",
+  "dataPropAttributes": [
+    "data-prop-archived-at-field",
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-archivepill\" data-oods-component=\"ArchivePill\" data-oods-node-id=\"probe-archivepill\" data-badge-variant=\"archive\" data-prop-archived-at-field=\"ArchivePill archivedAtField\" data-prop-field=\"ArchivePill field\">Archive</span>"
+}

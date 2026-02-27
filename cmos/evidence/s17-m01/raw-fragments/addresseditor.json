@@ -1,0 +1,28 @@
+{
+  "component": "AddressEditor",
+  "displayName": "AddressEditor",
+  "classification": "partial",
+  "nodeId": "probe-addresseditor",
+  "attempts": 1,
+  "probeProps": {
+    "allowDynamicParameter": true,
+    "defaultRoleField": "AddressEditor defaultRoleField",
+    "field": "AddressEditor field",
+    "roleParameter": "AddressEditor roleParameter"
+  },
+  "rootTag": "form",
+  "structureSummary": "form -> children: header, h3, div, label, span, input; text: \"Address Editor Street City Region Postal Code\"",
+  "dataPropAttributes": [
+    "data-prop-allow-dynamic-parameter",
+    "data-prop-default-role-field",
+    "data-prop-field",
+    "data-prop-role-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<form id=\"probe-addresseditor\" data-oods-component=\"AddressEditor\" data-oods-node-id=\"probe-addresseditor\" data-form-type=\"address-editor\" data-prop-allow-dynamic-parameter=\"true\" data-prop-default-role-field=\"AddressEditor defaultRoleField\" data-prop-field=\"AddressEditor field\" data-prop-role-parameter=\"AddressEditor roleParameter\"><header data-form-header=\"true\"><h3>Address Editor</h3></header><div data-form-content=\"true\"><label data-form-control=\"input\"><span>Street</span><input type=\"text\" name=\"street\" /></label><label data-form-control=\"input\"><span>City</span><input type=\"text\" name=\"city\" /></label><label data-form-control=\"input\"><span>Region</span><input type=\"text\" name=\"region\" /></label><label data-form-control=\"input\"><span>Postal Code</span><input type=\"text\" name=\"postalCode\" /></label></div></form>"
+}

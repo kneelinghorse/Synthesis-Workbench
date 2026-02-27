@@ -1,0 +1,35 @@
+{
+  "component": "Tabs",
+  "displayName": "Tabs",
+  "classification": "full-content",
+  "nodeId": "probe-tabs",
+  "attempts": 2,
+  "probeProps": {
+    "tabs": [
+      {
+        "id": "overview",
+        "label": "Overview"
+      },
+      {
+        "id": "pipeline",
+        "label": "Pipeline"
+      },
+      {
+        "id": "team",
+        "label": "Team"
+      }
+    ],
+    "activeTab": "overview"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: div, button; text: \"Overview Pipeline Team\"",
+  "dataPropAttributes": [],
+  "cssRefs": [
+    "css.base",
+    "css.tokens",
+    "cmp.tabs.base"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-tabs\" data-oods-component=\"Tabs\" data-oods-node-id=\"probe-tabs\"><div role=\"tablist\"><button role=\"tab\" id=\"probe-tabs-tab-button-1\" aria-controls=\"probe-tabs-tab-panel-1\" aria-selected=\"true\" tabindex=\"0\">Overview</button><button role=\"tab\" id=\"probe-tabs-tab-button-2\" aria-controls=\"probe-tabs-tab-panel-2\" aria-selected=\"false\" tabindex=\"-1\">Pipeline</button><button role=\"tab\" id=\"probe-tabs-tab-button-3\" aria-controls=\"probe-tabs-tab-panel-3\" aria-selected=\"false\" tabindex=\"-1\">Team</button></div><div role=\"tabpanel\" id=\"probe-tabs-tab-panel-1\" aria-labelledby=\"probe-tabs-tab-button-1\"></div><div role=\"tabpanel\" id=\"probe-tabs-tab-panel-2\" aria-labelledby=\"probe-tabs-tab-button-2\" hidden></div><div role=\"tabpanel\" id=\"probe-tabs-tab-panel-3\" aria-labelledby=\"probe-tabs-tab-button-3\" hidden></div></section>"
+}

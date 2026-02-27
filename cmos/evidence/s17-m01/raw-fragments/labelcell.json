@@ -1,0 +1,25 @@
+{
+  "component": "LabelCell",
+  "displayName": "LabelCell",
+  "classification": "partial",
+  "nodeId": "probe-labelcell",
+  "attempts": 1,
+  "probeProps": {
+    "descriptionField": "LabelCell descriptionField",
+    "field": "LabelCell field",
+    "truncate": "LabelCell truncate"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: span; text: none",
+  "dataPropAttributes": [
+    "data-prop-description-field",
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-labelcell\" data-oods-component=\"LabelCell\" data-oods-node-id=\"probe-labelcell\" data-prop-description-field=\"LabelCell descriptionField\" data-prop-field=\"LabelCell field\"><span data-oods-label-cell-primary=\"true\"></span></span>"
+}

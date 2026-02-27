@@ -1,0 +1,20 @@
+{
+  "component": "Grid",
+  "displayName": "Grid",
+  "classification": "error",
+  "nodeId": "probe-grid",
+  "attempts": 1,
+  "probeProps": {
+    "columns": 3,
+    "gap": 16
+  },
+  "rootTag": null,
+  "structureSummary": "unknown (no inner HTML)",
+  "dataPropAttributes": [],
+  "cssRefs": [],
+  "warnings": [],
+  "errors": [
+    "UNKNOWN_COMPONENT: Component 'Grid' is not in the OODS registry"
+  ],
+  "html": ""
+}

@@ -1,0 +1,22 @@
+{
+  "component": "MessageStatusBadge",
+  "displayName": "MessageStatusBadge",
+  "classification": "partial",
+  "nodeId": "probe-messagestatusbadge",
+  "attempts": 1,
+  "probeProps": {
+    "statusesField": "active"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Message\"",
+  "dataPropAttributes": [
+    "data-prop-statuses-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-messagestatusbadge\" data-oods-component=\"MessageStatusBadge\" data-oods-node-id=\"probe-messagestatusbadge\" data-badge-variant=\"message\" data-prop-statuses-field=\"active\">Message</span>"
+}

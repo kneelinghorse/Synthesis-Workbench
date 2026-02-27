@@ -1,0 +1,27 @@
+{
+  "component": "TemplatePicker",
+  "displayName": "TemplatePicker",
+  "classification": "partial",
+  "nodeId": "probe-templatepicker",
+  "attempts": 1,
+  "probeProps": {
+    "channelsField": [
+      "one",
+      "two"
+    ],
+    "templatesField": "TemplatePicker templatesField"
+  },
+  "rootTag": "fieldset",
+  "structureSummary": "fieldset -> children: legend, div, label, span, select, option; text: \"Template Picker Template Select... Channel email sms in_app\"",
+  "dataPropAttributes": [
+    "data-prop-channels-field",
+    "data-prop-templates-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<fieldset id=\"probe-templatepicker\" data-oods-component=\"TemplatePicker\" data-oods-node-id=\"probe-templatepicker\" data-form-type=\"template-picker\" data-prop-channels-field=\"[&quot;one&quot;,&quot;two&quot;]\" data-prop-templates-field=\"TemplatePicker templatesField\"><legend>Template Picker</legend><div data-form-content=\"true\"><label data-form-control=\"select\"><span>Template</span><select name=\"template\"><option value=\"\">Select...</option></select></label><label data-form-control=\"select\"><span>Channel</span><select name=\"channel\"><option value=\"email\">email</option><option value=\"sms\">sms</option><option value=\"in_app\">in_app</option></select></label></div></fieldset>"
+}

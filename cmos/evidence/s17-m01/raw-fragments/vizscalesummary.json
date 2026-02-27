@@ -1,0 +1,34 @@
+{
+  "component": "VizScaleSummary",
+  "displayName": "VizScaleSummary",
+  "classification": "partial",
+  "nodeId": "probe-vizscalesummary",
+  "attempts": 1,
+  "probeProps": {
+    "domainMaxField": "VizScaleSummary domainMaxField",
+    "domainMinField": "VizScaleSummary domainMinField",
+    "modeField": "default",
+    "niceField": "VizScaleSummary niceField",
+    "timezoneField": "UTC",
+    "type": "VizScaleSummary type",
+    "zeroField": "VizScaleSummary zeroField"
+  },
+  "rootTag": "section",
+  "structureSummary": "section -> children: h3, dl, div, dt, dd; text: \"Viz Scale Summary Type VizScaleSummary type\"",
+  "dataPropAttributes": [
+    "data-prop-domain-max-field",
+    "data-prop-domain-min-field",
+    "data-prop-mode-field",
+    "data-prop-nice-field",
+    "data-prop-timezone-field",
+    "data-prop-type",
+    "data-prop-zero-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<section id=\"probe-vizscalesummary\" data-oods-component=\"VizScaleSummary\" data-oods-node-id=\"probe-vizscalesummary\" data-summary-type=\"viz-scale-summary\" data-prop-domain-max-field=\"VizScaleSummary domainMaxField\" data-prop-domain-min-field=\"VizScaleSummary domainMinField\" data-prop-mode-field=\"default\" data-prop-nice-field=\"VizScaleSummary niceField\" data-prop-timezone-field=\"UTC\" data-prop-type=\"VizScaleSummary type\" data-prop-zero-field=\"VizScaleSummary zeroField\"><h3 data-summary-title=\"true\">Viz Scale Summary</h3><dl><div data-summary-item=\"true\"><dt>Type</dt><dd>VizScaleSummary type</dd></div></dl></section>"
+}

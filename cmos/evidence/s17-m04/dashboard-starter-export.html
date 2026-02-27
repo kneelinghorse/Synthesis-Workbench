@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dashboard scaffold with status banner, KPI cards, and a summary table">
+  <title>Dashboard Starter</title>
+  <style>
+    :root {
+    --colors-primary: #3b82f6;
+    --colors-secondary: #64748b;
+    --colors-accent: #f59e0b;
+    --colors-background: #ffffff;
+    --colors-surface: #f8fafc;
+    --colors-text-primary: #0f172a;
+    --colors-text-secondary: #475569;
+    --colors-text-disabled: #94a3b8;
+    --colors-status-success: #22c55e;
+    --colors-status-warning: #f59e0b;
+    --colors-status-error: #ef4444;
+    --colors-status-info: #3b82f6;
+    --colors-border: #e2e8f0;
+    --typography-fontFamily-sans: Inter, system-ui, sans-serif;
+    --typography-fontFamily-mono: JetBrains Mono, monospace;
+    --typography-fontSize-xs: 0.75rem;
+    --typography-fontSize-sm: 0.875rem;
+    --typography-fontSize-base: 1rem;
+    --typography-fontSize-lg: 1.125rem;
+    --typography-fontSize-xl: 1.25rem;
+    --typography-fontSize-2xl: 1.5rem;
+    --typography-fontSize-3xl: 1.875rem;
+    --typography-fontWeight-normal: 400;
+    --typography-fontWeight-medium: 500;
+    --typography-fontWeight-semibold: 600;
+    --typography-fontWeight-bold: 700;
+    --typography-lineHeight-tight: 1.25;
+    --typography-lineHeight-normal: 1.5;
+    --typography-lineHeight-relaxed: 1.75;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --radius-none: 0;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-full: 9999px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--typography-fontFamily-sans, system-ui, sans-serif);
+      font-size: var(--typography-fontSize-base, 1rem);
+      line-height: var(--typography-lineHeight-normal, 1.5);
+      color: var(--colors-text-primary, #111);
+      background: var(--colors-background, #fff);
+      padding: var(--spacing-lg, 1.5rem);
+    }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 1000;
+      padding: 0.5rem 0.75rem;
+      background: var(--colors-primary, #3b82f6);
+      color: #fff;
+      border-radius: 0.25rem;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+    }
+    main[role="main"] {
+      max-width: min(72rem, 100%);
+      margin: 0 auto;
+      padding: var(--spacing-xl, 2rem);
+      border-radius: var(--radius-lg, 0.5rem);
+      background: var(--colors-surface, #f8fafc);
+      box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 48rem) {
+      body {
+        padding: var(--spacing-md, 1rem);
+      }
+      main[role="main"] {
+        padding: var(--spacing-lg, 1.5rem);
+        border-radius: var(--radius-md, 0.375rem);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" role="main" aria-label="Dashboard Starter">
+    <style data-foundry-fragment-css="true">
+    #oods-preview-root {
+    margin: 0;
+      padding: var(--ref-space-inset-default, 24px);
+      min-height: 100dvh;
+      box-sizing: border-box;
+      background: var(--ref-color-neutral-50, #f8fafc);
+      color: var(--ref-color-neutral-900, #0f172a);
+      font-family: var(--ref-typography-families-sans, Inter, "Helvetica Neue", Arial, sans-serif);
+    }
+    
+    [data-oods-component] {
+    box-sizing: border-box;
+    }
+    
+    [data-sidebar-aside="true"] {
+    border-left: var(--ref-border-width-hairline, 1px) solid var(--ref-color-neutral-200, #e2e8f0);
+      padding-left: var(--ref-space-inset-compact, 8px);
+    }
+    
+    /**
+     * Do not edit directly, this file was auto-generated.
+     */
+    
+    :root {
+      --ref-border-width-hairline: 1px; /** Hairline border width for foundational surfaces. */
+      --ref-border-width-bold: 2px; /** Bold border width for emphasis and outlines. */
+      --ref-border-radius-sm: 8px; /** Small radius for banners and compact surfaces. */
+      --ref-border-radius-md: 12px; /** Medium radius for cards and panels. */
+      --ref-border-radius-pill: 999px; /** Pill radius for chip and badge treatments. */
+      --ref-border-style-solid: solid; /** Solid border style for primary UI elements. */
+      --ref-color-primary-100: oklch(0.9563 0.0277 225.69); /** Primary 100; airy accent surface drawn from Theme 0 ramp. */
+      --ref-color-primary-300: oklch(0.7031 0.1967 274.55); /** Primary 300; luminous accent for dark hover states. */
+      --ref-color-primary-400: oklch(0.6631 0.1867 274.55); /** Primary 400; elevated accent for dark mode focus/hover. */
+      --ref-color-primary-500: oklch(0.5631 0.1717 274.55); /** Primary 500; core interactive colour for Theme 0. */
+      --ref-color-primary-600: oklch(0.4631 0.1867 274.55); /** Primary 600; hover state reference for interactive surfaces. */
+      --ref-color-primary-700: oklch(0.4231 0.1967 274.55); /** Primary 700; pressed state reference for interactive surfaces. */
+      --ref-color-neutral-0: oklch(1 0 0); /** Neutral 0; pure white anchor for the lightest surfaces. */
+      --ref-color-neutral-50: oklch(0.9913 0.0013 286.38); /** Neutral 50; luminous canvas background for Theme 0. */
+      --ref-color-neutral-100: oklch(0.9816 0.0017 247.84); /** Neutral 100; primary raised surface. */
+      --ref-color-neutral-200: oklch(0.9417 0.0052 247.88); /** Neutral 200; subtle surface and soft border tone. */
+      --ref-color-neutral-300: oklch(0.8875 0.0147 264.49); /** Neutral 300; structural border contrast for light UI. */
+      --ref-color-neutral-400: oklch(0.7951 0.0148 268.46); /** Neutral 400; disabled foreground tone. */
+      --ref-color-neutral-500: oklch(0.6929 0.0198 269.00); /** Neutral 500; tertiary text and icon tone. */
+      --ref-color-neutral-600: oklch(0.5595 0.0225 270.01); /** Neutral 600; high-contrast muted text tone. */
+      --ref-color-neutral-700: oklch(0.5109 0.0264 269.16); /** Neutral 700; secondary body text tone. */
+      --ref-color-neutral-800: oklch(0.4239 0.021 267.53); /** Neutral 800; dense iconography tone. */
+      --ref-color-neutral-900: oklch(0.313 0.0171 266.40); /** Neutral 900; high-contrast foreground tone. */
+      --ref-color-info-100: oklch(0.9685 0.0148 260.73); /** Info 100; calming informational surface. */
+      --ref-color-info-300: oklch(0.8191 0.0763 260.81); /** Info 300; informational border tone. */
+      --ref-color-info-700: oklch(0.5466 0.1806 263.48); /** Info 700; informational icon tone. */
+      --ref-color-info-900: oklch(0.3847 0.1344 263.74); /** Info 900; informational headline/text tone. */
+      --ref-color-success-100: oklch(0.9743 0.0192 167.94); /** Success 100; success feedback surface. */
+      --ref-color-success-300: oklch(0.8671 0.0772 165.25); /** Success 300; success border tone. */
+      --ref-color-success-700: oklch(0.6005 0.1199 161.34); /** Success 700; success icon tone. */
+      --ref-color-success-900: oklch(0.4315 0.0821 163.04); /** Success 900; success text tone. */
+      --ref-color-warning-100: oklch(0.9795 0.026 90.09); /** Warning 100; warning feedback surface. */
+      --ref-color-warning-300: oklch(0.8949 0.1177 87.87); /** Warning 300; warning border tone. */
+      --ref-color-warning-700: oklch(0.6573 0.1198 81.65); /** Warning 700; warning icon tone. */
+      --ref-color-warning-900: oklch(0.4914 0.1012 82.20); /** Warning 900; warning text tone. */
+      --ref-color-critical-100: oklch(0.9672 0.0163 12.78); /** Critical 100; error feedback surface. */
+      --ref-color-critical-300: oklch(0.824 0.0834 19.01); /** Critical 300; error border tone. */
+      --ref-color-critical-700: oklch(0.6039 0.1827 24.43); /** Critical 700; error icon tone. */
+      --ref-color-critical-900: oklch(0.465 0.147 24.94); /** Critical 900; error text tone. */
+      --ref-space-inset-compact: 8px; /** Compact padding for dense containers. */
+      --ref-space-inset-default: 24px; /** Default padding for primary cards and panels. */
+      --ref-space-stack-compact: 12px; /** Tight vertical spacing between related items. */
+      --ref-space-stack-default: 20px; /** Standard vertical spacing between sections. */
+      --ref-space-inline-xs: 8px; /** Compact horizontal spacing. */
+      --ref-space-inline-sm: 14px; /** Small horizontal spacing used in chip contexts. */
+      --ref-shadow-color-subtle: rgba(15, 23, 42, 0.12); /** Soft ambient shadow colour for elevated surfaces. */
+      --ref-shadow-color-strong: rgba(15, 23, 42, 0.24); /** Stronger shadow colour for high elevation overlays. */
+      --ref-typography-families-sans: Inter, "Inter", '"Helvetica Neue"', Helvetica, Arial, sans-serif; /** Primary sans-serif stack for product UI. */
+      --ref-typography-weights-regular: 400; /** Standard reading weight. */
+      --ref-typography-weights-medium: 500; /** Medium emphasis for supporting text and labels. */
+      --ref-typography-weights-semibold: 600; /** Semibold weight for headings and key UI labels. */
+      --ref-typography-weights-bold: 700; /** Bold weight for hero headings and emphasis. */
+      --ref-typography-sizes-xs: 12px; /** Caption scale. */
+      --ref-typography-sizes-sm: 14px; /** Compact body/label scale. */
+      --ref-typography-sizes-md: 16px; /** Default reading scale. */
+      --ref-typography-sizes-lg: 20px; /** Large supporting heading scale. */
+      --ref-typography-sizes-xl: 24px; /** Primary heading scale. */
+      --ref-typography-sizes-xxl: 32px; /** Hero heading scale. */
+      --ref-typography-line-height-tight: 120%; /** Tight rhythm for headlines and compact contexts. */
+      --ref-typography-line-height-standard: 140%; /** Baseline rhythm for UI text. */
+      --ref-typography-line-height-relaxed: 150%; /** Relaxed rhythm for dense reading. */
+      --ref-typography-line-height-loose: 160%; /** Loose rhythm for long-form detail views. */
+      --ref-typography-letter-spacing-tight: -0.01em; /** Tight tracking for large headings. */
+      --ref-typography-letter-spacing-default: 0em; /** Neutral tracking for body copy. */
+      --ref-typography-letter-spacing-wide: 0.08em; /** Wide tracking for uppercase captions. */
+      --oods-motion-duration-fast: 120ms; /** Snappy micro interactions such as hovers. */
+      --oods-motion-duration-base: 180ms; /** Default interaction tempo for focus, chips, and buttons. */
+      --oods-motion-duration-slow: 320ms; /** Long-form transitions like banners entering the viewport. */
+      --oods-motion-reduced-duration-fast: 0ms; /** Instant feedback for motion-sensitive contexts. */
+      --oods-motion-reduced-duration-base: 0ms; /** Primary reduced-motion tempo. */
+      --oods-motion-reduced-duration-slow: 0ms; /** Long-form transitions collapse to zero in reduced motion. */
+      --oods-motion-reduced-transition-hover-delay: 0ms; /** Hover states snap immediately when motion is reduced. */
+      --oods-motion-reduced-transition-focus-delay: 0ms; /** Focus rings become instant in reduced-motion. */
+      --oods-motion-reduced-transition-chip-in-delay: 0ms; /** Chip selection occurs without momentum. */
+      --oods-motion-reduced-transition-chip-out-delay: 0ms; /** Chip removal happens immediately. */
+      --oods-motion-reduced-transition-banner-reveal-delay: 0ms; /** Banner reveal falls back to an instant appearance. */
+      --oods-motion-easing-standard: cubic-bezier(0.2, 0, 0.38, 1); /** Primary ease-out curve for UI transitions. */
+      --oods-motion-easing-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1); /** Emphasized ease for entrance motion requiring more weight. */
+      --oods-motion-easing-linear: cubic-bezier(0, 0, 1, 1); /** Linear fallback for reduced-motion scenarios. */
+      --oods-motion-transition-hover-delay: 0ms; /** Hover affordances across buttons, chips, and cards. */
+      --oods-motion-transition-focus-delay: 0ms; /** Focus outlines and glow elevation. */
+      --oods-motion-transition-chip-in-delay: 0ms; /** Chip selection and entry into filter groups. */
+      --oods-motion-transition-chip-out-delay: 0ms; /** Chip deselection or removal. */
+      --oods-motion-transition-banner-reveal-delay: 20ms; /** Banner entrance along the vertical axis. */
+      --oods-overlay-backdrop-opacity: 0.5; /** Default backdrop opacity for overlays. */
+      --oods-overlay-transition-open-delay: 0ms; /** Overlay open transition; collapses under reduced motion. */
+      --oods-overlay-transition-close-delay: 0ms; /** Overlay close transition; collapses under reduced motion. */
+      --oods-shadow-elevation-card-offset-x: 0px; /** Baseline elevation shadow for cards and raised panels. */
+      --oods-shadow-elevation-card-offset-y: 16px; /** Baseline elevation shadow for cards and raised panels. */
+      --oods-shadow-elevation-card-blur: 40px; /** Baseline elevation shadow for cards and raised panels. */
+      --oods-shadow-elevation-card-spread: -12px; /** Baseline elevation shadow for cards and raised panels. */
+      --oods-shadow-elevation-card-color: rgba(15, 23, 42, 0.12); /** Baseline elevation shadow for cards and raised panels. */
+      --oods-shadow-elevation-overlay-offset-x: 0px; /** High elevation shadow used for overlays and dialogs. */
+      --oods-shadow-elevation-overlay-offset-y: 24px; /** High elevation shadow used for overlays and dialogs. */
+      --oods-shadow-elevation-overlay-blur: 56px; /** High elevation shadow used for overlays and dialogs. */
+      --oods-shadow-elevation-overlay-spread: -16px; /** High elevation shadow used for overlays and dialogs. */
+      --oods-shadow-elevation-overlay-color: rgba(15, 23, 42, 0.24); /** High elevation shadow used for overlays and dialogs. */
+      --sys-motion-reduced-transition-hover-delay: 0ms; /** Reduced-motion hover transition. */
+      --sys-motion-reduced-transition-focus-delay: 0ms; /** Reduced-motion focus transition. */
+      --sys-motion-reduced-transition-chip-in-delay: 0ms; /** Reduced-motion chip entry transition. */
+      --sys-motion-reduced-transition-chip-out-delay: 0ms; /** Reduced-motion chip exit transition. */
+      --sys-motion-reduced-transition-banner-reveal-delay: 0ms; /** Reduced-motion banner reveal transition. */
+      --sys-motion-transition-hover-delay: 0ms; /** System hover transition for interactive affordances. */
+      --sys-motion-transition-focus-delay: 0ms; /** System focus transition for outlines/glow. */
+      --sys-motion-transition-chip-in-delay: 0ms; /** System chip entry transition. */
+      --sys-motion-transition-chip-out-delay: 0ms; /** System chip exit transition. */
+      --sys-motion-transition-banner-reveal-delay: 20ms; /** System banner reveal transition. */
+      --sys-text-scale-caption-text-case: uppercase; /** System caption scale. */
+      --sys-text-scale-label-md-text-case: none; /** System label medium scale. */
+      --oods-text-scale-caption-text-case: uppercase; /** Caption text for metadata, badges, and helper copy. */
+      --oods-text-scale-label-md-text-case: none; /** Form labels and actionable micro copy. */
+      --oods-z-base: 0; /** Default stacking context for page content. */
+      --oods-z-raised: 10; /** Raised cards and sticky UI. */
+      --oods-z-overlay: 1000; /** Modal overlays and backdrops. */
+      --oods-z-toast: 1100; /** Toasts and non-blocking alerts. */
+      --oods-z-tooltip: 1200; /** Tooltips and popovers above overlays. */
+      --oods-color-brand-a-surface-canvas: Canvas; /** Forced-colors canvas maps to system Canvas. */
+      --oods-color-brand-a-surface-raised: Canvas; /** Raised surfaces mirror Canvas in HC mode. */
+      --oods-color-brand-a-surface-subtle: Canvas; /** Subtle surfaces flatten to Canvas for predictability. */
+      --oods-color-brand-a-surface-disabled: Canvas; /** Disabled surfaces stay on Canvas to preserve outlines. */
+      --oods-color-brand-a-surface-backdrop: Canvas; /** Backdrop scrims fall back to Canvas in HC mode. */
+      --oods-color-brand-a-surface-inverse: CanvasText; /** Inverse surfaces flip to CanvasText for contrast. */
+      --oods-color-brand-a-surface-interactive-primary-default: Highlight; /** Primary action aligns to Highlight in HC. */
+      --oods-color-brand-a-surface-interactive-primary-hover: Highlight; /** Hover remains Highlight to avoid flicker. */
+      --oods-color-brand-a-surface-interactive-primary-pressed: Highlight; /** Pressed state remains Highlight. */
+      --oods-color-brand-a-border-subtle: CanvasText; /** Default border maps to CanvasText. */
+      --oods-color-brand-a-border-strong: Highlight; /** High-emphasis border uses Highlight for visibility. */
+      --oods-color-brand-a-text-primary: CanvasText; /** Primary text uses CanvasText for HC compliance. */
+      --oods-color-brand-a-text-secondary: GrayText; /** Secondary copy falls back to GrayText. */
+      --oods-color-brand-a-text-muted: GrayText; /** Muted copy also maps to GrayText. */
+      --oods-color-brand-a-text-inverse: Canvas; /** Inverse text uses Canvas to contrast CanvasText surfaces. */
+      --oods-color-brand-a-text-accent: LinkText; /** Accent inline text maps to LinkText in HC. */
+      --oods-color-brand-a-text-on-interactive: HighlightText; /** Interactive foreground uses HighlightText. */
+      --oods-color-brand-a-text-disabled: GrayText; /** Disabled text uses GrayText baseline. */
+      --oods-color-brand-a-accent-background: Canvas; /** Accent surfaces resolve to Canvas. */
+      --oods-color-brand-a-accent-border: Highlight; /** Accent border leverages Highlight. */
+      --oods-color-brand-a-accent-text: HighlightText; /** Accent text maps to HighlightText. */
+      --oods-color-brand-a-status-info-surface: Canvas; /** Info backgrounds map to Canvas. */
+      --oods-color-brand-a-status-info-border: Highlight; /** Info borders use Highlight. */
+      --oods-color-brand-a-status-info-text: HighlightText; /** Info text uses HighlightText. */
+      --oods-color-brand-a-status-info-icon: HighlightText; /** Info icon uses HighlightText. */
+      --oods-color-brand-a-status-success-surface: Canvas; /** Success surfaces map to Canvas. */
+      --oods-color-brand-a-status-success-border: Highlight; /** Success border uses Highlight. */
+      --oods-color-brand-a-status-success-text: HighlightText; /** Success text uses HighlightText. */
+      --oods-color-brand-a-status-success-icon: HighlightText; /** Success icon uses HighlightText. */
+      --oods-color-brand-a-status-warning-surface: Canvas; /** Warning surfaces map to Canvas. */
+      --oods-color-brand-a-status-warning-border: Highlight; /** Warning border uses Highlight. */
+      --oods-color-brand-a-status-warning-text: HighlightText; /** Warning text uses HighlightText. */
+      --oods-color-brand-a-status-warning-icon: HighlightText; /** Warning icon uses HighlightText. */
+      --oods-color-brand-a-status-critical-surface: Canvas; /** Critical surfaces flatten to Canvas. */
+      --oods-color-brand-a-status-critical-border: Highlight; /** Critical border uses Highlight. */
+      --oods-color-brand-a-status-critical-text: HighlightText; /** Critical text uses HighlightText. */
+      --oods-color-brand-a-status-critical-icon: HighlightText; /** Critical icon uses HighlightText. */
+      --oods-color-brand-a-status-neutral-surface: Canvas; /** Neutral surface maps to Canvas. */
+      --oods-color-brand-a-status-neutral-border: CanvasText; /** Neutral border uses CanvasText. */
+      --oods-color-brand-a-status-neutral-text: CanvasText; /** Neutral text uses CanvasText. */
+      --oods-color-brand-a-status-neutral-icon: CanvasText; /** Neutral icon uses CanvasText. */
+      --oods-color-brand-b-surface-canvas: Canvas; /** Forced-colors canvas maps to system Canvas. */
+      --oods-color-brand-b-surface-raised: Canvas; /** Raised surfaces mirror Canvas in HC mode. */
+      --oods-color-brand-b-surface-subtle: Canvas; /** Subtle surfaces flatten to Canvas for predictability. */
+      --oods-color-brand-b-surface-disabled: Canvas; /** Disabled surfaces stay on Canvas to preserve outlines. */
+      --oods-color-brand-b-surface-backdrop: Canvas; /** Backdrop scrims fall back to Canvas in HC mode. */
+      --oods-color-brand-b-surface-inverse: CanvasText; /** Inverse surfaces flip to CanvasText for contrast. */
+      --oods-color-brand-b-surface-interactive-primary-default: Highlight; /** Primary action aligns to Highlight in HC. */
+      --oods-color-brand-b-surface-interactive-primary-hover: Highlight; /** Hover remains Highlight to avoid flicker. */
+      --oods-color-brand-b-surface-interactive-primary-pressed: Highlight; /** Pressed state remains Highlight. */
+      --oods-color-brand-b-border-subtle: CanvasText; /** Default border maps to CanvasText. */
+      --oods-color-brand-b-border-strong: Highlight; /** High-emphasis border uses Highlight for visibility. */
+      --oods-color-brand-b-text-primary: CanvasText; /** Primary text uses CanvasText for HC compliance. */
+      --oods-color-brand-b-text-secondary: GrayText; /** Secondary copy falls back to GrayText. */
+      --oods-color-brand-b-text-muted: GrayText; /** Muted copy also maps to GrayText. */
+      --oods-color-brand-b-text-inverse: Canvas; /** Inverse text uses Canvas to contrast CanvasText surfaces. */
+      --oods-color-brand-b-text-accent: LinkText; /** Accent inline text maps to LinkText in HC. */
+      --oods-color-brand-b-text-on-interactive: HighlightText; /** Interactive foreground uses HighlightText. */
+      --oods-color-brand-b-text-disabled: GrayText; /** Disabled text uses GrayText baseline. */
+      --oods-color-brand-b-accent-background: Canvas; /** Accent surfaces resolve to Canvas. */
+      --oods-color-brand-b-accent-border: Highlight; /** Accent border leverages Highlight. */
+      --oods-color-brand-b-accent-text: HighlightText; /** Accent text maps to HighlightText. */
+      --oods-color-brand-b-status-info-surface: Canvas; /** Info backgrounds map to Canvas. */
+      --oods-color-brand-b-status-info-border: Highlight; /** Info borders use Highlight. */
+      --oods-color-brand-b-status-info-text: HighlightText; /** Info text uses HighlightText. */
+      --oods-color-brand-b-status-info-icon: HighlightText; /** Info icon uses HighlightText. */
+      --oods-color-brand-b-status-success-surface: Canvas; /** Success surfaces map to Canvas. */
+      --oods-color-brand-b-status-success-border: Highlight; /** Success border uses Highlight. */
+      --oods-color-brand-b-status-success-text: HighlightText; /** Success text uses HighlightText. */
+      --oods-color-brand-b-status-success-icon: HighlightText; /** Success icon uses HighlightText. */
+      --oods-color-brand-b-status-warning-surface: Canvas; /** Warning surfaces map to Canvas. */
+      --oods-color-brand-b-status-warning-border: Highlight; /** Warning border uses Highlight. */
+      --oods-color-brand-b-status-warning-text: HighlightText; /** Warning text uses HighlightText. */
+      --oods-color-brand-b-status-warning-icon: HighlightText; /** Warning icon uses HighlightText. */
+      --oods-color-brand-b-status-critical-surface: Canvas; /** Critical surfaces flatten to Canvas. */
+      --oods-color-brand-b-status-critical-border: Highlight; /** Critical border uses Highlight. */
+      --oods-color-brand-b-status-critical-text: HighlightText; /** Critical text uses HighlightText. */
+      --oods-color-brand-b-status-critical-icon: HighlightText; /** Critical icon uses HighlightText. */
+      --oods-color-brand-b-status-neutral-surface: Canvas; /** Neutral surface maps to Canvas. */
+      --oods-color-brand-b-status-neutral-border: CanvasText; /** Neutral border uses CanvasText. */
+      --oods-color-brand-b-status-neutral-text: CanvasText; /** Neutral text uses CanvasText. */
+      --oods-color-brand-b-status-neutral-icon: CanvasText; /** Neutral icon uses CanvasText. */
+      --theme-dark-focus-ring-outer: oklch(0.85 0.13 274.55); /** Outer focus ring tuned for dark surfaces. */
+      --theme-dark-focus-ring-inner: oklch(0.16 0.015 260); /** Inner focus contrast colour that nests against the outer ring. */
+      --theme-dark-focus-text: oklch(0.77 0.16 274.55); /** Text and indicator colour used within focus treatments. */
+      --theme-dark-focus-width: 2px; /** Focus ring width shared with light theme. */
+      --theme-dark-motion-duration-fast: 120ms; /** Snappy micro interactions such as hovers. */
+      --theme-dark-motion-duration-base: 180ms; /** Default interaction tempo for focus, chips, and buttons. */
+      --theme-dark-motion-duration-slow: 320ms; /** Long-form transitions like banners entering the viewport. */
+      --theme-dark-motion-easing-standard: cubic-bezier(0.2, 0, 0.38, 1); /** Primary ease-out curve for UI transitions. */
+      --theme-dark-motion-easing-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1); /** Emphasized ease for entrance motion requiring more weight. */
+      --theme-dark-motion-easing-linear: cubic-bezier(0, 0, 1, 1); /** Linear fallback for reduced-motion scenarios. */
+      --theme-dark-motion-transition-hover-delay: 0ms; /** Hover affordances across buttons, chips, and cards. */
+      --theme-dark-motion-transition-focus-delay: 0ms; /** Focus outlines and glow elevation. */
+      --theme-dark-motion-transition-chip-in-delay: 0ms; /** Chip selection and entry into filter groups. */
+      --theme-dark-motion-transition-chip-out-delay: 0ms; /** Chip deselection or removal. */
+      --theme-dark-motion-transition-banner-reveal-delay: 20ms; /** Banner entrance along the vertical axis. */
+      --theme-dark-motion-reduced-duration-fast: 0ms; /** Instant feedback for motion-sensitive contexts. */
+      --theme-dark-motion-reduced-duration-base: 0ms; /** Primary reduced-motion tempo. */
+      --theme-dark-motion-reduced-duration-slow: 0ms; /** Long-form transitions collapse to zero in reduced motion. */
+      --theme-dark-motion-reduced-transition-hover-delay: 0ms; /** Hover states snap immediately when motion is reduced. */
+      --theme-dark-motion-reduced-transition-focus-delay: 0ms; /** Focus rings become instant in reduced-motion. */
+      --theme-dark-motion-reduced-transition-chip-in-delay: 0ms; /** Chip selection occurs without momentum. */
+      --theme-dark-motion-reduced-transition-chip-out-delay: 0ms; /** Chip removal happens immediately. */
+      --theme-dark-motion-reduced-transition-banner-reveal-delay: 0ms; /** Banner reveal falls back to an instant appearance. */
+      --theme-dark-shadow-elevation-card-offset-x: 0px; /** Primary elevation for dark cards—leans on outline support with a low, cool glow. */
+      --theme-dark-shadow-elevation-card-offset-y: 18px; /** Primary elevation for dark cards—leans on outline support with a low, cool glow. */
+      --theme-dark-shadow-elevation-card-blur: 48px; /** Primary elevation for dark cards—leans on outline support with a low, cool glow. */
+      --theme-dark-shadow-elevation-card-spread: -28px; /** Primary elevation for dark cards—leans on outline support with a low, cool glow. */
+      --theme-dark-shadow-elevation-card-color: rgba(4, 10, 22, 0.48); /** Primary elevation for dark cards—leans on outline support with a low, cool glow. */
+      --theme-dark-shadow-elevation-overlay-offset-x: 0px; /** Overlay elevation tuned for modals and trays without blooming. */
+      --theme-dark-shadow-elevation-overlay-offset-y: 32px; /** Overlay elevation tuned for modals and trays without blooming. */
+      --theme-dark-shadow-elevation-overlay-blur: 68px; /** Overlay elevation tuned for modals and trays without blooming. */
+      --theme-dark-shadow-elevation-overlay-spread: -30px; /** Overlay elevation tuned for modals and trays without blooming. */
+      --theme-dark-shadow-elevation-overlay-color: rgba(8, 18, 38, 0.55); /** Overlay elevation tuned for modals and trays without blooming. */
+      --theme-dark-status-info-surface: oklch(0.31 0.08 262); /** Informational surface balancing depth with clarity. */
+      --theme-dark-status-info-border: oklch(0.43 0.11 262); /** High-contrast info outline for banners and panels. */
+      --theme-dark-status-info-text: oklch(0.88 0.06 262); /** Informational text meeting AA on the info surface. */
+      --theme-dark-status-info-icon: oklch(0.8 0.1 262); /** Icon tone for info banners. */
+      --theme-dark-status-success-surface: oklch(0.32 0.09 161); /** Success confirmation background with AA margin. */
+      --theme-dark-status-success-border: oklch(0.43 0.11 161); /** Success border emphasising resolved state. */
+      --theme-dark-status-success-text: oklch(0.88 0.07 165); /** Success text with comfortable contrast against the surface. */
+      --theme-dark-status-success-icon: oklch(0.78 0.1 163); /** Icon colour for success states. */
+      --theme-dark-status-warning-surface: oklch(0.34 0.09 85); /** Warning tone that stays legible without overpowering the scene. */
+      --theme-dark-status-warning-border: oklch(0.46 0.12 85); /** Warning border for elevated callouts. */
+      --theme-dark-status-warning-text: oklch(0.9 0.08 87); /** Warning text that clears AA minimums on warning surfaces. */
+      --theme-dark-status-warning-icon: oklch(0.81 0.11 85); /** Warning icon colour harmonised with the border tone. */
+      --theme-dark-status-accent-surface: oklch(0.33 0.15 274.55); /** Accent ribbon for promotion or emphasis banners. */
+      --theme-dark-status-accent-border: oklch(0.45 0.18 274.55); /** Accent border providing crisp separation. */
+      --theme-dark-status-accent-text: oklch(0.86 0.1 274.55); /** Accent text that remains legible on saturated surfaces. */
+      --theme-dark-status-accent-icon: oklch(0.76 0.15 274.55); /** Accent icon tone pairing with the accent surface. */
+      --theme-dark-status-critical-surface: oklch(0.31 0.12 25); /** Critical surface tuned for alerts without blooming. */
+      --theme-dark-status-critical-border: oklch(0.43 0.15 25); /** Critical border that stays evident on dark shells. */
+      --theme-dark-status-critical-text: oklch(0.88 0.09 23); /** Critical text exceeding AA thresholds. */
+      --theme-dark-status-critical-icon: oklch(0.79 0.13 24); /** Critical icon treatment for destructive banners. */
+      --theme-dark-status-neutral-surface: oklch(0.32 0.02 260); /** Neutral notification surface for passive messaging. */
+      --theme-dark-status-neutral-border: oklch(0.41 0.025 260); /** Neutral border for low-emphasis outlines. */
+      --theme-dark-status-neutral-text: oklch(0.86 0.02 260); /** Neutral banner text ensuring AA compliance. */
+      --theme-dark-status-neutral-icon: oklch(0.74 0.02 260); /** Neutral banner icon tone. */
+      --theme-dark-surface-canvas: oklch(0.18 0.007 255); /** Primary dark canvas with a cool bias to avoid fogging. */
+      --theme-dark-surface-raised: oklch(0.24 0.007 255); /** Raised panel surface lifted just enough to separate from canvas. */
+      --theme-dark-surface-subtle: oklch(0.3 0.01 255); /** Subtle surface tone for secondary sections and timeline shells. */
+      --theme-dark-surface-disabled: oklch(0.31 0.005 255); /** Disabled surface keeps affordances visible without drawing focus. */
+      --theme-dark-surface-backdrop: oklch(0.12 0.015 255); /** Backdrop scrim for overlays; deepens scenes without flattening. */
+      --theme-dark-surface-inverse: oklch(0.96 0.002 255); /** Inverse surface for chips or sheets rendered inside dark UI. */
+      --theme-dark-surface-interactive-primary-default: oklch(0.43 0.17 274.55); /** Primary action surface tuned for dark backgrounds with AA margin. */
+      --theme-dark-surface-interactive-primary-hover: oklch(0.51 0.18 274.55); /** Hover raises luminance without sacrificing the Δ guardrail. */
+      --theme-dark-surface-interactive-primary-pressed: oklch(0.55 0.19 274.55); /** Pressed state stays above hover while maintaining relative colour bounds. */
+      --theme-dark-border-subtle: oklch(0.41 0.025 260); /** Default outline for cards and neutral shells on dark. */
+      --theme-dark-border-strong: oklch(0.5 0.03 260); /** High-emphasis border for focus traps and interactive outlines. */
+      --theme-dark-text-primary: oklch(0.91 0.006 260); /** Primary body text on dark backgrounds. */
+      --theme-dark-text-secondary: oklch(0.79 0.01 260); /** Secondary text for supporting detail copy. */
+      --theme-dark-text-muted: oklch(0.68 0.015 260); /** Muted captions and tertiary text. */
+      --theme-dark-text-inverse: oklch(0.22 0.02 265); /** Inverse text for light surfaces inside dark compositions. */
+      --theme-dark-text-accent: oklch(0.77 0.18 274.55); /** Accent text used for inline highlights and links. */
+      --theme-dark-text-on-interactive: oklch(0.97 0.003 260); /** Foreground for interactive primary surfaces. */
+      --theme-dark-text-disabled: oklch(0.55 0.01 260); /** Disabled text with minimum 3:1 contrast against disabled surfaces. */
+      --theme-dark-icon-primary: oklch(0.85 0.005 260); /** Primary icon colour for dark UI. */
+      --theme-dark-icon-muted: oklch(0.64 0.01 260); /** Muted icon treatment for tertiary affordances. */
+      --theme-dark-icon-on-interactive: oklch(0.97 0.003 260); /** Icon colour on primary interactive surfaces. */
+      --theme-focus-width: 2px; /** Standard focus outline width. */
+      --theme-motion-transition-hover-delay: 0ms;
+      --theme-motion-transition-focus-delay: 0ms;
+      --theme-motion-transition-chip-in-delay: 0ms;
+      --theme-motion-transition-chip-out-delay: 0ms;
+      --theme-motion-transition-banner-reveal-delay: 20ms;
+      --theme-motion-reduced-transition-hover-delay: 0ms;
+      --theme-motion-reduced-transition-focus-delay: 0ms;
+      --theme-motion-reduced-transition-chip-in-delay: 0ms;
+      --theme-motion-reduced-transition-chip-out-delay: 0ms;
+      --theme-motion-reduced-transition-banner-reveal-delay: 0ms;
+      --theme-shadow-elevation-card-offset-x: 0px;
+      --theme-shadow-elevation-card-offset-y: 16px;
+      --theme-shadow-elevation-card-blur: 40px;
+      --theme-shadow-elevation-card-spread: -12px;
+      --theme-shadow-elevation-card-color: rgba(15, 23, 42, 0.12);
+      --theme-shadow-elevation-overlay-offset-x: 0px;
+      --theme-shadow-elevation-overlay-offset-y: 24px;
+      --theme-shadow-elevation-overlay-blur: 56px;
+      --theme-shadow-elevation-overlay-spread: -16px;
+      --theme-shadow-elevation-overlay-color: rgba(15, 23, 42, 0.24);
+      --oods-viz-map-basemap-stroke-width: 0.5px; /** Base map stroke width for subtle boundary lines. */
+      --oods-viz-map-region-stroke-width: 1px; /** Region boundary stroke width. */
+      --oods-viz-map-region-hover-stroke-width: 2px; /** Region stroke width on hover state. */
+      --oods-viz-map-symbol-stroke-width: 1px; /** Symbol outline stroke width. */
+      --oods-viz-map-symbol-min-radius: 4px; /** Minimum symbol radius for bubble maps. */
+      --oods-viz-map-symbol-max-radius: 40px; /** Maximum symbol radius for bubble maps. */
+      --oods-viz-map-route-stroke-opacity: 0.6; /** Default opacity for route/flow lines. */
+      --oods-viz-map-route-min-width: 1px; /** Minimum route line width. */
+      --oods-viz-map-route-max-width: 10px; /** Maximum route line width for high-volume flows. */
+      --oods-viz-scale-sequential-01: oklch(0.94 0.025 250); /** Sequential scale step 01 – lightest tint for subtle backgrounds. */
+      --oods-viz-scale-sequential-02: oklch(0.84 0.04 250); /** Sequential scale step 02 – hover states on pale data regions. */
+      --oods-viz-scale-sequential-03: oklch(0.74 0.055 250); /** Sequential scale step 03 – low-emphasis series fills. */
+      --oods-viz-scale-sequential-04: oklch(0.64 0.07 250); /** Sequential scale step 04 – balanced fill for stacked charts. */
+      --oods-viz-scale-sequential-05: oklch(0.54 0.09 250); /** Sequential scale step 05 – baseline data hue. */
+      --oods-viz-scale-sequential-06: oklch(0.44 0.11 250); /** Sequential scale step 06 – hover/highlight overlay. */
+      --oods-viz-scale-sequential-07: oklch(0.34 0.13 250); /** Sequential scale step 07 – saturated accent for dense marks. */
+      --oods-viz-scale-sequential-08: oklch(0.24 0.14 250); /** Sequential scale step 08 – darker focus for dense data. */
+      --oods-viz-scale-sequential-09: oklch(0.14 0.15 250); /** Sequential scale step 09 – highest contrast extreme. */
+      --oods-viz-scale-diverging-neutral: oklch(0.82 0.01 260); /** Diverging scale midpoint neutral. */
+      --oods-viz-scale-diverging-neg-05: oklch(0.22 0.09 210); /** Diverging scale far-negative anchor. */
+      --oods-viz-scale-diverging-neg-04: oklch(0.32 0.08 210); /** Diverging scale negative level 4. */
+      --oods-viz-scale-diverging-neg-03: oklch(0.42 0.07 210); /** Diverging scale negative level 3. */
+      --oods-viz-scale-diverging-neg-02: oklch(0.52 0.06 210); /** Diverging scale negative level 2. */
+      --oods-viz-scale-diverging-neg-01: oklch(0.62 0.05 210); /** Diverging scale near-neutral negative. */
+      --oods-viz-scale-diverging-pos-01: oklch(0.62 0.06 25); /** Diverging scale near-neutral positive. */
+      --oods-viz-scale-diverging-pos-02: oklch(0.52 0.07 25); /** Diverging scale positive level 2. */
+      --oods-viz-scale-diverging-pos-03: oklch(0.42 0.08 25); /** Diverging scale positive level 3. */
+      --oods-viz-scale-diverging-pos-04: oklch(0.32 0.09 25); /** Diverging scale positive level 4. */
+      --oods-viz-scale-diverging-pos-05: oklch(0.22 0.11 25); /** Diverging scale far-positive anchor. */
+      --oods-viz-size-point-01: 3px; /** Point glyph size XS for dense scatterplots. */
+      --oods-viz-size-point-02: 5px; /** Point glyph size SM for multi-series overlays. */
+      --oods-viz-size-point-03: 7px; /** Point glyph size MD used as default marker radius. */
+      --oods-viz-size-point-04: 10px; /** Point glyph size LG for highlighted selections. */
+      --oods-viz-size-point-05: 14px; /** Point glyph size XL for focus or annotations. */
+      --oods-viz-size-stroke-01: 1px; /** Stroke width hairline (grid, helper lines). */
+      --oods-viz-size-stroke-02: 2px; /** Stroke width default for lines and outlines. */
+      --oods-viz-size-stroke-03: 3px; /** Stroke width heavy for emphasis/selection. */
+      --oods-viz-size-stroke-04: 4px; /** Stroke width extreme for focus/highlight bands. */
+      --oods-viz-size-bar-narrow: 12px; /** Bar width for compact spark-style charts. */
+      --oods-viz-size-bar-standard: 18px; /** Bar width default for dashboard usage. */
+      --oods-viz-size-bar-wide: 24px; /** Bar width for storytelling layouts or focus states. */
+      --oods-brand-a-surface-canvas: var(--oods-color-brand-a-surface-canvas); /** Alias for Brand A canvas surface. */
+      --oods-brand-a-surface-raised: var(--oods-color-brand-a-surface-raised); /** Alias for Brand A raised surface. */
+      --oods-brand-a-surface-subtle: var(--oods-color-brand-a-surface-subtle); /** Alias for Brand A subtle surface. */
+      --oods-brand-a-surface-interactive-primary: var(--oods-color-brand-a-surface-interactive-primary-default); /** Alias for Brand A primary interactive background. */
+      --oods-brand-a-text-primary: var(--oods-color-brand-a-text-primary); /** Alias for Brand A primary text. */
+      --oods-brand-a-text-secondary: var(--oods-color-brand-a-text-secondary); /** Alias for Brand A secondary text. */
+      --oods-brand-a-text-muted: var(--oods-color-brand-a-text-muted); /** Alias for Brand A muted text. */
+      --oods-brand-a-text-on-interactive: var(--oods-color-brand-a-text-on-interactive); /** Alias for Brand A interactive foreground. */
+      --oods-brand-a-border-subtle: var(--oods-color-brand-a-border-subtle); /** Alias for Brand A subtle border. */
+      --oods-brand-a-border-strong: var(--oods-color-brand-a-border-strong); /** Alias for Brand A strong border. */
+      --oods-brand-a-status-info-surface: var(--oods-color-brand-a-status-info-surface); /** Alias for Brand A info surface. */
+      --oods-brand-a-status-info-text: var(--oods-color-brand-a-status-info-text); /** Alias for Brand A info text. */
+      --oods-brand-a-status-success-surface: var(--oods-color-brand-a-status-success-surface); /** Alias for Brand A success surface. */
+      --oods-brand-a-status-success-text: var(--oods-color-brand-a-status-success-text); /** Alias for Brand A success text. */
+      --oods-brand-a-status-warning-surface: var(--oods-color-brand-a-status-warning-surface); /** Alias for Brand A warning surface. */
+      --oods-brand-a-status-warning-text: var(--oods-color-brand-a-status-warning-text); /** Alias for Brand A warning text. */
+      --oods-brand-a-status-critical-surface: var(--oods-color-brand-a-status-critical-surface); /** Alias for Brand A critical surface. */
+      --oods-brand-a-status-critical-text: var(--oods-color-brand-a-status-critical-text); /** Alias for Brand A critical text. */
+      --oods-brand-a-status-neutral-surface: var(--oods-color-brand-a-status-neutral-surface); /** Alias for Brand A neutral surface. */
+      --oods-brand-a-status-neutral-text: var(--oods-color-brand-a-status-neutral-text); /** Alias for Brand A neutral text. */
+      --oods-brand-b-surface-canvas: var(--oods-color-brand-b-surface-canvas); /** Alias for Brand B canvas surface. */
+      --oods-brand-b-surface-raised: var(--oods-color-brand-b-surface-raised); /** Alias for Brand B raised surface. */
+      --oods-brand-b-surface-subtle: var(--oods-color-brand-b-surface-subtle); /** Alias for Brand B subtle surface. */
+      --oods-brand-b-surface-interactive-primary: var(--oods-color-brand-b-surface-interactive-primary-default); /** Alias for Brand B primary interactive background. */
+      --oods-brand-b-text-primary: var(--oods-color-brand-b-text-primary); /** Alias for Brand B primary text. */
+      --oods-brand-b-text-secondary: var(--oods-color-brand-b-text-secondary); /** Alias for Brand B secondary text. */
+      --oods-brand-b-text-muted: var(--oods-color-brand-b-text-muted); /** Alias for Brand B muted text. */
+      --oods-brand-b-text-on-interactive: var(--oods-color-brand-b-text-on-interactive); /** Alias for Brand B interactive foreground. */
+      --oods-brand-b-border-subtle: var(--oods-color-brand-b-border-subtle); /** Alias for Brand B subtle border. */
+      --oods-brand-b-border-strong: var(--oods-color-brand-b-border-strong); /** Alias for Brand B strong border. */
+      --oods-brand-b-status-info-surface: var(--oods-color-brand-b-status-info-surface); /** Alias for Brand B info surface. */
+      --oods-brand-b-status-info-text: var(--oods-color-brand-b-status-info-text); /** Alias for Brand B info text. */
+      --oods-brand-b-status-success-surface: var(--oods-color-brand-b-status-success-surface); /** Alias for Brand B success surface. */
+      --oods-brand-b-status-success-text: var(--oods-color-brand-b-status-success-text); /** Alias for Brand B success text. */
+      --oods-brand-b-status-warning-surface: var(--oods-color-brand-b-status-warning-surface); /** Alias for Brand B warning surface. */
+      --oods-brand-b-status-warning-text: var(--oods-color-brand-b-status-warning-text); /** Alias for Brand B warning text. */
+      --oods-brand-b-status-critical-surface: var(--oods-color-brand-b-status-critical-surface); /** Alias for Brand B critical surface. */
+      --oods-brand-b-status-critical-text: var(--oods-color-brand-b-status-critical-text); /** Alias for Brand B critical text. */
+      --oods-brand-b-status-neutral-surface: var(--oods-color-brand-b-status-neutral-surface); /** Alias for Brand B neutral surface. */
+      --oods-brand-b-status-neutral-text: var(--oods-color-brand-b-status-neutral-text); /** Alias for Brand B neutral text. */
+      --ref-color-accent-100: var(--ref-color-primary-100); /** Accent 100; mirrors primary 100 for highlight surfaces. */
+      --ref-color-accent-300: var(--ref-color-primary-500); /** Accent 300; aligns accent border with primary default. */
+      --ref-color-accent-400: var(--ref-color-primary-600); /** Accent 400; accent hover derived from primary hover. */
+      --ref-color-accent-500: var(--ref-color-primary-700); /** Accent 500; accent foreground aligned to primary pressed. */
+      --oods-border-panel-default-width: var(--ref-border-width-hairline); /** Default border for cards and primary panels. */
+      --oods-border-panel-default-style: var(--ref-border-style-solid); /** Default border for cards and primary panels. */
+      --oods-border-panel-default-radius: var(--ref-border-radius-md); /** Default border for cards and primary panels. */
+      --oods-border-surface-default-width: var(--ref-border-width-hairline); /** Alias to panel default border. */
+      --oods-border-surface-default-style: var(--ref-border-style-solid); /** Alias to panel default border. */
+      --oods-border-surface-default-radius: var(--ref-border-radius-md); /** Alias to panel default border. */
+      --oods-border-status-critical-width: var(--ref-border-width-hairline); /** Critical status banner border with rounded corners. */
+      --oods-border-status-critical-style: var(--ref-border-style-solid); /** Critical status banner border with rounded corners. */
+      --oods-border-status-critical-radius: var(--ref-border-radius-sm); /** Critical status banner border with rounded corners. */
+      --oods-motion-reduced-transition-hover-duration: var(--oods-motion-reduced-duration-fast); /** Hover states snap immediately when motion is reduced. */
+      --oods-motion-reduced-transition-hover-timing-function: var(--oods-motion-easing-linear); /** Hover states snap immediately when motion is reduced. */
+      --oods-motion-reduced-transition-focus-duration: var(--oods-motion-reduced-duration-base); /** Focus rings become instant in reduced-motion. */
+      --oods-motion-reduced-transition-focus-timing-function: var(--oods-motion-easing-linear); /** Focus rings become instant in reduced-motion. */
+      --oods-motion-reduced-transition-chip-in-duration: var(--oods-motion-reduced-duration-base); /** Chip selection occurs without momentum. */
+      --oods-motion-reduced-transition-chip-in-timing-function: var(--oods-motion-easing-linear); /** Chip selection occurs without momentum. */
+      --oods-motion-reduced-transition-chip-out-duration: var(--oods-motion-reduced-duration-fast); /** Chip removal happens immediately. */
+      --oods-motion-reduced-transition-chip-out-timing-function: var(--oods-motion-easing-linear); /** Chip removal happens immediately. */
+      --oods-motion-reduced-transition-banner-reveal-duration: var(--oods-motion-reduced-duration-slow); /** Banner reveal falls back to an instant appearance. */
+      --oods-motion-reduced-transition-banner-reveal-timing-function: var(--oods-motion-easing-linear); /** Banner reveal falls back to an instant appearance. */
+      --oods-motion-transition-hover-duration: var(--oods-motion-duration-fast); /** Hover affordances across buttons, chips, and cards. */
+      --oods-motion-transition-hover-timing-function: var(--oods-motion-easing-standard); /** Hover affordances across buttons, chips, and cards. */
+      --oods-motion-transition-focus-duration: var(--oods-motion-duration-base); /** Focus outlines and glow elevation. */
+      --oods-motion-transition-focus-timing-function: var(--oods-motion-easing-standard); /** Focus outlines and glow elevation. */
+      --oods-motion-transition-chip-in-duration: var(--oods-motion-duration-base); /** Chip selection and entry into filter groups. */
+      --oods-motion-transition-chip-in-timing-function: var(--oods-motion-easing-emphasized); /** Chip selection and entry into filter groups. */
+      --oods-motion-transition-chip-out-duration: var(--oods-motion-duration-fast); /** Chip deselection or removal. */
+      --oods-motion-transition-chip-out-timing-function: var(--oods-motion-easing-standard); /** Chip deselection or removal. */
+      --oods-motion-transition-banner-reveal-duration: var(--oods-motion-duration-slow); /** Banner entrance along the vertical axis. */
+      --oods-motion-transition-banner-reveal-timing-function: var(--oods-motion-easing-emphasized); /** Banner entrance along the vertical axis. */
+      --oods-overlay-transition-open-duration: var(--oods-motion-duration-base); /** Overlay open transition; collapses under reduced motion. */
+      --oods-overlay-transition-open-timing-function: var(--oods-motion-easing-standard); /** Overlay open transition; collapses under reduced motion. */
+      --oods-overlay-transition-close-duration: var(--oods-motion-duration-base); /** Overlay close transition; collapses under reduced motion. */
+      --oods-overlay-transition-close-timing-function: var(--oods-motion-easing-standard); /** Overlay close transition; collapses under reduced motion. */
+      --sys-focus-width: var(--theme-focus-width); /** Focus ring width. */
+      --sys-motion-duration-fast: var(--oods-motion-duration-fast); /** System fast duration for micro-interactions. */
+      --sys-motion-duration-base: var(--oods-motion-duration-base); /** System baseline duration for component transitions. */
+      --sys-motion-duration-slow: var(--oods-motion-duration-slow); /** System slow duration for entrance/exit motion. */
+      --sys-motion-reduced-duration-fast: var(--oods-motion-reduced-duration-fast); /** Reduced-motion fast duration resolves to instant. */
+      --sys-motion-reduced-duration-base: var(--oods-motion-reduced-duration-base); /** Reduced-motion default duration resolves to instant. */
+      --sys-motion-reduced-duration-slow: var(--oods-motion-reduced-duration-slow); /** Reduced-motion slow duration resolves to instant. */
+      --sys-motion-reduced-transition-hover-duration: var(--oods-motion-reduced-duration-fast); /** Reduced-motion hover transition. */
+      --sys-motion-reduced-transition-hover-timing-function: var(--oods-motion-easing-linear); /** Reduced-motion hover transition. */
+      --sys-motion-reduced-transition-focus-duration: var(--oods-motion-reduced-duration-base); /** Reduced-motion focus transition. */
+      --sys-motion-reduced-transition-focus-timing-function: var(--oods-motion-easing-linear); /** Reduced-motion focus transition. */
+      --sys-motion-reduced-transition-chip-in-duration: var(--oods-motion-reduced-duration-base); /** Reduced-motion chip entry transition. */
+      --sys-motion-reduced-transition-chip-in-timing-function: var(--oods-motion-easing-linear); /** Reduced-motion chip entry transition. */
+      --sys-motion-reduced-transition-chip-out-duration: var(--oods-motion-reduced-duration-fast); /** Reduced-motion chip exit transition. */
+      --sys-motion-reduced-transition-chip-out-timing-function: var(--oods-motion-easing-linear); /** Reduced-motion chip exit transition. */
+      --sys-motion-reduced-transition-banner-reveal-duration: var(--oods-motion-reduced-duration-slow); /** Reduced-motion banner reveal transition. */
+      --sys-motion-reduced-transition-banner-reveal-timing-function: var(--oods-motion-easing-linear); /** Reduced-motion banner reveal transition. */
+      --sys-motion-easing-standard: var(--oods-motion-easing-standard); /** System standard easing curve. */
+      --sys-motion-easing-emphasized: var(--oods-motion-easing-emphasized); /** System emphasized easing curve. */
+      --sys-motion-easing-linear: var(--oods-motion-easing-linear); /** System linear easing curve for reduced motion. */
+      --sys-motion-transition-hover-duration: var(--oods-motion-duration-fast); /** System hover transition for interactive affordances. */
+      --sys-motion-transition-hover-timing-function: var(--oods-motion-easing-standard); /** System hover transition for interactive affordances. */
+      --sys-motion-transition-focus-duration: var(--oods-motion-duration-base); /** System focus transition for outlines/glow. */
+      --sys-motion-transition-focus-timing-function: var(--oods-motion-easing-standard); /** System focus transition for outlines/glow. */
+      --sys-motion-transition-chip-in-duration: var(--oods-motion-duration-base); /** System chip entry transition. */
+      --sys-motion-transition-chip-in-timing-function: var(--oods-motion-easing-emphasized); /** System chip entry transition. */
+      --sys-motion-transition-chip-out-duration: var(--oods-motion-duration-fast); /** System chip exit transition. */
+      --sys-motion-transition-chip-out-timing-function: var(--oods-motion-easing-standard); /** System chip exit transition. */
+      --sys-motion-transition-banner-reveal-duration: var(--oods-motion-duration-slow); /** System banner reveal transition. */
+      --sys-motion-transition-banner-reveal-timing-function: var(--oods-motion-easing-emphasized); /** System banner reveal transition. */
+      --sys-text-scale-caption-font-family: var(--ref-typography-families-sans); /** System caption scale. */
+      --sys-text-scale-caption-font-weight: var(--ref-typography-weights-medium); /** System caption scale. */
+      --sys-text-scale-caption-font-size: var(--ref-typography-sizes-xs); /** System caption scale. */
+      --sys-text-scale-label-md-font-family: var(--ref-typography-families-sans); /** System label medium scale. */
+      --sys-text-scale-label-md-font-weight: var(--ref-typography-weights-semibold); /** System label medium scale. */
+      --sys-text-scale-label-md-font-size: var(--ref-typography-sizes-sm); /** System label medium scale. */
+      --sys-text-scale-body-sm-font-family: var(--ref-typography-families-sans); /** System compact body scale. */
+      --sys-text-scale-body-sm-font-weight: var(--ref-typography-weights-regular); /** System compact body scale. */
+      --sys-text-scale-body-sm-font-size: var(--ref-typography-sizes-sm); /** System compact body scale. */
+      --sys-text-scale-body-md-font-family: var(--ref-typography-families-sans); /** System default body scale. */
+      --sys-text-scale-body-md-font-weight: var(--ref-typography-weights-regular); /** System default body scale. */
+      --sys-text-scale-body-md-font-size: var(--ref-typography-sizes-md); /** System default body scale. */
+      --sys-text-scale-heading-lg-font-family: var(--ref-typography-families-sans); /** System large heading scale. */
+      --sys-text-scale-heading-lg-font-weight: var(--ref-typography-weights-semibold); /** System large heading scale. */
+      --sys-text-scale-heading-lg-font-size: var(--ref-typography-sizes-xl); /** System large heading scale. */
+      --sys-text-scale-heading-xl-font-family: var(--ref-typography-families-sans); /** System extra-large heading scale. */
+      --sys-text-scale-heading-xl-font-weight: var(--ref-typography-weights-bold); /** System extra-large heading scale. */
+      --sys-text-scale-heading-xl-font-size: var(--ref-typography-sizes-xxl); /** System extra-large heading scale. */
+      --oods-text-line-height-tight: var(--ref-typography-line-height-tight); /** Tight rhythm for condensed contexts. */
+      --oods-text-line-height-standard: var(--ref-typography-line-height-standard); /** Standard rhythm for general UI copy. */
+      --oods-text-line-height-relaxed: var(--ref-typography-line-height-relaxed); /** Relaxed rhythm for supporting text. */
+      --oods-text-line-height-loose: var(--ref-typography-line-height-loose); /** Loose rhythm for long-form reading. */
+      --oods-text-letter-spacing-tight: var(--ref-typography-letter-spacing-tight); /** Tight tracking for display headings. */
+      --oods-text-letter-spacing-default: var(--ref-typography-letter-spacing-default); /** Neutral tracking. */
+      --oods-text-letter-spacing-wide: var(--ref-typography-letter-spacing-wide); /** Wide tracking for uppercase or caption text. */
+      --oods-text-scale-caption-font-family: var(--ref-typography-families-sans); /** Caption text for metadata, badges, and helper copy. */
+      --oods-text-scale-caption-font-weight: var(--ref-typography-weights-medium); /** Caption text for metadata, badges, and helper copy. */
+      --oods-text-scale-caption-font-size: var(--ref-typography-sizes-xs); /** Caption text for metadata, badges, and helper copy. */
+      --oods-text-scale-label-md-font-family: var(--ref-typography-families-sans); /** Form labels and actionable micro copy. */
+      --oods-text-scale-label-md-font-weight: var(--ref-typography-weights-semibold); /** Form labels and actionable micro copy. */
+      --oods-text-scale-label-md-font-size: var(--ref-typography-sizes-sm); /** Form labels and actionable micro copy. */
+      --oods-text-scale-body-sm-font-family: var(--ref-typography-families-sans); /** Compact body text for dense list views. */
+      --oods-text-scale-body-sm-font-weight: var(--ref-typography-weights-regular); /** Compact body text for dense list views. */
+      --oods-text-scale-body-sm-font-size: var(--ref-typography-sizes-sm); /** Compact body text for dense list views. */
+      --oods-text-scale-body-md-font-family: var(--ref-typography-families-sans); /** Primary body copy for detail reading. */
+      --oods-text-scale-body-md-font-weight: var(--ref-typography-weights-regular); /** Primary body copy for detail reading. */
+      --oods-text-scale-body-md-font-size: var(--ref-typography-sizes-md); /** Primary body copy for detail reading. */
+      --oods-text-scale-heading-lg-font-family: var(--ref-typography-families-sans); /** Major section headings and card titles. */
+      --oods-text-scale-heading-lg-font-weight: var(--ref-typography-weights-semibold); /** Major section headings and card titles. */
+      --oods-text-scale-heading-lg-font-size: var(--ref-typography-sizes-xl); /** Major section headings and card titles. */
+      --oods-text-scale-heading-xl-font-family: var(--ref-typography-families-sans); /** Page-level hero headings. */
+      --oods-text-scale-heading-xl-font-weight: var(--ref-typography-weights-bold); /** Page-level hero headings. */
+      --oods-text-scale-heading-xl-font-size: var(--ref-typography-sizes-xxl); /** Page-level hero headings. */
+      --theme-dark-motion-transition-hover-duration: var(--theme-dark-motion-duration-fast); /** Hover affordances across buttons, chips, and cards. */
+      --theme-dark-motion-transition-hover-timing-function: var(--theme-dark-motion-easing-standard); /** Hover affordances across buttons, chips, and cards. */
+      --theme-dark-motion-transition-focus-duration: var(--theme-dark-motion-duration-base); /** Focus outlines and glow elevation. */
+      --theme-dark-motion-transition-focus-timing-function: var(--theme-dark-motion-easing-standard); /** Focus outlines and glow elevation. */
+      --theme-dark-motion-transition-chip-in-duration: var(--theme-dark-motion-duration-base); /** Chip selection and entry into filter groups. */
+      --theme-dark-motion-transition-chip-in-timing-function: var(--theme-dark-motion-easing-emphasized); /** Chip selection and entry into filter groups. */
+      --theme-dark-motion-transition-chip-out-duration: var(--theme-dark-motion-duration-fast); /** Chip deselection or removal. */
+      --theme-dark-motion-transition-chip-out-timing-function: var(--theme-dark-motion-easing-standard); /** Chip deselection or removal. */
+      --theme-dark-motion-transition-banner-reveal-duration: var(--theme-dark-motion-duration-slow); /** Banner entrance along the vertical axis. */
+      --theme-dark-motion-transition-banner-reveal-timing-function: var(--theme-dark-motion-easing-emphasized); /** Banner entrance along the vertical axis. */
+      --theme-dark-motion-reduced-transition-hover-duration: var(--theme-dark-motion-reduced-duration-fast); /** Hover states snap immediately when motion is reduced. */
+      --theme-dark-motion-reduced-transition-hover-timing-function: var(--theme-dark-motion-easing-linear); /** Hover states snap immediately when motion is reduced. */
+      --theme-dark-motion-reduced-transition-focus-duration: var(--theme-dark-motion-reduced-duration-base); /** Focus rings become instant in reduced-motion. */
+      --theme-dark-motion-reduced-transition-focus-timing-function: var(--theme-dark-motion-easing-linear); /** Focus rings become instant in reduced-motion. */
+      --theme-dark-motion-reduced-transition-chip-in-duration: var(--theme-dark-motion-reduced-duration-base); /** Chip selection occurs without momentum. */
+      --theme-dark-motion-reduced-transition-chip-in-timing-function: var(--theme-dark-motion-easing-linear); /** Chip selection occurs without momentum. */
+      --theme-dark-motion-reduced-transition-chip-out-duration: var(--theme-dark-motion-reduced-duration-fast); /** Chip removal happens immediately. */
+      --theme-dark-motion-reduced-transition-chip-out-timing-function: var(--theme-dark-motion-easing-linear); /** Chip removal happens immediately. */
+      --theme-dark-motion-reduced-transition-banner-reveal-duration: var(--theme-dark-motion-reduced-duration-slow); /** Banner reveal falls back to an instant appearance. */
+      --theme-dark-motion-reduced-transition-banner-reveal-timing-function: var(--theme-dark-motion-easing-linear); /** Banner reveal falls back to an instant appearance. */
+      --theme-dark-space-inset-compact: var(--ref-space-inset-compact); /** Dark theme compact inset spacing matches light for parity. */
+      --theme-dark-space-inset-default: var(--ref-space-inset-default); /** Default inset padding shared across themes. */
+      --theme-dark-space-stack-compact: var(--ref-space-stack-compact); /** Compact vertical rhythm retained from base spacing. */
+      --theme-dark-space-stack-default: var(--ref-space-stack-default); /** Default vertical rhythm shared with Theme 0. */
+      --theme-dark-space-inline-xs: var(--ref-space-inline-xs); /** Extra-small inline spacing consistent across themes. */
+      --theme-dark-space-inline-sm: var(--ref-space-inline-sm); /** Small inline spacing retained for dark layouts. */
+      --theme-focus-ring-outer: var(--ref-color-neutral-900); /** Outer glow of focus ring. */
+      --theme-focus-ring-inner: var(--ref-color-neutral-100); /** Inner contrast colour for focus outlines. */
+      --theme-focus-text: var(--ref-color-primary-600); /** Focus text/indicator colour. */
+      --theme-motion-duration-fast: var(--oods-motion-duration-fast);
+      --theme-motion-duration-base: var(--oods-motion-duration-base);
+      --theme-motion-duration-slow: var(--oods-motion-duration-slow);
+      --theme-motion-easing-standard: var(--oods-motion-easing-standard);
+      --theme-motion-easing-emphasized: var(--oods-motion-easing-emphasized);
+      --theme-motion-easing-linear: var(--oods-motion-easing-linear);
+      --theme-motion-transition-hover-duration: var(--oods-motion-duration-fast);
+      --theme-motion-transition-hover-timing-function: var(--oods-motion-easing-standard);
+      --theme-motion-transition-focus-duration: var(--oods-motion-duration-base);
+      --theme-motion-transition-focus-timing-function: var(--oods-motion-easing-standard);
+      --theme-motion-transition-chip-in-duration: var(--oods-motion-duration-base);
+      --theme-motion-transition-chip-in-timing-function: var(--oods-motion-easing-emphasized);
+      --theme-motion-transition-chip-out-duration: var(--oods-motion-duration-fast);
+      --theme-motion-transition-chip-out-timing-function: var(--oods-motion-easing-standard);
+      --theme-motion-transition-banner-reveal-duration: var(--oods-motion-duration-slow);
+      --theme-motion-transition-banner-reveal-timing-function: var(--oods-motion-easing-emphasized);
+      --theme-motion-reduced-duration-fast: var(--oods-motion-reduced-duration-fast);
+      --theme-motion-reduced-duration-base: var(--oods-motion-reduced-duration-base);
+      --theme-motion-reduced-duration-slow: var(--oods-motion-reduced-duration-slow);
+      --theme-motion-reduced-transition-hover-duration: var(--oods-motion-reduced-duration-fast);
+      --theme-motion-reduced-transition-hover-timing-function: var(--oods-motion-easing-linear);
+      --theme-motion-reduced-transition-focus-duration: var(--oods-motion-reduced-duration-base);
+      --theme-motion-reduced-transition-focus-timing-function: var(--oods-motion-easing-linear);
+      --theme-motion-reduced-transition-chip-in-duration: var(--oods-motion-reduced-duration-base);
+      --theme-motion-reduced-transition-chip-in-timing-function: var(--oods-motion-easing-linear);
+      --theme-motion-reduced-transition-chip-out-duration: var(--oods-motion-reduced-duration-fast);
+      --theme-motion-reduced-transition-chip-out-timing-function: var(--oods-motion-easing-linear);
+      --theme-motion-reduced-transition-banner-reveal-duration: var(--oods-motion-reduced-duration-slow);
+      --theme-motion-reduced-transition-banner-reveal-timing-function: var(--oods-motion-easing-linear);
+      --theme-space-inset-compact: var(--ref-space-inset-compact); /** Compact padding for dense layouts in Theme 0. */
+      --theme-space-inset-default: var(--ref-space-inset-default); /** Default padding for spacious layouts in Theme 0. */
+      --theme-space-stack-compact: var(--ref-space-stack-compact); /** Tight vertical rhythm in Theme 0. */
+      --theme-space-stack-default: var(--ref-space-stack-default); /** Default vertical rhythm in Theme 0. */
+      --theme-space-inline-xs: var(--ref-space-inline-xs); /** Compact inline spacing for Theme 0. */
+      --theme-space-inline-sm: var(--ref-space-inline-sm); /** Small inline spacing for Theme 0. */
+      --theme-status-info-surface: var(--ref-color-info-100); /** Informational background tone. */
+      --theme-status-info-border: var(--ref-color-info-300); /** Informational border tone. */
+      --theme-status-info-text: var(--ref-color-info-900); /** Informational text colour. */
+      --theme-status-info-icon: var(--ref-color-info-700); /** Informational icon colour. */
+      --theme-status-success-surface: var(--ref-color-success-100); /** Success background tone. */
+      --theme-status-success-border: var(--ref-color-success-300); /** Success border tone. */
+      --theme-status-success-text: var(--ref-color-success-900); /** Success text tone. */
+      --theme-status-success-icon: var(--ref-color-success-700); /** Success icon colour. */
+      --theme-status-warning-surface: var(--ref-color-warning-100); /** Warning background tone. */
+      --theme-status-warning-border: var(--ref-color-warning-300); /** Warning border tone. */
+      --theme-status-warning-text: var(--ref-color-warning-900); /** Warning text tone. */
+      --theme-status-warning-icon: var(--ref-color-warning-700); /** Warning icon colour. */
+      --theme-status-critical-surface: var(--ref-color-critical-100); /** Critical background tone. */
+      --theme-status-critical-border: var(--ref-color-critical-300); /** Critical border tone. */
+      --theme-status-critical-text: var(--ref-color-critical-900); /** Critical text tone. */
+      --theme-status-critical-icon: var(--ref-color-critical-700); /** Critical icon colour. */
+      --theme-status-neutral-surface: var(--ref-color-neutral-100); /** Neutral status background tone. */
+      --theme-status-neutral-border: var(--ref-color-neutral-300); /** Neutral status border tone. */
+      --theme-status-neutral-text: var(--ref-color-neutral-800); /** Neutral status text tone. */
+      --theme-status-neutral-icon: var(--ref-color-neutral-700); /** Neutral status icon colour. */
+      --theme-surface-canvas: var(--ref-color-neutral-50); /** Primary page background for Theme 0. */
+      --theme-surface-raised: var(--ref-color-neutral-100); /** Raised card surface with soft separation. */
+      --theme-surface-subtle: var(--ref-color-neutral-200); /** Secondary panel surface tone. */
+      --theme-surface-backdrop: var(--ref-color-neutral-900); /** Backdrop scrim for overlays. */
+      --theme-surface-inverse: var(--ref-color-neutral-900); /** Inverse surface for dark elements on light UI. */
+      --theme-surface-disabled: var(--ref-color-neutral-200); /** Surface colour for disabled components. */
+      --theme-surface-interactive-primary-default: var(--ref-color-primary-500); /** Primary action surface default state. */
+      --theme-surface-interactive-primary-hover: var(--ref-color-primary-600); /** Primary action hover surface. */
+      --theme-surface-interactive-primary-pressed: var(--ref-color-primary-700); /** Primary action pressed surface. */
+      --theme-border-subtle: var(--ref-color-neutral-200); /** Subtle border colour for cards and panels. */
+      --theme-border-strong: var(--ref-color-neutral-300); /** Strong border for dividers and outlines. */
+      --theme-text-primary: var(--ref-color-neutral-900); /** Primary body text. */
+      --theme-text-secondary: var(--ref-color-neutral-700); /** Secondary text for supporting content. */
+      --theme-text-muted: var(--ref-color-neutral-600); /** Muted text for captions and labels with AA contrast. */
+      --theme-text-inverse: var(--ref-color-neutral-100); /** Text presented on inverse surfaces. */
+      --theme-text-accent: var(--ref-color-primary-600); /** Accent text used sparingly for highlights. */
+      --theme-text-on-interactive: var(--ref-color-neutral-100); /** Text on interactive primary surfaces. */
+      --theme-text-disabled: var(--ref-color-neutral-400); /** Disabled text tone. */
+      --theme-icon-primary: var(--ref-color-neutral-800); /** Primary icon tone. */
+      --theme-icon-muted: var(--ref-color-neutral-500); /** Muted icon tone for tertiary affordances. */
+      --theme-icon-on-interactive: var(--ref-color-neutral-100); /** Icons on interactive primary surfaces. */
+      --oods-viz-map-basemap-fill: var(--ref-color-neutral-100); /** Base map fill color for land/water boundaries. */
+      --oods-viz-map-basemap-stroke: var(--ref-color-neutral-300); /** Base map stroke color for coastlines and borders. */
+      --oods-viz-map-region-stroke: var(--ref-color-neutral-400); /** Region boundary stroke color for choropleth regions. */
+      --oods-viz-map-region-hover-stroke: var(--ref-color-primary-500); /** Region stroke color on hover state. */
+      --oods-viz-map-symbol-stroke: var(--ref-color-neutral-0); /** Symbol outline stroke for contrast on filled shapes. */
+      --oods-viz-scale-sequential-blue-1: var(--oods-viz-scale-sequential-01); /** Sequential blue step 1 - lightest for low values. */
+      --oods-viz-scale-sequential-blue-2: var(--oods-viz-scale-sequential-02); /** Sequential blue step 2. */
+      --oods-viz-scale-sequential-blue-3: var(--oods-viz-scale-sequential-03); /** Sequential blue step 3. */
+      --oods-viz-scale-sequential-blue-4: var(--oods-viz-scale-sequential-04); /** Sequential blue step 4 - midpoint. */
+      --oods-viz-scale-sequential-blue-5: var(--oods-viz-scale-sequential-05); /** Sequential blue step 5. */
+      --oods-viz-scale-sequential-blue-6: var(--oods-viz-scale-sequential-06); /** Sequential blue step 6. */
+      --oods-viz-scale-sequential-blue-7: var(--oods-viz-scale-sequential-07); /** Sequential blue step 7 - darkest for high values. */
+      --oods-viz-scale-diverging-negative-1: var(--oods-viz-scale-diverging-neg-01); /** Diverging near-neutral negative. */
+      --oods-viz-scale-diverging-negative-2: var(--oods-viz-scale-diverging-neg-03); /** Diverging negative level 2. */
+      --oods-viz-scale-diverging-negative-3: var(--oods-viz-scale-diverging-neg-05); /** Diverging far negative anchor. */
+      --oods-viz-scale-diverging-positive-1: var(--oods-viz-scale-diverging-pos-01); /** Diverging near-neutral positive. */
+      --oods-viz-scale-diverging-positive-2: var(--oods-viz-scale-diverging-pos-03); /** Diverging positive level 2. */
+      --oods-viz-scale-diverging-positive-3: var(--oods-viz-scale-diverging-pos-05); /** Diverging far positive anchor. */
+      --oods-border-panel-default-color: var(--theme-border-subtle); /** Default border for cards and primary panels. */
+      --oods-border-surface-default-color: var(--theme-border-subtle); /** Alias to panel default border. */
+      --oods-border-status-critical-color: var(--theme-status-critical-border); /** Critical status banner border with rounded corners. */
+      --sys-focus-ring-outer: var(--theme-focus-ring-outer); /** Outer focus ring colour. */
+      --sys-focus-ring-inner: var(--theme-focus-ring-inner); /** Inner focus ring colour. */
+      --sys-focus-text: var(--theme-focus-text); /** Focus foreground colour. */
+      --sys-space-inset-compact: var(--theme-space-inset-compact); /** Compact inset spacing for semantic use. */
+      --sys-space-inset-default: var(--theme-space-inset-default); /** Default inset spacing for semantic use. */
+      --sys-space-stack-compact: var(--theme-space-stack-compact); /** Compact vertical spacing for semantic use. */
+      --sys-space-stack-default: var(--theme-space-stack-default); /** Default vertical spacing for semantic use. */
+      --sys-space-inline-xs: var(--theme-space-inline-xs); /** Compact inline spacing for semantic use. */
+      --sys-space-inline-sm: var(--theme-space-inline-sm); /** Small inline spacing for semantic use. */
+      --sys-status-info-surface: var(--theme-status-info-surface); /** Informational background surface. */
+      --sys-status-info-border: var(--theme-status-info-border); /** Informational border colour. */
+      --sys-status-info-text: var(--theme-status-info-text); /** Informational text colour. */
+      --sys-status-info-icon: var(--theme-status-info-icon); /** Informational icon colour. */
+      --sys-status-success-surface: var(--theme-status-success-surface); /** Success feedback background. */
+      --sys-status-success-border: var(--theme-status-success-border); /** Success border colour. */
+      --sys-status-success-text: var(--theme-status-success-text); /** Success text colour. */
+      --sys-status-success-icon: var(--theme-status-success-icon); /** Success icon colour. */
+      --sys-status-warning-surface: var(--theme-status-warning-surface); /** Warning feedback background. */
+      --sys-status-warning-border: var(--theme-status-warning-border); /** Warning border colour. */
+      --sys-status-warning-text: var(--theme-status-warning-text); /** Warning text colour. */
+      --sys-status-warning-icon: var(--theme-status-warning-icon); /** Warning icon colour. */
+      --sys-status-critical-surface: var(--theme-status-critical-surface); /** Critical feedback background. */
+      --sys-status-critical-border: var(--theme-status-critical-border); /** Critical border colour. */
+      --sys-status-critical-text: var(--theme-status-critical-text); /** Critical text colour. */
+      --sys-status-critical-icon: var(--theme-status-critical-icon); /** Critical icon colour. */
+      --sys-status-neutral-surface: var(--theme-status-neutral-surface); /** Neutral feedback background. */
+      --sys-status-neutral-border: var(--theme-status-neutral-border); /** Neutral border colour. */
+      --sys-status-neutral-text: var(--theme-status-neutral-text); /** Neutral text colour. */
+      --sys-status-neutral-icon: var(--theme-status-neutral-icon); /** Neutral icon colour. */
+      --sys-surface-canvas: var(--theme-surface-canvas); /** Primary application canvas. */
+      --sys-surface-raised: var(--theme-surface-raised); /** Raised card surface. */
+      --sys-surface-subtle: var(--theme-surface-subtle); /** Subtle secondary surface. */
+      --sys-surface-backdrop: var(--theme-surface-backdrop); /** Backdrop scrim surface. */
+      --sys-surface-inverse: var(--theme-surface-inverse); /** Inverse surface for dark-on-light treatments. */
+      --sys-surface-disabled: var(--theme-surface-disabled); /** Surface colour for disabled or inactive UI. */
+      --sys-surface-interactive-primary-default: var(--theme-surface-interactive-primary-default); /** Primary interactive surface default state. */
+      --sys-surface-interactive-primary-hover: var(--theme-surface-interactive-primary-hover); /** Primary interactive surface hover state. */
+      --sys-surface-interactive-primary-pressed: var(--theme-surface-interactive-primary-pressed); /** Primary interactive surface pressed state. */
+      --sys-border-subtle: var(--theme-border-subtle); /** Default border for surfaces. */
+      --sys-border-strong: var(--theme-border-strong); /** High-emphasis border. */
+      --sys-text-primary: var(--theme-text-primary); /** Primary reading text. */
+      --sys-text-secondary: var(--theme-text-secondary); /** Secondary supporting text. */
+      --sys-text-muted: var(--theme-text-muted); /** Muted caption text. */
+      --sys-text-inverse: var(--theme-text-inverse); /** Text on inverse surfaces. */
+      --sys-text-accent: var(--theme-text-accent); /** Accent text colour. */
+      --sys-text-on-interactive: var(--theme-text-on-interactive); /** Text placed on primary interactive surfaces. */
+      --sys-text-disabled: var(--theme-text-disabled); /** Disabled or de-emphasised text. */
+      --sys-text-line-height-tight: var(--oods-text-line-height-tight); /** System line-height for condensed typography contexts. */
+      --sys-text-line-height-standard: var(--oods-text-line-height-standard); /** System line-height for general UI copy. */
+      --sys-text-line-height-relaxed: var(--oods-text-line-height-relaxed); /** System line-height for spacious compositions. */
+      --sys-text-line-height-loose: var(--oods-text-line-height-loose); /** System line-height for long-form reading. */
+      --sys-text-scale-caption-line-height: var(--oods-text-line-height-standard); /** System caption scale. */
+      --sys-text-scale-caption-letter-spacing: var(--oods-text-letter-spacing-wide); /** System caption scale. */
+      --sys-text-scale-label-md-line-height: var(--oods-text-line-height-standard); /** System label medium scale. */
+      --sys-text-scale-label-md-letter-spacing: var(--oods-text-letter-spacing-default); /** System label medium scale. */
+      --sys-text-scale-body-sm-line-height: var(--oods-text-line-height-relaxed); /** System compact body scale. */
+      --sys-text-scale-body-sm-letter-spacing: var(--oods-text-letter-spacing-default); /** System compact body scale. */
+      --sys-text-scale-body-md-line-height: var(--oods-text-line-height-relaxed); /** System default body scale. */
+      --sys-text-scale-body-md-letter-spacing: var(--oods-text-letter-spacing-default); /** System default body scale. */
+      --sys-text-scale-heading-lg-line-height: var(--oods-text-line-height-tight); /** System large heading scale. */
+      --sys-text-scale-heading-lg-letter-spacing: var(--oods-text-letter-spacing-tight); /** System large heading scale. */
+      --sys-text-scale-heading-xl-line-height: var(--oods-text-line-height-tight); /** System extra-large heading scale. */
+      --sys-text-scale-heading-xl-letter-spacing: var(--oods-text-letter-spacing-tight); /** System extra-large heading scale. */
+      --sys-icon-primary: var(--theme-icon-primary); /** Primary icon colour. */
+      --sys-icon-muted: var(--theme-icon-muted); /** Muted icon colour. */
+      --sys-icon-on-interactive: var(--theme-icon-on-interactive); /** Icon colour on primary interactive surfaces. */
+      --oods-text-scale-caption-line-height: var(--oods-text-line-height-standard); /** Caption text for metadata, badges, and helper copy. */
+      --oods-text-scale-caption-letter-spacing: var(--oods-text-letter-spacing-wide); /** Caption text for metadata, badges, and helper copy. */
+      --oods-text-scale-label-md-line-height: var(--oods-text-line-height-standard); /** Form labels and actionable micro copy. */
+      --oods-text-scale-label-md-letter-spacing: var(--oods-text-letter-spacing-default); /** Form labels and actionable micro copy. */
+      --oods-text-scale-body-sm-line-height: var(--oods-text-line-height-relaxed); /** Compact body text for dense list views. */
+      --oods-text-scale-body-sm-letter-spacing: var(--oods-text-letter-spacing-default); /** Compact body text for dense list views. */
+      --oods-text-scale-body-md-line-height: var(--oods-text-line-height-relaxed); /** Primary body copy for detail reading. */
+      --oods-text-scale-body-md-letter-spacing: var(--oods-text-letter-spacing-default); /** Primary body copy for detail reading. */
+      --oods-text-scale-heading-lg-line-height: var(--oods-text-line-height-tight); /** Major section headings and card titles. */
+      --oods-text-scale-heading-lg-letter-spacing: var(--oods-text-letter-spacing-tight); /** Major section headings and card titles. */
+      --oods-text-scale-heading-xl-line-height: var(--oods-text-line-height-tight); /** Page-level hero headings. */
+      --oods-text-scale-heading-xl-letter-spacing: var(--oods-text-letter-spacing-tight); /** Page-level hero headings. */
+      --theme-status-accent-surface: var(--ref-color-accent-100); /** Accent background tone drawn from primary ramp. */
+      --theme-status-accent-border: var(--ref-color-accent-300); /** Accent border tone. */
+      --theme-status-accent-text: var(--ref-color-accent-500); /** Accent text tone. */
+      --theme-status-accent-icon: var(--ref-color-accent-400); /** Accent icon colour. */
+      --oods-spacing-inset-compact: var(--sys-space-inset-compact); /** Inset spacing for dense contexts. */
+      --oods-spacing-inset-default: var(--sys-space-inset-default); /** Baseline inset spacing. */
+      --oods-spacing-stack-compact: var(--sys-space-stack-compact); /** Compact vertical rhythm. */
+      --oods-spacing-stack-default: var(--sys-space-stack-default); /** Default vertical rhythm. */
+      --oods-spacing-inline-xs: var(--sys-space-inline-xs); /** Extra small inline spacing. */
+      --oods-spacing-inline-sm: var(--sys-space-inline-sm); /** Small inline spacing. */
+      --sys-status-accent-surface: var(--theme-status-accent-surface); /** Accent feedback background. */
+      --sys-status-accent-border: var(--theme-status-accent-border); /** Accent border colour. */
+      --sys-status-accent-text: var(--theme-status-accent-text); /** Accent text colour. */
+      --sys-status-accent-icon: var(--theme-status-accent-icon); /** Accent icon colour. */
+      --oods-viz-scale-categorical-01: var(--sys-status-info-icon); /** Categorical slot 01 derived from info tone. */
+      --oods-viz-scale-categorical-03: var(--sys-status-success-icon); /** Categorical slot 03 derived from success tone. */
+      --oods-viz-scale-categorical-04: var(--sys-status-warning-icon); /** Categorical slot 04 derived from warning tone. */
+      --oods-viz-scale-categorical-05: var(--sys-status-critical-icon); /** Categorical slot 05 derived from critical tone. */
+      --oods-viz-scale-categorical-06: var(--sys-status-neutral-icon); /** Categorical slot 06 derived from neutral tone. */
+      --oods-viz-margin-tight: var(--sys-space-inset-compact); /** Tight chart margin referencing system inset compact. */
+      --oods-viz-margin-default: var(--sys-space-inline-sm); /** Default chart margin referencing inline small spacing. */
+      --oods-viz-margin-roomy: var(--sys-space-stack-default); /** Roomy chart margin referencing stack default spacing. */
+      --oods-viz-scale-categorical-02: var(--sys-status-accent-icon); /** Categorical slot 02 derived from accent tone. */
+    }
+    
+    [data-oods-component="Banner"] {
+    border-radius: var(--ref-border-radius-md, 12px);
+      border-left: 4px solid var(--ref-color-info-700, #2563eb);
+      padding: var(--ref-space-inset-compact, 8px);
+      background: var(--ref-color-info-100, #eff6ff);
+    }
+    
+    [data-oods-component="Tabs"] [role="tablist"] {
+    display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    [data-oods-component="Card"] {
+    border: var(--ref-border-width-hairline, 1px) solid var(--ref-color-neutral-200, #e2e8f0);
+      border-radius: var(--ref-border-radius-md, 12px);
+      background: var(--ref-color-neutral-0, #ffffff);
+      padding: var(--ref-space-inset-compact, 8px);
+    }
+    
+    [data-oods-component="Table"] {
+    width: 100%;
+      border-collapse: collapse;
+    }
+    
+    [data-oods-component="Table"] th,
+    [data-oods-component="Table"] td {
+    border-bottom: var(--ref-border-width-hairline, 1px) solid var(--ref-color-neutral-200, #e2e8f0);
+      text-align: left;
+      padding: 0.5rem;
+    }
+    
+    [data-oods-component="Button"] {
+    border: var(--ref-border-width-hairline, 1px) solid var(--ref-color-primary-500, #4f46e5);
+      border-radius: var(--ref-border-radius-md, 12px);
+      background: var(--ref-color-primary-500, #4f46e5);
+      color: var(--ref-color-neutral-0, #ffffff);
+      padding: 0.5rem 0.875rem;
+    }
+    </style><div id="oods-preview-root"><div style="display: flex; flex-direction: column; gap: 16px" data-layout="stack"><div data-component-id="dash-banner" data-component-ref="oods:Banner"><section id="dash-banner" role="status" title="Workbench Overview" data-oods-component="Banner" data-oods-node-id="dash-banner" data-prop-intent="info"><div data-fragment-enhanced="true" data-enhancer="Banner" style="display:flex;flex-direction:column;gap:var(--ref-space-stack-compact,12px);">
+        <div style="font-size:var(--ref-typography-sizes-sm,14px);line-height:var(--ref-typography-line-height-standard,140%);font-weight:var(--ref-typography-weights-medium,500);color:var(--ref-color-neutral-700,#334155);font-weight:var(--ref-typography-weights-semibold,600);color:var(--ref-color-info-900,#1e3a8a);">Workbench Overview</div>
+        <div style="font-size:var(--ref-typography-sizes-md,16px);line-height:var(--ref-typography-line-height-standard,140%);font-weight:var(--ref-typography-weights-regular,400);color:var(--ref-color-neutral-800,#1f2937);color:var(--ref-color-info-900,#1e3a8a);">Track pipeline health, adoption, and delivery metrics.</div>
+      </div></section></div>
+    <div data-component-id="dash-tabs" data-component-ref="oods:Tabs"><section id="dash-tabs" data-oods-component="Tabs" data-oods-node-id="dash-tabs"><div role="tablist"><button role="tab" id="dash-tabs-tab-button-1" aria-controls="dash-tabs-tab-panel-1" aria-selected="true" tabindex="0">Overview</button><button role="tab" id="dash-tabs-tab-button-2" aria-controls="dash-tabs-tab-panel-2" aria-selected="false" tabindex="-1">Pipeline</button><button role="tab" id="dash-tabs-tab-button-3" aria-controls="dash-tabs-tab-panel-3" aria-selected="false" tabindex="-1">Team</button></div><div role="tabpanel" id="dash-tabs-tab-panel-1" aria-labelledby="dash-tabs-tab-button-1"></div><div role="tabpanel" id="dash-tabs-tab-panel-2" aria-labelledby="dash-tabs-tab-button-2" hidden></div><div role="tabpanel" id="dash-tabs-tab-panel-3" aria-labelledby="dash-tabs-tab-button-3" hidden></div></section></div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px" data-layout="grid"><div data-component-id="dash-kpi-users" data-component-ref="oods:Card"><article id="dash-kpi-users" title="Active users" data-oods-component="Card" data-oods-node-id="dash-kpi-users" data-prop-value="1,240" data-prop-trend="+12%"><div data-fragment-enhanced="true" data-enhancer="Card" style="display:flex;flex-direction:column;gap:var(--ref-space-stack-compact,12px);">
+        <div style="font-size:var(--ref-typography-sizes-sm,14px);line-height:var(--ref-typography-line-height-standard,140%);font-weight:var(--ref-typography-weights-medium,500);color:var(--ref-color-neutral-700,#334155)">Active users</div>
+        <div style="font-size:var(--ref-typography-sizes-xl,24px);line-height:var(--ref-typography-line-height-tight,120%);font-weight:var(--ref-typography-weights-semibold,600);color:var(--ref-color-neutral-900,#0f172a)">1,240</div>
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;border:1px solid var(--ref-color-info-300,#93c5fd);background:var(--ref-color-info-100,#dbeafe);font-size:var(--ref-typography-sizes-xs,12px);color:var(--ref-color-info-900,#1e3a8a);">+12%</div>
+      </div></article></div>
+    <div data-component-id="dash-kpi-revenue" data-component-ref="oods:Card"><article id="dash-kpi-revenue" title="Revenue" data-oods-component="Card" data-oods-node-id="dash-kpi-revenue" data-prop-value="$42k" data-prop-trend="+8%"><div data-fragment-enhanced="true" data-enhancer="Card" style="display:flex;flex-direction:column;gap:var(--ref-space-stack-compact,12px);">
+        <div style="font-size:var(--ref-typography-sizes-sm,14px);line-height:var(--ref-typography-line-height-standard,140%);font-weight:var(--ref-typography-weights-medium,500);color:var(--ref-color-neutral-700,#334155)">Revenue</div>
+        <div style="font-size:var(--ref-typography-sizes-xl,24px);line-height:var(--ref-typography-line-height-tight,120%);font-weight:var(--ref-typography-weights-semibold,600);color:var(--ref-color-neutral-900,#0f172a)">$42k</div>
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;border:1px solid var(--ref-color-info-300,#93c5fd);background:var(--ref-color-info-100,#dbeafe);font-size:var(--ref-typography-sizes-xs,12px);color:var(--ref-color-info-900,#1e3a8a);">+8%</div>
+      </div></article></div>
+    <div data-component-id="dash-kpi-conversion" data-component-ref="oods:Card"><article id="dash-kpi-conversion" title="Conversion" data-oods-component="Card" data-oods-node-id="dash-kpi-conversion" data-prop-value="3.8%" data-prop-trend="+0.4%"><div data-fragment-enhanced="true" data-enhancer="Card" style="display:flex;flex-direction:column;gap:var(--ref-space-stack-compact,12px);">
+        <div style="font-size:var(--ref-typography-sizes-sm,14px);line-height:var(--ref-typography-line-height-standard,140%);font-weight:var(--ref-typography-weights-medium,500);color:var(--ref-color-neutral-700,#334155)">Conversion</div>
+        <div style="font-size:var(--ref-typography-sizes-xl,24px);line-height:var(--ref-typography-line-height-tight,120%);font-weight:var(--ref-typography-weights-semibold,600);color:var(--ref-color-neutral-900,#0f172a)">3.8%</div>
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;border:1px solid var(--ref-color-info-300,#93c5fd);background:var(--ref-color-info-100,#dbeafe);font-size:var(--ref-typography-sizes-xs,12px);color:var(--ref-color-info-900,#1e3a8a);">+0.4%</div>
+      </div></article></div></div>
+    <div data-component-id="dash-table" data-component-ref="oods:Table"><table id="dash-table" data-oods-component="Table" data-oods-node-id="dash-table"><thead><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Delta</th></tr></thead><tbody><tr><td>Sessions</td><td>18,240</td><td>+4.2%</td></tr><tr><td>Template applies</td><td>1,032</td><td>+9.8%</td></tr><tr><td>A11y pass rate</td><td>97.4%</td><td>+1.1%</td></tr></tbody></table></div>
+    <div data-component-id="dash-action" data-component-ref="oods:Button"><button id="dash-action" type="button" data-oods-component="Button" data-oods-node-id="dash-action" data-prop-variant="primary">View full report</button></div></div></div>
+  </main>
+</body>
+</html>

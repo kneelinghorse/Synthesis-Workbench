@@ -1,0 +1,24 @@
+{
+  "component": "Badge",
+  "displayName": "Badge",
+  "classification": "partial",
+  "nodeId": "probe-badge",
+  "attempts": 1,
+  "probeProps": {
+    "label": "Active",
+    "intent": "info"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Active\"",
+  "dataPropAttributes": [
+    "data-prop-intent"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens",
+    "cmp.badge.base"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-badge\" data-oods-component=\"Badge\" data-oods-node-id=\"probe-badge\" data-prop-intent=\"info\">Active</span>"
+}

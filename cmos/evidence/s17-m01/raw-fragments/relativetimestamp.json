@@ -1,0 +1,26 @@
+{
+  "component": "RelativeTimestamp",
+  "displayName": "RelativeTimestamp",
+  "classification": "empty-shell",
+  "nodeId": "probe-relativetimestamp",
+  "attempts": 1,
+  "probeProps": {
+    "fallbackField": "RelativeTimestamp fallbackField",
+    "field": "RelativeTimestamp field",
+    "timezoneParameter": "UTC"
+  },
+  "rootTag": "time",
+  "structureSummary": "time (no inner HTML)",
+  "dataPropAttributes": [
+    "data-prop-fallback-field",
+    "data-prop-field",
+    "data-prop-timezone-parameter"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<time id=\"probe-relativetimestamp\" data-oods-component=\"RelativeTimestamp\" data-oods-node-id=\"probe-relativetimestamp\" data-prop-fallback-field=\"RelativeTimestamp fallbackField\" data-prop-field=\"RelativeTimestamp field\" data-prop-timezone-parameter=\"UTC\"></time>"
+}

@@ -1,0 +1,26 @@
+{
+  "component": "AuditEvent",
+  "displayName": "AuditEvent",
+  "classification": "partial",
+  "nodeId": "probe-auditevent",
+  "attempts": 1,
+  "probeProps": {
+    "timestampField": "AuditEvent timestampField",
+    "timezoneParameter": "UTC",
+    "typeField": "AuditEvent typeField"
+  },
+  "rootTag": "article",
+  "structureSummary": "article -> children: p; text: \"Audit Event\"",
+  "dataPropAttributes": [
+    "data-prop-timestamp-field",
+    "data-prop-timezone-parameter",
+    "data-prop-type-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<article id=\"probe-auditevent\" data-oods-component=\"AuditEvent\" data-oods-node-id=\"probe-auditevent\" data-event-type=\"audit\" data-prop-timestamp-field=\"AuditEvent timestampField\" data-prop-timezone-parameter=\"UTC\" data-prop-type-field=\"AuditEvent typeField\"><p data-event-label=\"true\">Audit Event</p></article>"
+}

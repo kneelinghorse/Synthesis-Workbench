@@ -52,6 +52,8 @@ const CONNECTION_STATUS_DOT: Record<PreviewConnectionStatus, string> = {
 };
 
 const DEFAULT_FOUNDRY_BRAND = "A";
+const CANONICAL_TOKEN_WARNING =
+  "Foundry did not return canonical tokens for this theme (skipping sync).";
 
 const THEME_REQUEST_CANDIDATES: Record<PreviewThemeId, string[]> = {
   base: ["light", "base", "default"],
@@ -136,6 +138,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
 
   useCompositionPreview(client);
   const isOfflineMode = client === null;
+  const isLiveFragmentPreview = foundryStatus === "live";
 
   const foundryHealth = useFoundryHealth({ intervalMs: 30_000 });
 
@@ -163,12 +166,18 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
         themeTokenCacheRef.current[theme] = bridgeResult.mappedTokens;
 
         if (Object.keys(bridgeResult.mappedTokens).length === 0) {
+          if (isLiveFragmentPreview) {
+            setThemeSyncStatus("ready");
+            setThemeSyncMessage(null);
+            return;
+          }
+
           const hint =
             bridgeResult.unmappedPaths.length > 0
               ? `Foundry returned ${bridgeResult.unmappedPaths.length} token path${
                   bridgeResult.unmappedPaths.length === 1 ? "" : "s"
                 } but none mapped to Workbench tokens.`
-              : "Foundry did not return canonical tokens for this theme (skipping sync).";
+              : CANONICAL_TOKEN_WARNING;
           setThemeSyncStatus("ready");
           setThemeSyncMessage(hint);
           return;
@@ -225,12 +234,16 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, syncCanonicalTokens, theme, themeSyncNonce]);
+  }, [client, isLiveFragmentPreview, syncCanonicalTokens, theme, themeSyncNonce]);
 
   const document = useDocumentStateStore((s) => s.document);
 
   const isRendering = compositionStatus === "rendering";
   const hasErrors = compositionErrors.length > 0;
+  const visibleThemeSyncMessage =
+    isLiveFragmentPreview && themeSyncMessage === CANONICAL_TOKEN_WARNING
+      ? null
+      : themeSyncMessage;
   const showOfflineEmptyState = isOfflineMode && !html && !document;
   const handleReloadPreview = useCallback(() => {
     setPreviewReloadNonce((previous) => previous + 1);
@@ -336,7 +349,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
         onRetry={foundryHealth.check}
       />
 
-      {themeSyncMessage ? (
+      {visibleThemeSyncMessage ? (
         <div
           className={cn(
             "flex items-start justify-between gap-3 rounded-xl border px-4 py-2 text-xs",
@@ -345,7 +358,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
               : "border-white/10 bg-white/5 text-white/70"
           )}
         >
-          <span className="min-w-0 flex-1">{themeSyncMessage}</span>
+          <span className="min-w-0 flex-1">{visibleThemeSyncMessage}</span>
           {themeSyncStatus === "error" && (
             <button
               type="button"

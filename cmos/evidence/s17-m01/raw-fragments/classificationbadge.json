@@ -1,0 +1,25 @@
+{
+  "component": "ClassificationBadge",
+  "displayName": "ClassificationBadge",
+  "classification": "partial",
+  "nodeId": "probe-classificationbadge",
+  "attempts": 1,
+  "probeProps": {
+    "mode": "default",
+    "primaryCategoryField": "ClassificationBadge primaryCategoryField",
+    "tagPreviewField": "ClassificationBadge tagPreviewField"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Classification\"",
+  "dataPropAttributes": [
+    "data-prop-primary-category-field",
+    "data-prop-tag-preview-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-classificationbadge\" data-oods-component=\"ClassificationBadge\" data-oods-node-id=\"probe-classificationbadge\" data-badge-status=\"default\" data-badge-variant=\"classification\" data-prop-primary-category-field=\"ClassificationBadge primaryCategoryField\" data-prop-tag-preview-field=\"ClassificationBadge tagPreviewField\">Classification</span>"
+}

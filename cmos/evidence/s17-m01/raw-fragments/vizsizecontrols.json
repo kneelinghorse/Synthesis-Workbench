@@ -1,0 +1,30 @@
+{
+  "component": "VizSizeControls",
+  "displayName": "VizSizeControls",
+  "classification": "partial",
+  "nodeId": "probe-vizsizecontrols",
+  "attempts": 1,
+  "probeProps": {
+    "maxAreaField": "VizSizeControls maxAreaField",
+    "maxField": "VizSizeControls maxField",
+    "minAreaField": "VizSizeControls minAreaField",
+    "minField": "VizSizeControls minField",
+    "strategyField": "VizSizeControls strategyField"
+  },
+  "rootTag": "fieldset",
+  "structureSummary": "fieldset -> children: legend, div, label, span, select, option; text: \"Viz Size Controls Strategy range area Min Size Max Size Max \"",
+  "dataPropAttributes": [
+    "data-prop-max-area-field",
+    "data-prop-max-field",
+    "data-prop-min-area-field",
+    "data-prop-min-field",
+    "data-prop-strategy-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<fieldset id=\"probe-vizsizecontrols\" data-oods-component=\"VizSizeControls\" data-oods-node-id=\"probe-vizsizecontrols\" data-form-type=\"viz-size-controls\" data-prop-max-area-field=\"VizSizeControls maxAreaField\" data-prop-max-field=\"VizSizeControls maxField\" data-prop-min-area-field=\"VizSizeControls minAreaField\" data-prop-min-field=\"VizSizeControls minField\" data-prop-strategy-field=\"VizSizeControls strategyField\"><legend>Viz Size Controls</legend><div data-form-content=\"true\"><label data-form-control=\"select\"><span>Strategy</span><select name=\"strategy\"><option value=\"range\">range</option><option value=\"area\">area</option></select></label><label data-form-control=\"input\"><span>Min Size</span><input type=\"number\" name=\"minSize\" /></label><label data-form-control=\"input\"><span>Max Size</span><input type=\"number\" name=\"maxSize\" /></label><label data-form-control=\"input\"><span>Max Area</span><input type=\"number\" name=\"maxArea\" /></label></div></fieldset>"
+}

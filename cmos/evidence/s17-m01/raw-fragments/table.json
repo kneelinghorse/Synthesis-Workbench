@@ -1,0 +1,44 @@
+{
+  "component": "Table",
+  "displayName": "Table",
+  "classification": "partial",
+  "nodeId": "probe-table",
+  "attempts": 1,
+  "probeProps": {
+    "headers": [
+      "Metric",
+      "Value",
+      "Delta"
+    ],
+    "rows": [
+      [
+        "Users",
+        "1,240",
+        "+12%"
+      ],
+      [
+        "Revenue",
+        "$42k",
+        "+8%"
+      ],
+      [
+        "Conversion",
+        "3.8%",
+        "+0.4%"
+      ]
+    ]
+  },
+  "rootTag": "table",
+  "structureSummary": "table -> children: thead, tr, th, tbody, td; text: \"Column 1 Column 2 Column 3 Users 1,240 +12% Revenue $42k +8%\"",
+  "dataPropAttributes": [
+    "data-prop-headers"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens",
+    "cmp.table.base"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<table id=\"probe-table\" data-oods-component=\"Table\" data-oods-node-id=\"probe-table\" data-prop-headers=\"[&quot;Metric&quot;,&quot;Value&quot;,&quot;Delta&quot;]\"><thead><tr><th scope=\"col\">Column 1</th><th scope=\"col\">Column 2</th><th scope=\"col\">Column 3</th></tr></thead><tbody><tr><td>Users</td><td>1,240</td><td>+12%</td></tr><tr><td>Revenue</td><td>$42k</td><td>+8%</td></tr><tr><td>Conversion</td><td>3.8%</td><td>+0.4%</td></tr></tbody></table>"
+}

@@ -1,0 +1,22 @@
+{
+  "component": "CancellationBadge",
+  "displayName": "CancellationBadge",
+  "classification": "partial",
+  "nodeId": "probe-cancellationbadge",
+  "attempts": 1,
+  "probeProps": {
+    "field": "CancellationBadge field"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Cancellation\"",
+  "dataPropAttributes": [
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-cancellationbadge\" data-oods-component=\"CancellationBadge\" data-oods-node-id=\"probe-cancellationbadge\" data-badge-variant=\"cancellation\" data-prop-field=\"CancellationBadge field\">Cancellation</span>"
+}

@@ -1,0 +1,26 @@
+{
+  "component": "VizPointPreview",
+  "displayName": "VizPointPreview",
+  "classification": "partial",
+  "nodeId": "probe-vizpointpreview",
+  "attempts": 1,
+  "probeProps": {
+    "fillField": "VizPointPreview fillField",
+    "shapeField": "VizPointPreview shapeField",
+    "sizeField": "VizPointPreview sizeField"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: div; text: \"Point preview (640 x 360)\"",
+  "dataPropAttributes": [
+    "data-prop-fill-field",
+    "data-prop-shape-field",
+    "data-prop-size-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-vizpointpreview\" data-oods-component=\"VizPointPreview\" data-oods-node-id=\"probe-vizpointpreview\" data-viz-preview-type=\"point\" data-viz-width=\"640\" data-viz-height=\"360\" data-prop-fill-field=\"VizPointPreview fillField\" data-prop-shape-field=\"VizPointPreview shapeField\" data-prop-size-field=\"VizPointPreview sizeField\"><div data-viz-preview-placeholder=\"true\">Point preview (640 x 360)</div></div>"
+}

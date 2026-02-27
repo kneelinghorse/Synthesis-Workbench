@@ -1,0 +1,22 @@
+{
+  "component": "GeoResolutionBadge",
+  "displayName": "GeoResolutionBadge",
+  "classification": "partial",
+  "nodeId": "probe-georesolutionbadge",
+  "attempts": 2,
+  "probeProps": {
+    "resolutionField": "GeoResolutionBadge resolutionField"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Geo\"",
+  "dataPropAttributes": [
+    "data-prop-resolution-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-georesolutionbadge\" data-oods-component=\"GeoResolutionBadge\" data-oods-node-id=\"probe-georesolutionbadge\" data-badge-variant=\"geo\" data-prop-resolution-field=\"GeoResolutionBadge resolutionField\">Geo</span>"
+}

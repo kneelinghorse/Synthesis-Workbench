@@ -1,0 +1,26 @@
+{
+  "component": "CancellationEvent",
+  "displayName": "CancellationEvent",
+  "classification": "partial",
+  "nodeId": "probe-cancellationevent",
+  "attempts": 1,
+  "probeProps": {
+    "codeField": "CancellationEvent codeField",
+    "labelField": "CancellationEvent labelField",
+    "timestampField": "CancellationEvent timestampField"
+  },
+  "rootTag": "article",
+  "structureSummary": "article -> children: p; text: \"Cancellation Event\"",
+  "dataPropAttributes": [
+    "data-prop-code-field",
+    "data-prop-label-field",
+    "data-prop-timestamp-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<article id=\"probe-cancellationevent\" data-oods-component=\"CancellationEvent\" data-oods-node-id=\"probe-cancellationevent\" data-event-type=\"cancellation\" data-prop-code-field=\"CancellationEvent codeField\" data-prop-label-field=\"CancellationEvent labelField\" data-prop-timestamp-field=\"CancellationEvent timestampField\"><p data-event-label=\"true\">Cancellation Event</p></article>"
+}

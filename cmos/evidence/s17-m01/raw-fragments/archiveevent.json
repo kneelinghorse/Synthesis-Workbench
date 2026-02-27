@@ -1,0 +1,26 @@
+{
+  "component": "ArchiveEvent",
+  "displayName": "ArchiveEvent",
+  "classification": "partial",
+  "nodeId": "probe-archiveevent",
+  "attempts": 1,
+  "probeProps": {
+    "archivedAtField": "ArchiveEvent archivedAtField",
+    "reasonField": "ArchiveEvent reasonField",
+    "restoredAtField": "ArchiveEvent restoredAtField"
+  },
+  "rootTag": "article",
+  "structureSummary": "article -> children: p; text: \"Archive Event\"",
+  "dataPropAttributes": [
+    "data-prop-archived-at-field",
+    "data-prop-reason-field",
+    "data-prop-restored-at-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<article id=\"probe-archiveevent\" data-oods-component=\"ArchiveEvent\" data-oods-node-id=\"probe-archiveevent\" data-event-type=\"archive\" data-prop-archived-at-field=\"ArchiveEvent archivedAtField\" data-prop-reason-field=\"ArchiveEvent reasonField\" data-prop-restored-at-field=\"ArchiveEvent restoredAtField\"><p data-event-label=\"true\">Archive Event</p></article>"
+}

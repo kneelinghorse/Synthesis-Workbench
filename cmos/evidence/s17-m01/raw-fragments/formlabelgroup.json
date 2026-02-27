@@ -1,0 +1,24 @@
+{
+  "component": "FormLabelGroup",
+  "displayName": "FormLabelGroup",
+  "classification": "partial",
+  "nodeId": "probe-formlabelgroup",
+  "attempts": 1,
+  "probeProps": {
+    "labelField": "FormLabelGroup labelField",
+    "placeholderField": "FormLabelGroup placeholderField"
+  },
+  "rootTag": "label",
+  "structureSummary": "label -> children: span; text: \"Label\"",
+  "dataPropAttributes": [
+    "data-prop-label-field",
+    "data-prop-placeholder-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<label id=\"probe-formlabelgroup\" data-oods-component=\"FormLabelGroup\" data-oods-node-id=\"probe-formlabelgroup\" data-prop-label-field=\"FormLabelGroup labelField\" data-prop-placeholder-field=\"FormLabelGroup placeholderField\"><span data-oods-form-label=\"true\">Label</span></label>"
+}

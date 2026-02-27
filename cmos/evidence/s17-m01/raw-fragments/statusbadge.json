@@ -1,0 +1,24 @@
+{
+  "component": "StatusBadge",
+  "displayName": "StatusBadge",
+  "classification": "partial",
+  "nodeId": "probe-statusbadge",
+  "attempts": 1,
+  "probeProps": {
+    "field": "StatusBadge field",
+    "tone": "StatusBadge tone",
+    "variant": "StatusBadge variant"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Status\"",
+  "dataPropAttributes": [
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-statusbadge\" data-oods-component=\"StatusBadge\" data-oods-node-id=\"probe-statusbadge\" data-badge-variant=\"StatusBadge variant\" data-prop-field=\"StatusBadge field\">Status</span>"
+}

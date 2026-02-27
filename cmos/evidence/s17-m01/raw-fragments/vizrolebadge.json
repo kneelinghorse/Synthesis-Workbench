@@ -1,0 +1,22 @@
+{
+  "component": "VizRoleBadge",
+  "displayName": "VizRoleBadge",
+  "classification": "partial",
+  "nodeId": "probe-vizrolebadge",
+  "attempts": 1,
+  "probeProps": {
+    "labelField": "VizRoleBadge labelField"
+  },
+  "rootTag": "span",
+  "structureSummary": "span -> children: none; text: \"Viz Role\"",
+  "dataPropAttributes": [
+    "data-prop-label-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<span id=\"probe-vizrolebadge\" data-oods-component=\"VizRoleBadge\" data-oods-node-id=\"probe-vizrolebadge\" data-badge-variant=\"viz-role\" data-prop-label-field=\"VizRoleBadge labelField\">Viz Role</span>"
+}

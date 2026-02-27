@@ -1,0 +1,24 @@
+{
+  "component": "TagPills",
+  "displayName": "TagPills",
+  "classification": "empty-shell",
+  "nodeId": "probe-tagpills",
+  "attempts": 1,
+  "probeProps": {
+    "field": "TagPills field",
+    "maxVisible": "TagPills maxVisible",
+    "overflowLabel": "TagPills overflowLabel"
+  },
+  "rootTag": "div",
+  "structureSummary": "div (no inner HTML)",
+  "dataPropAttributes": [
+    "data-prop-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-tagpills\" data-oods-component=\"TagPills\" data-oods-node-id=\"probe-tagpills\" data-summary-type=\"tag-pills\" data-prop-field=\"TagPills field\"></div>"
+}

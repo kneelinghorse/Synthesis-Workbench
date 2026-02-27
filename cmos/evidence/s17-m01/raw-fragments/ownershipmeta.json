@@ -1,0 +1,24 @@
+{
+  "component": "OwnershipMeta",
+  "displayName": "OwnershipMeta",
+  "classification": "partial",
+  "nodeId": "probe-ownershipmeta",
+  "attempts": 1,
+  "probeProps": {
+    "ownerTypeField": "OwnershipMeta ownerTypeField",
+    "roleField": "OwnershipMeta roleField"
+  },
+  "rootTag": "div",
+  "structureSummary": "div -> children: span, strong; text: \"Ownership Owner Type: OwnershipMeta ownerTypeField Role: Own\"",
+  "dataPropAttributes": [
+    "data-prop-owner-type-field",
+    "data-prop-role-field"
+  ],
+  "cssRefs": [
+    "css.base",
+    "css.tokens"
+  ],
+  "warnings": [],
+  "errors": [],
+  "html": "<div id=\"probe-ownershipmeta\" data-oods-component=\"OwnershipMeta\" data-oods-node-id=\"probe-ownershipmeta\" data-meta-type=\"ownership\" data-prop-owner-type-field=\"OwnershipMeta ownerTypeField\" data-prop-role-field=\"OwnershipMeta roleField\"><span data-meta-title=\"true\">Ownership</span><span data-meta-item=\"true\"><strong>Owner Type:</strong> OwnershipMeta ownerTypeField</span><span data-meta-item=\"true\"><strong>Role:</strong> OwnershipMeta roleField</span></div>"
+}

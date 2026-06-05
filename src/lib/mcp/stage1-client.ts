@@ -44,10 +44,37 @@ export type Stage1InspectSurfaceArgs = {
   seedRoutes?: string[];
 };
 
+export const STAGE1_ERROR_CODES = [
+  "TIMEOUT",
+  "UNREACHABLE",
+  "CRAWL_ERROR",
+  "PARSE_ERROR",
+] as const;
+
+export type Stage1ErrorCode = (typeof STAGE1_ERROR_CODES)[number];
+
+export type Stage1InspectionError = {
+  code: Stage1ErrorCode;
+  message: string;
+  detail?: string;
+};
+
+export const STAGE1_ERROR_GUIDANCE: Record<Stage1ErrorCode, string> = {
+  TIMEOUT:
+    "The inspection timed out. Try a simpler URL or increase the timeout.",
+  UNREACHABLE:
+    "Could not reach the target URL. Check that the site is accessible and the URL is correct.",
+  CRAWL_ERROR:
+    "Failed to crawl the page. The site may block automated browsers or require authentication.",
+  PARSE_ERROR:
+    "Failed to parse the page content. The page structure may be unusual or dynamically rendered.",
+};
+
 export type Stage1InspectionResult = {
   run: Stage1RunSummary | null;
   payload: unknown;
   message?: string;
+  error?: Stage1InspectionError;
 };
 
 export type Stage1McpClient = {
@@ -84,6 +111,11 @@ class Stage1McpError extends Error {
 }
 
 const DEFAULT_TIMEOUT_MS = 15000;
+const INSPECTION_TIMEOUT_MS = 120000;
+// Inspections are long-running by design; a slow run is normal, not a transient
+// fault. Retry only genuine connection failures — never TIMEOUT — so a run that
+// exceeds the timeout isn't re-executed (which would multiply expensive upstream work).
+const INSPECTION_RETRYABLE_CODES = new Set(["NETWORK_ERROR", "CONNECTION_FAILED"]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -293,10 +325,56 @@ const extractInspectionMessage = (payload: unknown): string | undefined => {
   return undefined;
 };
 
+const isKnownErrorCode = (value: string): value is Stage1ErrorCode =>
+  (STAGE1_ERROR_CODES as readonly string[]).includes(value);
+
+const extractInspectionError = (
+  payload: unknown
+): Stage1InspectionError | undefined => {
+  if (!isRecord(payload)) return undefined;
+
+  // Direct error_code / errorCode / code on the payload.
+  // Stage1 uses { error: true, code: "PARSE_ERROR", message: "..." }
+  const directCode =
+    toStringValue(payload.error_code) ??
+    toStringValue(payload.errorCode) ??
+    (payload.error === true ? toStringValue(payload.code) : undefined);
+  if (directCode && isKnownErrorCode(directCode)) {
+    return {
+      code: directCode,
+      message:
+        toStringValue(payload.error_message) ??
+        toStringValue(payload.message) ??
+        directCode,
+      detail: toStringValue(payload.error_detail) ?? undefined,
+    };
+  }
+
+  // Nested error object with code
+  if (isRecord(payload.error)) {
+    const errorCode =
+      toStringValue(payload.error.code) ??
+      toStringValue(payload.error.error_code);
+    if (errorCode && isKnownErrorCode(errorCode)) {
+      return {
+        code: errorCode,
+        message:
+          toStringValue(payload.error.message) ??
+          toStringValue(payload.error.detail) ??
+          errorCode,
+        detail: toStringValue(payload.error.detail) ?? undefined,
+      };
+    }
+  }
+
+  return undefined;
+};
+
 const normalizeInspectionResult = (payload: unknown): Stage1InspectionResult => ({
   run: extractInspectionRun(payload),
   payload,
   message: extractInspectionMessage(payload),
+  error: extractInspectionError(payload),
 });
 
 const extractRuns = (payload: unknown): Stage1RunSummary[] => {
@@ -512,9 +590,10 @@ export const createStage1McpClient = (
 
   const callTool = async <T>(
     name: string,
-    args: Record<string, unknown> = {}
+    args: Record<string, unknown> = {},
+    overrideTimeoutMs?: number
   ): Promise<T> => {
-    const { signal, cleanup } = createTimeoutSignal(timeoutMs);
+    const { signal, cleanup } = createTimeoutSignal(overrideTimeoutMs ?? timeoutMs);
     try {
       const response = await fetcher(endpointUrl, {
         method: "POST",
@@ -607,9 +686,17 @@ export const createStage1McpClient = (
       return addBreadcrumb(
         () =>
           retryWithBackoff(async () => {
-            const payload = await callTool<unknown>("stage1_inspect_app", args);
+            const payload = await callTool<unknown>(
+              "stage1_inspect_app",
+              args,
+              Math.max(timeoutMs, INSPECTION_TIMEOUT_MS)
+            );
             return normalizeInspectionResult(payload);
-          }, retryOptions),
+          }, {
+            ...retryOptions,
+            retryableCodes:
+              retryOptions.retryableCodes ?? INSPECTION_RETRYABLE_CODES,
+          }),
         `running inspect_app for ${args.url}`
       );
     },
@@ -617,9 +704,17 @@ export const createStage1McpClient = (
       return addBreadcrumb(
         () =>
           retryWithBackoff(async () => {
-            const payload = await callTool<unknown>("stage1_inspect_surface", args);
+            const payload = await callTool<unknown>(
+              "stage1_inspect_surface",
+              args,
+              Math.max(timeoutMs, INSPECTION_TIMEOUT_MS)
+            );
             return normalizeInspectionResult(payload);
-          }, retryOptions),
+          }, {
+            ...retryOptions,
+            retryableCodes:
+              retryOptions.retryableCodes ?? INSPECTION_RETRYABLE_CODES,
+          }),
         `running inspect_surface for ${args.url}`
       );
     },

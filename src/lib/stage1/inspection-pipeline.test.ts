@@ -26,7 +26,7 @@ const makeInspectionResult = (
 });
 
 describe("runInspectionPipeline", () => {
-  it("returns inspected=false when run is null", async () => {
+  it("returns inspected=false when run is null (no upstream error)", async () => {
     const result = await runInspectionPipeline({
       run: null,
       payload: null,
@@ -35,6 +35,37 @@ describe("runInspectionPipeline", () => {
     expect(result.inspected).toBe(false);
     expect(result.discovery).toBeNull();
     expect(result.error).toBe("Inspection did not produce a run reference.");
+  });
+
+  it("surfaces upstream error message when run is null", async () => {
+    const result = await runInspectionPipeline({
+      run: null,
+      payload: null,
+      error: {
+        code: "PARSE_ERROR",
+        message:
+          "Expected app_profile.json to be created, but it was missing",
+      },
+    });
+
+    expect(result.inspected).toBe(false);
+    expect(result.discovery).toBeNull();
+    expect(result.error).toBe(
+      "[PARSE_ERROR] Expected app_profile.json to be created, but it was missing"
+    );
+    expect(result.inspectionError).toBeDefined();
+    expect(result.inspectionError?.code).toBe("PARSE_ERROR");
+  });
+
+  it("uses inspection message as fallback when no structured error", async () => {
+    const result = await runInspectionPipeline({
+      run: null,
+      payload: null,
+      message: "Connection refused",
+    });
+
+    expect(result.inspected).toBe(false);
+    expect(result.error).toBe("Connection refused");
   });
 
   it("returns error when run has no runDir", async () => {
@@ -191,6 +222,74 @@ describe("runInspectionPipeline", () => {
     expect(result.discovery?.tokenSuggestionCount).toBe(0);
     expect(result.discovery?.discoveredComponents).toEqual([]);
     expect(result.discovery?.tokenPaths).toEqual([]);
+  });
+
+  it("propagates inspectionError to discovery summary", async () => {
+    const mockLoadBundle = vi.fn(() => ({
+      ok: true,
+      componentCount: 0,
+      tokenSuggestionCount: 0,
+      errors: [] as string[],
+    }));
+
+    const mockClient = {
+      listRuns: vi.fn(),
+      getArtifact: vi.fn(async () => ({ manifest: {}, artifacts: [] })),
+      inspectApp: vi.fn(),
+      inspectSurface: vi.fn(),
+    };
+
+    const result = await runInspectionPipeline(
+      makeInspectionResult({
+        error: {
+          code: "CRAWL_ERROR",
+          message: "Failed to crawl page",
+          detail: "Blocked by robots.txt",
+        },
+      }),
+      {
+        client: mockClient,
+        loadBundle: mockLoadBundle,
+        getComponents: () => [],
+        getTokenSuggestions: () => ({}),
+      }
+    );
+
+    expect(result.inspected).toBe(true);
+    expect(result.discovery?.inspectionError).toBeDefined();
+    expect(result.discovery?.inspectionError?.code).toBe("CRAWL_ERROR");
+    expect(result.discovery?.inspectionError?.message).toBe(
+      "Failed to crawl page"
+    );
+    expect(result.discovery?.inspectionError?.detail).toBe(
+      "Blocked by robots.txt"
+    );
+  });
+
+  it("omits inspectionError from discovery when not present", async () => {
+    const mockLoadBundle = vi.fn(() => ({
+      ok: true,
+      componentCount: 2,
+      tokenSuggestionCount: 5,
+      errors: [] as string[],
+    }));
+
+    const mockClient = {
+      listRuns: vi.fn(),
+      getArtifact: vi.fn(async () => ({ manifest: {}, artifacts: [] })),
+      inspectApp: vi.fn(),
+      inspectSurface: vi.fn(),
+    };
+
+    const result = await runInspectionPipeline(makeInspectionResult(), {
+      client: mockClient,
+      loadBundle: mockLoadBundle,
+      getComponents: () => [{ name: "A" }, { name: "B" }],
+      getTokenSuggestions: () => ({ "colors.primary": "#111" }),
+    });
+
+    expect(result.inspected).toBe(true);
+    expect(result.discovery?.inspectionError).toBeUndefined();
   });
 
   it("uses type-safe InspectionPipelineResult return shape", async () => {

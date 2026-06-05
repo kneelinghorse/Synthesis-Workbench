@@ -104,7 +104,7 @@ const SetDocumentToolCard = ({
   const statusTone = resolveDocumentToolStatus({
     runtimeStatus: status.type,
     resolved,
-    isError,
+    isError: isError ?? false,
     hasErrors: errors.length > 0,
   });
 
@@ -198,7 +198,7 @@ const PatchNodeToolCard = ({
   const statusTone = resolveDocumentToolStatus({
     runtimeStatus: status.type,
     resolved,
-    isError,
+    isError: isError ?? false,
     hasErrors: errors.length > 0,
   });
 

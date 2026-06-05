@@ -18,7 +18,11 @@ import {
   ToolOutputCardStatus,
   ToolOutputCardTitle,
 } from "@/components/tool-ui/ToolOutputCard";
-import { createStage1McpClient } from "@/lib/mcp/stage1-client";
+import {
+  createStage1McpClient,
+  STAGE1_ERROR_GUIDANCE,
+  type Stage1InspectionError,
+} from "@/lib/mcp/stage1-client";
 import { runInspectionPipeline } from "@/lib/stage1/inspection-pipeline";
 import {
   INSPECT_SURFACE_TOOL_NAME,
@@ -37,6 +41,37 @@ const formatElapsed = (seconds: number) => {
 };
 
 type PipelinePhase = "inspecting" | "loading" | "idle";
+
+const InspectionErrorCallout = ({
+  inspectionError,
+  fallbackMessage,
+  label,
+}: {
+  inspectionError?: Stage1InspectionError;
+  fallbackMessage: string;
+  label: string;
+}) => (
+  <ToolOutputCardCallout tone="danger" className="space-y-2">
+    <div className="flex items-center gap-2">
+      <div className="text-xs uppercase tracking-[0.2em] text-red-100/70">
+        {label}
+      </div>
+      {inspectionError && (
+        <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-red-200">
+          {inspectionError.code}
+        </span>
+      )}
+    </div>
+    <div className="text-sm font-medium text-red-50">
+      {inspectionError?.message ?? fallbackMessage}
+    </div>
+    {inspectionError && (
+      <div className="text-xs text-red-100/60">
+        {STAGE1_ERROR_GUIDANCE[inspectionError.code]}
+      </div>
+    )}
+  </ToolOutputCardCallout>
+);
 
 const InspectSurfaceToolCard = ({
   args,
@@ -212,16 +247,15 @@ const InspectSurfaceToolCard = ({
         )}
 
         {resolved && !result?.inspected && !error && (
-          <ToolOutputCardCallout tone="danger" className="space-y-2">
-            <div className="text-xs uppercase tracking-[0.2em] text-red-100/70">
-              Surface capture failed
-            </div>
-            <div className="text-sm font-medium text-red-50">
-              {result?.errors?.join(" ") ??
-                result?.message ??
-                "Unknown error"}
-            </div>
-          </ToolOutputCardCallout>
+          <InspectionErrorCallout
+            inspectionError={discovery?.inspectionError}
+            fallbackMessage={
+              result?.errors?.join(" ") ??
+              result?.message ??
+              "Unknown error"
+            }
+            label="Surface capture failed"
+          />
         )}
       </ToolOutputCardBody>
     </ToolOutputCard>

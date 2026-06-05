@@ -427,4 +427,141 @@ describe("formatDiscoveryContext", () => {
         );
         expect(result).toContain("update_token_state");
     });
+
+    // ─── Enriched tokens ─────────────────────────────────────────
+
+    it("renders enriched token confidence and occurrences", () => {
+        const result = formatDiscoveryContext(
+            [],
+            { "colors.primary": "#3b82f6", "colors.secondary": "#6c757d" },
+            {
+                enrichedTokens: {
+                    "colors.primary": {
+                        value: "#3b82f6",
+                        confidence: 0.95,
+                        occurrences: 42,
+                    },
+                    "colors.secondary": {
+                        value: "#6c757d",
+                        confidence: 0.7,
+                    },
+                },
+            }
+        );
+
+        expect(result).toContain("colors.primary: #3b82f6 [confidence: 95%, 42 occurrences]");
+        expect(result).toContain("colors.secondary: #6c757d [confidence: 70%]");
+    });
+
+    it("renders plain tokens when enriched data has no confidence or occurrences", () => {
+        const result = formatDiscoveryContext(
+            [],
+            { "spacing.md": "16px" },
+            {
+                enrichedTokens: {
+                    "spacing.md": { value: "16px" },
+                },
+            }
+        );
+
+        // No brackets — just the plain format
+        expect(result).toContain("spacing.md: 16px");
+        expect(result).not.toContain("[");
+    });
+
+    // ─── Component props ─────────────────────────────────────────
+
+    it("renders component prop signatures", () => {
+        const result = formatDiscoveryContext(
+            [
+                {
+                    name: "Button",
+                    count: 12,
+                    props: [
+                        { name: "variant", type: "string", values: ["primary", "secondary"] },
+                        { name: "size", type: "string", values: ["sm", "md", "lg"] },
+                        { name: "label", type: "string", required: true },
+                    ],
+                },
+            ],
+            {}
+        );
+
+        expect(result).toContain("**Button**");
+        expect(result).toContain("props:");
+        expect(result).toContain("variant: string (primary | secondary)");
+        expect(result).toContain("size: string (sm | md | lg)");
+        expect(result).toContain("label: string *required*");
+    });
+
+    it("omits props line when component has no props", () => {
+        const result = formatDiscoveryContext(
+            [{ name: "Divider", count: 3 }],
+            {}
+        );
+
+        expect(result).toContain("**Divider**");
+        expect(result).not.toContain("props:");
+    });
+
+    // ─── Composition patterns ────────────────────────────────────
+
+    it("renders composition patterns with frequency and confidence", () => {
+        const result = formatDiscoveryContext([], {}, {
+            compositionPatterns: [
+                {
+                    name: "Card with Action",
+                    components: ["Card", "CardHeader", "Button"],
+                    frequency: 8,
+                    confidence: 0.87,
+                    description: "Action card used in dashboard grids",
+                },
+            ],
+        });
+
+        expect(result).toContain("## Composition Patterns");
+        expect(result).toContain("**Card with Action**: Card → CardHeader → Button");
+        expect(result).toContain("(8x)");
+        expect(result).toContain("[confidence: 87%]");
+        expect(result).toContain("Action card used in dashboard grids");
+    });
+
+    it("renders minimal composition patterns without optional fields", () => {
+        const result = formatDiscoveryContext([], {}, {
+            compositionPatterns: [
+                {
+                    name: "Simple Stack",
+                    components: ["Header", "Content", "Footer"],
+                },
+            ],
+        });
+
+        expect(result).toContain("**Simple Stack**: Header → Content → Footer");
+        expect(result).not.toContain("(x)");
+        expect(result).not.toContain("[confidence:");
+    });
+
+    it("omits composition patterns section when array is empty", () => {
+        const result = formatDiscoveryContext([], {}, {
+            compositionPatterns: [],
+        });
+
+        expect(result).not.toContain("## Composition Patterns");
+    });
+
+    // ─── Backward compatibility ──────────────────────────────────
+
+    it("produces identical output for old bundles without enriched options", () => {
+        const withoutOptions = formatDiscoveryContext(
+            [{ name: "Card", count: 5 }],
+            { "colors.primary": "#000" }
+        );
+        const withEmptyOptions = formatDiscoveryContext(
+            [{ name: "Card", count: 5 }],
+            { "colors.primary": "#000" },
+            { enrichedTokens: {}, compositionPatterns: [] }
+        );
+
+        expect(withoutOptions).toBe(withEmptyOptions);
+    });
 });

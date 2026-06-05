@@ -371,7 +371,7 @@ describe('renderDocument - OODS Dispatch', () => {
 
   it('should render all components in parallel (not sequentially)', async () => {
     const renderOrder: string[] = [];
-    let resolvers: Array<() => void> = [];
+    const resolvers: Array<() => void> = [];
 
     const client = createMockClient({
       render: vi.fn((schema: unknown) => {

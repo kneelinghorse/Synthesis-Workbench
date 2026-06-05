@@ -30,7 +30,7 @@ const STARTUP_HEALTH_MAX_ATTEMPTS = 20;
 
 const FOUNDRY_BRIDGE = path.join(
   DESIGN_TOOLS,
-  "OODS-Foundry-mcp/packages/mcp-bridge"
+  "OODS-Forge/packages/mcp-bridge"
 );
 const STAGE1_BRIDGE = path.join(
   DESIGN_TOOLS,

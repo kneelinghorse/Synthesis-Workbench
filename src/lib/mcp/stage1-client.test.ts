@@ -432,6 +432,220 @@ describe("stage1 MCP client", () => {
     });
   });
 
+  describe("structured error extraction", () => {
+    it("extracts error_code from inspection response payload", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  error_code: "TIMEOUT",
+                  message: "Inspection timed out after 120s",
+                  error_detail: "Page did not finish loading",
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://slow.test" });
+
+      expect(result.error).toBeDefined();
+      expect(result.error?.code).toBe("TIMEOUT");
+      expect(result.error?.message).toBe("Inspection timed out after 120s");
+      expect(result.error?.detail).toBe("Page did not finish loading");
+    });
+
+    it("extracts error code from nested error object", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  error: {
+                    code: "UNREACHABLE",
+                    message: "DNS resolution failed",
+                  },
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://nope.test" });
+
+      expect(result.error).toBeDefined();
+      expect(result.error?.code).toBe("UNREACHABLE");
+      expect(result.error?.message).toBe("DNS resolution failed");
+    });
+
+    it("does not set error for responses without error codes", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  runId: "abc-123",
+                  hostname: "example.com",
+                  runDir: "/tmp/out/example.com/abc-123",
+                  message: "Completed",
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://example.com" });
+
+      expect(result.error).toBeUndefined();
+      expect(result.run).not.toBeNull();
+    });
+
+    it("extracts error from { error: true, code } pattern (Stage1 native format)", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  error: true,
+                  code: "PARSE_ERROR",
+                  message:
+                    "Expected app_profile.json to be created, but it was missing",
+                  partial: null,
+                }),
+              },
+            ],
+            isError: true,
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://derekn.com" });
+
+      expect(result.error).toBeDefined();
+      expect(result.error?.code).toBe("PARSE_ERROR");
+      expect(result.error?.message).toBe(
+        "Expected app_profile.json to be created, but it was missing"
+      );
+      expect(result.run).toBeNull();
+    });
+
+    it("does not match payload.code when error is not boolean true", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  code: "PARSE_ERROR",
+                  message: "Some message",
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://example.com" });
+
+      // Without error: true, code alone should not trigger error extraction
+      expect(result.error).toBeUndefined();
+    });
+
+    it("ignores unknown error codes", async () => {
+      const fetcher = createMockFetch({
+        jsonPayload: {
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  error_code: "UNKNOWN_NEW_ERROR",
+                  message: "Something novel happened",
+                }),
+              },
+            ],
+          },
+        },
+      });
+
+      const client = createStage1McpClient({
+        baseUrl: "http://stage1.test/mcp",
+        fetcher,
+        retry: { maxAttempts: 1 },
+      });
+      const result = await client.inspectApp({ url: "https://novel.test" });
+
+      expect(result.error).toBeUndefined();
+    });
+
+    it("extracts CRAWL_ERROR and PARSE_ERROR codes", async () => {
+      for (const code of ["CRAWL_ERROR", "PARSE_ERROR"] as const) {
+        const fetcher = createMockFetch({
+          jsonPayload: {
+            result: {
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify({
+                    error_code: code,
+                    message: `${code} occurred`,
+                  }),
+                },
+              ],
+            },
+          },
+        });
+
+        const client = createStage1McpClient({
+          baseUrl: "http://stage1.test/mcp",
+          fetcher,
+          retry: { maxAttempts: 1 },
+        });
+        const result = await client.inspectApp({ url: "https://test.com" });
+
+        expect(result.error?.code).toBe(code);
+      }
+    });
+  });
+
   describe("inspectSurface", () => {
     it("calls stage1_inspect_surface and normalizes the result", async () => {
       const fetcher = createMockFetch({

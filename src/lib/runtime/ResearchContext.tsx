@@ -17,7 +17,11 @@ import {
     WORKBENCH_S44_COMPONENTS,
 } from "@/lib/foundry/catalog";
 import type { PhaseId } from "@/types/phase";
-import type { Stage1Component } from "@/types/stage1-bundle";
+import type {
+    Stage1Component,
+    Stage1CompositionPattern,
+    Stage1EnrichedToken,
+} from "@/types/stage1-bundle";
 
 // ============================================================================
 // System Prompt — Phase-Based Workflow
@@ -172,11 +176,19 @@ export function buildWorkflowContext(opts: {
 /**
  * Formats discovered Stage1 components with richer metadata.
  */
+export type FormatDiscoveryOptions = {
+    enrichedTokens?: Record<string, Stage1EnrichedToken>;
+    compositionPatterns?: Stage1CompositionPattern[];
+};
+
 export function formatDiscoveryContext(
     components: Stage1Component[],
-    tokenSuggestions: Record<string, string>
+    tokenSuggestions: Record<string, string>,
+    options?: FormatDiscoveryOptions
 ): string {
     const lines: string[] = [];
+    const enrichedTokens = options?.enrichedTokens ?? {};
+    const compositionPatterns = options?.compositionPatterns ?? [];
 
     lines.push("# DESIGN DISCOVERY CONTEXT (STAGE1)");
     lines.push("Use the following discovery data to ground your design decisions.");
@@ -196,6 +208,16 @@ export function formatDiscoveryContext(
             }
             if (c.selectors?.css) {
                 lines.push(`  selector: ${c.selectors.css}`);
+            }
+            if (c.props && c.props.length > 0) {
+                const propDescs = c.props.map((p) => {
+                    let desc = p.name;
+                    if (p.type) desc += `: ${p.type}`;
+                    if (p.values && p.values.length > 0) desc += ` (${p.values.join(" | ")})`;
+                    if (p.required) desc += " *required*";
+                    return desc;
+                });
+                lines.push(`  props: ${propDescs.join(", ")}`);
             }
         }
         lines.push("");
@@ -218,10 +240,34 @@ export function formatDiscoveryContext(
         for (const [category, entries] of Object.entries(groups)) {
             lines.push(`### ${category}`);
             for (const [path, value] of entries) {
-                lines.push(`- ${path}: ${value}`);
+                const enriched = enrichedTokens[path];
+                if (enriched && (enriched.confidence != null || enriched.occurrences != null)) {
+                    const meta: string[] = [];
+                    if (enriched.confidence != null) meta.push(`confidence: ${(enriched.confidence * 100).toFixed(0)}%`);
+                    if (enriched.occurrences != null) meta.push(`${enriched.occurrences} occurrences`);
+                    lines.push(`- ${path}: ${value} [${meta.join(", ")}]`);
+                } else {
+                    lines.push(`- ${path}: ${value}`);
+                }
             }
             lines.push("");
         }
+    }
+
+    if (compositionPatterns.length > 0) {
+        lines.push("## Composition Patterns");
+        lines.push("Common component arrangements detected in the target application.");
+        lines.push("");
+        for (const pattern of compositionPatterns) {
+            let entry = `- **${pattern.name}**: ${pattern.components.join(" → ")}`;
+            if (pattern.frequency != null) entry += ` (${pattern.frequency}x)`;
+            if (pattern.confidence != null) entry += ` [confidence: ${(pattern.confidence * 100).toFixed(0)}%]`;
+            lines.push(entry);
+            if (pattern.description) {
+                lines.push(`  ${pattern.description}`);
+            }
+        }
+        lines.push("");
     }
 
     return lines.join("\n");
@@ -255,6 +301,8 @@ type ResearchProviderProps = {
 export const ResearchProvider = ({ children }: ResearchProviderProps) => {
     const components = useStage1BundleStore((state) => state.components);
     const tokenSuggestions = useStage1BundleStore((state) => state.tokenSuggestions);
+    const enrichedTokens = useStage1BundleStore((state) => state.enrichedTokens);
+    const compositionPatterns = useStage1BundleStore((state) => state.compositionPatterns);
     const currentPhase = usePhaseStore((state) => state.currentPhase);
     const [foundryCatalogPrompt, setFoundryCatalogPrompt] = useState<string | null>(
         null
@@ -329,11 +377,14 @@ export const ResearchProvider = ({ children }: ResearchProviderProps) => {
 
         // Stage1 discovery context — when bundle data is loaded
         if (hasBundle) {
-            prompt += "\n\n" + formatDiscoveryContext(components, tokenSuggestions);
+            prompt += "\n\n" + formatDiscoveryContext(components, tokenSuggestions, {
+                enrichedTokens,
+                compositionPatterns,
+            });
         }
 
         return prompt;
-    }, [components, tokenSuggestions, currentPhase, foundryCatalogPrompt]);
+    }, [components, tokenSuggestions, enrichedTokens, compositionPatterns, currentPhase, foundryCatalogPrompt]);
 
     const value = useMemo(
         () => ({

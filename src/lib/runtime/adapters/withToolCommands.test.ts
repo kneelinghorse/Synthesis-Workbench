@@ -41,7 +41,8 @@ const createUserMessage = (id: string, text: string): ThreadMessage => ({
 const createAssistantToolMessage = (
   id: string,
   toolName: string,
-  result: unknown
+  result: unknown,
+  slashCommand = false
 ): ThreadMessage => ({
   id,
   createdAt: new Date(),
@@ -49,7 +50,9 @@ const createAssistantToolMessage = (
   content: [
     {
       type: "tool-call",
-      toolCallId: `${toolName}-${id}`,
+      toolCallId: slashCommand
+        ? `slash:${toolName}-${id}`
+        : `${toolName}-${id}`,
       toolName,
       args: {},
       argsText: "{}",
@@ -652,10 +655,11 @@ describe("withToolCommands", () => {
         errors: [],
         warnings: [],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -677,10 +681,11 @@ describe("withToolCommands", () => {
         errors: ["Missing component field"],
         warnings: ["Deprecated prop"],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -701,9 +706,9 @@ describe("withToolCommands", () => {
       acknowledged: true,
       notes: "Confirmed.",
       resolvedAt: "2025-01-01T00:00:00.000Z",
-    });
+    }, true);
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -720,9 +725,9 @@ describe("withToolCommands", () => {
     const assistantMessage = createAssistantToolMessage("a-2", SIGNAL_TOOL_NAME, {
       signal: "green",
       resolvedAt: "2025-01-01T00:00:00.000Z",
-    });
+    }, true);
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -744,10 +749,11 @@ describe("withToolCommands", () => {
         nextPhase: "explore",
         approved: true,
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -768,10 +774,11 @@ describe("withToolCommands", () => {
         phase: "review",
         decision: "approved",
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -793,10 +800,11 @@ describe("withToolCommands", () => {
         appliedCount: 2,
         invalidPaths: [],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -823,10 +831,11 @@ describe("withToolCommands", () => {
         unmappedFoundryPaths: [],
         entries: [],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -848,10 +857,11 @@ describe("withToolCommands", () => {
         componentCount: 4,
         tokenSuggestionCount: 6,
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -872,10 +882,11 @@ describe("withToolCommands", () => {
         rendered: true,
         html: "<div />",
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -899,10 +910,11 @@ describe("withToolCommands", () => {
         nodeCount: 6,
         componentCount: 4,
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -913,7 +925,7 @@ describe("withToolCommands", () => {
     });
   });
 
-  it("summarizes set_data_context tool results", async () => {
+  it("summarizes set_data_context tool results (slash-triggered)", async () => {
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
     const assistantMessage = createAssistantToolMessage(
@@ -923,7 +935,8 @@ describe("withToolCommands", () => {
         updated: true,
         keyCount: 2,
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
     const result = await runOnce(
@@ -935,6 +948,32 @@ describe("withToolCommands", () => {
     expect(result.content?.[0]).toMatchObject({
       type: "text",
       text: "Data context updated: 2 keys. Bindings will resolve on next render.",
+    });
+  });
+
+  it("delegates LLM-initiated tool results back to LLM (no interception)", async () => {
+    const adapter = createAdapter();
+    const wrapped = withToolCommands(adapter);
+    // LLM-initiated tool call — no slash: prefix → should NOT be intercepted
+    const assistantMessage = createAssistantToolMessage(
+      "a-llm-chain",
+      SET_DATA_CONTEXT_TOOL_NAME,
+      {
+        updated: true,
+        keyCount: 3,
+        resolvedAt: "2025-01-01T00:00:00.000Z",
+      }
+    );
+
+    const result = await runOnce(
+      wrapped,
+      createRunOptions([assistantMessage], assistantMessage)
+    );
+
+    expect(adapter.run).toHaveBeenCalledTimes(1);
+    expect(result.content?.[0]).toMatchObject({
+      type: "text",
+      text: "fallback",
     });
   });
 
@@ -1419,10 +1458,11 @@ describe("withToolCommands", () => {
           slug: "test",
           content: "<html>...</html>",
           resolvedAt: new Date().toISOString(),
-        }
+        },
+        true
       );
 
-      const result = await runOnce(wrapped, 
+      const result = await runOnce(wrapped,
         createRunOptions([assistantMsg], assistantMsg)
       );
 
@@ -1449,10 +1489,11 @@ describe("withToolCommands", () => {
           content: "",
           errors: ["No active design document."],
           resolvedAt: new Date().toISOString(),
-        }
+        },
+        true
       );
 
-      const result = await runOnce(wrapped, 
+      const result = await runOnce(wrapped,
         createRunOptions([assistantMsg], assistantMsg)
       );
 

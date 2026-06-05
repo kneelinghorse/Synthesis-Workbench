@@ -671,4 +671,408 @@ describe("useStage1BundleStore", () => {
       );
     });
   });
+
+  describe("enriched token parsing", () => {
+    it("parses enriched token entries to both flat and enriched maps", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "token_guess",
+            path: "token-guess.json",
+            payload: {
+              kind: "token_guess",
+              version: "2.0.0",
+              tokens: {
+                "colors.primary": {
+                  value: "#3b82f6",
+                  confidence: 0.95,
+                  category: "colors",
+                  occurrences: 42,
+                },
+                "typography.fontFamily.sans": {
+                  value: "Inter, system-ui",
+                  confidence: 0.88,
+                  category: "typography",
+                  occurrences: 15,
+                },
+              },
+            },
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      // Flat map for backward compat
+      expect(result.tokenSuggestions["colors.primary"]).toBe("#3b82f6");
+      expect(result.tokenSuggestions["typography.fontFamily.sans"]).toBe(
+        "Inter, system-ui"
+      );
+      expect(result.tokenSuggestionCount).toBe(2);
+
+      // Enriched map with metadata
+      expect(result.enrichedTokens["colors.primary"]).toEqual({
+        value: "#3b82f6",
+        confidence: 0.95,
+        category: "colors",
+        occurrences: 42,
+      });
+      expect(result.enrichedTokens["typography.fontFamily.sans"]).toEqual({
+        value: "Inter, system-ui",
+        confidence: 0.88,
+        category: "typography",
+        occurrences: 15,
+      });
+    });
+
+    it("handles mixed flat and enriched tokens in same artifact", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "token_guess",
+            path: "token-guess.json",
+            payload: {
+              kind: "token_guess",
+              version: "2.0.0",
+              tokens: {
+                "colors.primary": "#3b82f6",
+                "spacing.md": {
+                  value: "1rem",
+                  confidence: 0.92,
+                  category: "spacing",
+                  occurrences: 30,
+                },
+                "radius.md": "0.375rem",
+              },
+            },
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      // All three in flat map
+      expect(result.tokenSuggestions["colors.primary"]).toBe("#3b82f6");
+      expect(result.tokenSuggestions["spacing.md"]).toBe("1rem");
+      expect(result.tokenSuggestions["radius.md"]).toBe("0.375rem");
+      expect(result.tokenSuggestionCount).toBe(3);
+
+      // Only enriched entry in enriched map
+      expect(Object.keys(result.enrichedTokens)).toEqual(["spacing.md"]);
+      expect(result.enrichedTokens["spacing.md"]?.confidence).toBe(0.92);
+    });
+
+    it("handles enriched tokens with missing optional fields", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "token_guess",
+            path: "token-guess.json",
+            payload: {
+              kind: "token_guess",
+              version: "2.0.0",
+              tokens: {
+                "colors.accent": {
+                  value: "#f59e0b",
+                },
+              },
+            },
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      expect(result.tokenSuggestions["colors.accent"]).toBe("#f59e0b");
+      expect(result.enrichedTokens["colors.accent"]).toEqual({
+        value: "#f59e0b",
+        confidence: undefined,
+        category: undefined,
+        occurrences: undefined,
+      });
+    });
+
+    it("stores enriched tokens in zustand state", () => {
+      const state = useStage1BundleStore.getState();
+      state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "token_guess",
+            path: "token-guess.json",
+            payload: {
+              kind: "token_guess",
+              version: "2.0.0",
+              tokens: {
+                "colors.primary": {
+                  value: "#111",
+                  confidence: 0.9,
+                  category: "colors",
+                  occurrences: 5,
+                },
+              },
+            },
+          },
+        ],
+      });
+
+      const updated = useStage1BundleStore.getState();
+      expect(updated.enrichedTokens["colors.primary"]?.confidence).toBe(0.9);
+      expect(updated.tokenSuggestions["colors.primary"]).toBe("#111");
+    });
+
+    it("seedTokenState works unchanged with enriched tokens", () => {
+      const state = useStage1BundleStore.getState();
+      state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "token_guess",
+            path: "token-guess.json",
+            payload: {
+              kind: "token_guess",
+              version: "2.0.0",
+              tokens: {
+                "colors.primary": {
+                  value: "#ff0000",
+                  confidence: 0.95,
+                  category: "colors",
+                  occurrences: 10,
+                },
+                "spacing.md": "1rem",
+              },
+            },
+          },
+        ],
+      });
+
+      const seedResult = state.seedTokenState();
+      const tokenState = useTokenStateStore.getState().tokens;
+
+      expect(seedResult.appliedCount).toBeGreaterThan(0);
+      expect(tokenState.colors.primary).toBe("#ff0000");
+      expect(tokenState.spacing.md).toBe("1rem");
+    });
+  });
+
+  describe("component prop signatures", () => {
+    it("parses component props from cluster entries", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "component_clusters",
+            path: "component_clusters.json",
+            payload: {
+              kind: "component_clusters",
+              version: "1.2.0",
+              clusters: [
+                {
+                  name: "Button",
+                  count: 12,
+                  confidence: 0.92,
+                  selectors: { css: "button" },
+                  parent_cluster: null,
+                  variants: ["primary", "ghost"],
+                  props: [
+                    {
+                      name: "variant",
+                      type: "string",
+                      values: ["primary", "secondary", "ghost"],
+                      required: true,
+                    },
+                    {
+                      name: "size",
+                      type: "string",
+                      values: ["sm", "md", "lg"],
+                    },
+                    {
+                      name: "disabled",
+                      type: "boolean",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      const button = result.components.find((c) => c.name === "Button");
+      expect(button?.props).toHaveLength(3);
+      expect(button?.props?.[0]).toEqual({
+        name: "variant",
+        type: "string",
+        values: ["primary", "secondary", "ghost"],
+        required: true,
+      });
+      expect(button?.props?.[1]).toEqual({
+        name: "size",
+        type: "string",
+        values: ["sm", "md", "lg"],
+        required: undefined,
+      });
+      expect(button?.props?.[2]).toEqual({
+        name: "disabled",
+        type: "boolean",
+        values: undefined,
+        required: undefined,
+      });
+    });
+
+    it("omits props when not present in cluster entry", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "component_clusters",
+            path: "component_clusters.json",
+            payload: {
+              kind: "component_clusters",
+              version: "1.1.0",
+              clusters: [
+                {
+                  name: "Card",
+                  count: 6,
+                  confidence: 0.85,
+                  selectors: { css: ".card" },
+                  parent_cluster: null,
+                  variants: [],
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      const card = result.components.find((c) => c.name === "Card");
+      expect(card?.props).toBeUndefined();
+    });
+  });
+
+  describe("composition patterns", () => {
+    it("extracts composition patterns from bundle top-level", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        compositionPatterns: [
+          {
+            name: "Card with Action",
+            components: ["Card", "CardHeader", "Button"],
+            frequency: 8,
+            confidence: 0.87,
+            description: "Card containing a header and action button",
+          },
+          {
+            name: "Form Field",
+            components: ["Label", "Input", "ErrorMessage"],
+            frequency: 12,
+            confidence: 0.93,
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      expect(result.compositionPatterns).toHaveLength(2);
+      expect(result.compositionPatterns[0]).toEqual({
+        name: "Card with Action",
+        components: ["Card", "CardHeader", "Button"],
+        frequency: 8,
+        confidence: 0.87,
+        description: "Card containing a header and action button",
+      });
+      expect(result.compositionPatterns[1]?.name).toBe("Form Field");
+    });
+
+    it("extracts composition patterns from artifacts", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        artifacts: [
+          {
+            type: "composition_patterns",
+            path: "composition_patterns.json",
+            payload: {
+              kind: "composition_patterns",
+              version: "1.0.0",
+              patterns: [
+                {
+                  name: "Nav Item",
+                  components: ["NavLink", "Icon"],
+                  frequency: 15,
+                  confidence: 0.91,
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      expect(result.compositionPatterns).toHaveLength(1);
+      expect(result.compositionPatterns[0]?.name).toBe("Nav Item");
+      expect(result.compositionPatterns[0]?.components).toEqual([
+        "NavLink",
+        "Icon",
+      ]);
+    });
+
+    it("deduplicates composition patterns by name", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        compositionPatterns: [
+          {
+            name: "Card with Action",
+            components: ["Card", "Button"],
+            frequency: 8,
+          },
+        ],
+        synthesis: {
+          compositionPatterns: [
+            {
+              name: "Card with Action",
+              components: ["Card", "CardHeader", "Button"],
+              frequency: 10,
+            },
+          ],
+        },
+      });
+
+      expect(result.ok).toBe(true);
+      expect(result.compositionPatterns).toHaveLength(1);
+    });
+
+    it("stores composition patterns in zustand state", () => {
+      const state = useStage1BundleStore.getState();
+      state.loadBundle({
+        manifest: { contractVersion: "1.0.0" },
+        compositionPatterns: [
+          {
+            name: "Hero Section",
+            components: ["Heading", "Text", "Button"],
+            frequency: 3,
+          },
+        ],
+      });
+
+      const updated = useStage1BundleStore.getState();
+      expect(updated.compositionPatterns).toHaveLength(1);
+      expect(updated.compositionPatterns[0]?.name).toBe("Hero Section");
+    });
+
+    it("returns empty composition patterns when none present", () => {
+      const state = useStage1BundleStore.getState();
+      const result = state.loadBundle(sampleBundle);
+
+      expect(result.compositionPatterns).toEqual([]);
+    });
+  });
 });

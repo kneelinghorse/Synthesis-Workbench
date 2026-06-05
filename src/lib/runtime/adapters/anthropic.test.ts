@@ -5,7 +5,7 @@ import type {
 } from "@assistant-ui/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createAnthropicAdapter } from "./anthropic";
+import { buildAnthropicMessages, createAnthropicAdapter } from "./anthropic";
 
 const createUserMessage = (id: string, text: string): ThreadMessage => ({
   id,
@@ -410,5 +410,249 @@ describe("createAnthropicAdapter", () => {
     } else {
       throw new Error("Expected a text error response.");
     }
+  });
+
+  it("patches orphaned tool_use blocks with synthetic error results", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      createStreamResponse([
+        'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"OK"},"index":0}\n\n',
+        'data: {"type":"message_stop"}\n\n',
+      ])
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const adapter = createAnthropicAdapter({
+      baseUrl: "https://proxy.local/anthropic",
+    });
+
+    // Assistant message with a tool_use that has NO result (orphan)
+    const orphanAssistant: ThreadMessage = {
+      id: "a-orphan",
+      createdAt: new Date(),
+      role: "assistant",
+      content: [
+        {
+          type: "tool-call",
+          toolCallId: "toolu_orphan_1",
+          toolName: "set_document",
+          args: {},
+          argsText: "{}",
+          // result is undefined — orphan!
+        },
+      ],
+      metadata: { custom: {} },
+    };
+
+    await collectUpdates(
+      adapter.run,
+      createRunOptions([
+        createUserMessage("u-orphan-1", "compose something"),
+        orphanAssistant,
+      ])
+    );
+
+    const call = fetchMock.mock.calls[0];
+    if (!call) throw new Error("Expected fetch to be called.");
+    const [, options] = call as [string, RequestInit];
+    if (typeof options.body !== "string") throw new Error("Expected JSON body.");
+    const body = JSON.parse(options.body) as {
+      messages: Array<{ role: string; content: unknown }>;
+    };
+
+    // Should have: user(text), assistant(tool_use), user(synthetic tool_result)
+    const assistantMsg = body.messages.find((m) => m.role === "assistant");
+    expect(assistantMsg).toBeDefined();
+
+    const toolResultMsg = body.messages.find(
+      (m) =>
+        m.role === "user" &&
+        Array.isArray(m.content) &&
+        m.content.some(
+          (b: Record<string, unknown>) => b.type === "tool_result"
+        )
+    );
+    expect(toolResultMsg).toBeDefined();
+
+    if (toolResultMsg && Array.isArray(toolResultMsg.content)) {
+      const result = toolResultMsg.content.find(
+        (b: Record<string, unknown>) => b.tool_use_id === "toolu_orphan_1"
+      ) as Record<string, unknown> | undefined;
+      expect(result).toBeDefined();
+      expect(result?.is_error).toBe(true);
+      expect(result?.content).toBe("[Tool result not available]");
+    }
+  });
+
+  it("does not inject synthetic results for properly paired tool_use/tool_result", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      createStreamResponse([
+        'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Done"},"index":0}\n\n',
+        'data: {"type":"message_stop"}\n\n',
+      ])
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const adapter = createAnthropicAdapter({
+      baseUrl: "https://proxy.local/anthropic",
+    });
+
+    // Properly paired: tool_use with result
+    const pairedAssistant = createAssistantToolResultMessage(
+      "a-paired",
+      "toolu_paired_1",
+      "set_document",
+      { schema: { component: "Card" } },
+      { saved: true, nodeCount: 1 }
+    );
+
+    await collectUpdates(
+      adapter.run,
+      createRunOptions([
+        createUserMessage("u-paired-1", "compose a card"),
+        pairedAssistant,
+      ])
+    );
+
+    const call = fetchMock.mock.calls[0];
+    if (!call) throw new Error("Expected fetch to be called.");
+    const [, options] = call as [string, RequestInit];
+    if (typeof options.body !== "string") throw new Error("Expected JSON body.");
+    const body = JSON.parse(options.body) as {
+      messages: Array<{ role: string; content: unknown }>;
+    };
+
+    // Should have proper tool_result for toolu_paired_1 — not a synthetic error
+    const toolResultMsgs = body.messages.filter(
+      (m) =>
+        m.role === "user" &&
+        Array.isArray(m.content) &&
+        m.content.some(
+          (b: Record<string, unknown>) => b.type === "tool_result"
+        )
+    );
+    expect(toolResultMsgs.length).toBe(1);
+
+    const results = (
+      toolResultMsgs[0].content as Array<Record<string, unknown>>
+    ).filter((b) => b.type === "tool_result");
+    expect(results.length).toBe(1);
+    expect(results[0].is_error).toBeUndefined();
+    expect(results[0].tool_use_id).toBe("toolu_paired_1");
+  });
+});
+
+describe("buildAnthropicMessages — orphan detection", () => {
+  it("injects synthetic tool_result for orphaned tool_use (no result set)", () => {
+    const messages: ThreadMessage[] = [
+      createUserMessage("u-1", "compose a card"),
+      {
+        id: "a-orphan",
+        createdAt: new Date(),
+        role: "assistant",
+        content: [
+          {
+            type: "tool-call",
+            toolCallId: "toolu_orphan",
+            toolName: "set_document",
+            args: {},
+            argsText: "{}",
+            // result is undefined — orphaned tool_use
+          },
+        ],
+        metadata: { custom: {} },
+      },
+    ];
+
+    const result = buildAnthropicMessages(messages);
+
+    // Should have: user, assistant(tool_use), user(synthetic tool_result)
+    expect(result.messages.length).toBe(3);
+    expect(result.messages[0].role).toBe("user");
+    expect(result.messages[1].role).toBe("assistant");
+    expect(result.messages[2].role).toBe("user");
+
+    const syntheticBlock = (
+      result.messages[2].content as Array<Record<string, unknown>>
+    ).find((b) => b.tool_use_id === "toolu_orphan");
+    expect(syntheticBlock).toBeDefined();
+    expect(syntheticBlock?.type).toBe("tool_result");
+    expect(syntheticBlock?.is_error).toBe(true);
+    expect(syntheticBlock?.content).toBe("[Tool result not available]");
+  });
+
+  it("appends synthetic results alongside existing tool_results when partially orphaned", () => {
+    const messages: ThreadMessage[] = [
+      createUserMessage("u-1", "compose and export"),
+      {
+        id: "a-multi",
+        createdAt: new Date(),
+        role: "assistant",
+        content: [
+          {
+            type: "tool-call",
+            toolCallId: "toolu_a",
+            toolName: "set_document",
+            args: {},
+            argsText: "{}",
+            result: { saved: true }, // has result
+          },
+          {
+            type: "tool-call",
+            toolCallId: "toolu_b",
+            toolName: "export_design",
+            args: {},
+            argsText: "{}",
+            // no result — orphan
+          },
+        ],
+        metadata: { custom: {} },
+      },
+    ];
+
+    const result = buildAnthropicMessages(messages);
+
+    // user, assistant(tool_use_a, tool_use_b), user(tool_result_a + synthetic_b)
+    expect(result.messages.length).toBe(3);
+
+    const toolResultContent = result.messages[2].content as Array<
+      Record<string, unknown>
+    >;
+    expect(toolResultContent.length).toBe(2);
+
+    const resultA = toolResultContent.find(
+      (b) => b.tool_use_id === "toolu_a"
+    );
+    expect(resultA?.is_error).toBeUndefined();
+
+    const resultB = toolResultContent.find(
+      (b) => b.tool_use_id === "toolu_b"
+    );
+    expect(resultB?.is_error).toBe(true);
+    expect(resultB?.content).toBe("[Tool result not available]");
+  });
+
+  it("leaves properly paired tool_use/tool_result unchanged", () => {
+    const messages: ThreadMessage[] = [
+      createUserMessage("u-1", "render a button"),
+      createAssistantToolResultMessage(
+        "a-1",
+        "toolu_ok",
+        "render_component",
+        { component: "Button" },
+        { rendered: true }
+      ),
+    ];
+
+    const result = buildAnthropicMessages(messages);
+
+    // user, assistant(tool_use), user(tool_result)
+    expect(result.messages.length).toBe(3);
+
+    const toolResultContent = result.messages[2].content as Array<
+      Record<string, unknown>
+    >;
+    expect(toolResultContent.length).toBe(1);
+    expect(toolResultContent[0].is_error).toBeUndefined();
+    expect(toolResultContent[0].tool_use_id).toBe("toolu_ok");
   });
 });

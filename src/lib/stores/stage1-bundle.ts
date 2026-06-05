@@ -9,6 +9,9 @@ import type {
   Stage1BundlePayload,
   Stage1Component,
   Stage1ComponentClusterEntry,
+  Stage1ComponentProp,
+  Stage1CompositionPattern,
+  Stage1EnrichedToken,
   Stage1Manifest,
   Stage1TokenSeedResult,
 } from "@/types/stage1-bundle";
@@ -18,6 +21,8 @@ type Stage1BundleState = {
   manifest: Stage1Manifest | null;
   components: Stage1Component[];
   tokenSuggestions: Record<string, string>;
+  enrichedTokens: Record<string, Stage1EnrichedToken>;
+  compositionPatterns: Stage1CompositionPattern[];
   error: string | null;
   loadedAt: string | null;
   loadBundle: (input: Stage1BundleInput) => Stage1BundleLoadResult;
@@ -321,22 +326,45 @@ const isTokenGuessArtifact = (value: unknown): boolean => {
   return toStringValue(value.kind) === "token_guess" && isRecord(value.tokens);
 };
 
-const handleTokenGuessPayload = (value: unknown): Record<string, string> => {
-  if (!isRecord(value)) return {};
-  if (toStringValue(value.kind) !== "token_guess") return {};
+type TokenGuessResult = {
+  flat: Record<string, string>;
+  enriched: Record<string, Stage1EnrichedToken>;
+};
+
+const isEnrichedTokenEntry = (
+  value: unknown
+): value is Record<string, unknown> =>
+  isRecord(value) && "value" in value && isPrimitive(value.value);
+
+const handleTokenGuessPayload = (value: unknown): TokenGuessResult => {
+  const empty: TokenGuessResult = { flat: {}, enriched: {} };
+  if (!isRecord(value)) return empty;
+  if (toStringValue(value.kind) !== "token_guess") return empty;
 
   const tokens = value.tokens;
-  if (!isRecord(tokens)) return {};
+  if (!isRecord(tokens)) return empty;
 
-  const result: Record<string, string> = {};
+  const flat: Record<string, string> = {};
+  const enriched: Record<string, Stage1EnrichedToken> = {};
+
   for (const [key, val] of Object.entries(tokens)) {
     if (typeof val === "string") {
-      result[key] = val;
+      flat[key] = val;
     } else if (isPrimitive(val)) {
-      result[key] = String(val);
+      flat[key] = String(val);
+    } else if (isEnrichedTokenEntry(val)) {
+      const strValue = String(val.value);
+      flat[key] = strValue;
+      enriched[key] = {
+        value: strValue,
+        confidence: toNumberValue(val.confidence),
+        category: toStringValue(val.category) ?? undefined,
+        occurrences: toNumberValue(val.occurrences),
+      };
     }
   }
-  return result;
+
+  return { flat, enriched };
 };
 
 const isComponentClustersArtifact = (value: unknown): boolean => {
@@ -361,6 +389,32 @@ const handleComponentClustersPayload = (
     .filter((entry): entry is Record<string, unknown> => isRecord(entry))
     .map((entry) => buildComponentFromCluster(entry, source))
     .filter((entry): entry is Stage1Component => entry !== null);
+};
+
+const extractComponentProps = (value: unknown): Stage1ComponentProp[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((entry): entry is Record<string, unknown> => isRecord(entry))
+    .map((entry): Stage1ComponentProp | null => {
+      const name = toStringValue(entry.name);
+      if (!name) return null;
+
+      const type = toStringValue(entry.type) ?? undefined;
+      const required =
+        typeof entry.required === "boolean" ? entry.required : undefined;
+      const values = Array.isArray(entry.values)
+        ? entry.values.filter((v): v is string => typeof v === "string")
+        : undefined;
+
+      return {
+        name,
+        type,
+        values: values && values.length > 0 ? values : undefined,
+        required,
+      } satisfies Stage1ComponentProp;
+    })
+    .filter((entry): entry is Stage1ComponentProp => entry !== null);
 };
 
 const buildComponentFromCluster = (
@@ -402,6 +456,8 @@ const buildComponentFromCluster = (
     ? entry.variants.filter((v): v is string => typeof v === "string")
     : undefined;
 
+  const props = extractComponentProps(entry.props);
+
   return {
     name,
     count,
@@ -410,6 +466,7 @@ const buildComponentFromCluster = (
     selectors,
     parentCluster,
     variants: variants && variants.length > 0 ? variants : undefined,
+    props: props.length > 0 ? props : undefined,
   };
 };
 
@@ -822,6 +879,7 @@ const dedupeComponents = (components: Stage1Component[]): Stage1Component[] => {
       selectors: existing.selectors ?? component.selectors,
       parentCluster: existing.parentCluster ?? component.parentCluster,
       variants: existing.variants ?? component.variants,
+      props: existing.props ?? component.props,
     });
   }
 
@@ -881,11 +939,17 @@ const extractComponents = (
   return dedupeComponents(components);
 };
 
+type TokenExtractionResult = {
+  suggestions: Record<string, string>;
+  enriched: Record<string, Stage1EnrichedToken>;
+};
+
 const extractTokenSuggestions = (
   bundle: Stage1BundlePayload,
   artifacts: ArtifactCandidate[]
-): Record<string, string> => {
+): TokenExtractionResult => {
   const suggestions: Record<string, string> = {};
+  const enriched: Record<string, Stage1EnrichedToken> = {};
 
   const fingerprint =
     bundle.styleFingerprint ??
@@ -911,7 +975,9 @@ const extractTokenSuggestions = (
       artifact.type === "token_guess" ||
       isTokenGuessArtifact(artifact.payload)
     ) {
-      Object.assign(suggestions, handleTokenGuessPayload(artifact.payload));
+      const result = handleTokenGuessPayload(artifact.payload);
+      Object.assign(suggestions, result.flat);
+      Object.assign(enriched, result.enriched);
       continue;
     }
 
@@ -935,7 +1001,80 @@ const extractTokenSuggestions = (
     }
   }
 
-  return suggestions;
+  return { suggestions, enriched };
+};
+
+const extractCompositionPatterns = (
+  bundle: Stage1BundlePayload,
+  artifacts: ArtifactCandidate[]
+): Stage1CompositionPattern[] => {
+  const patterns: Stage1CompositionPattern[] = [];
+
+  const bundleSources = [
+    bundle.compositionPatterns,
+    isRecord(bundle.synthesis) ? bundle.synthesis.compositionPatterns : undefined,
+    isRecord(bundle.evidence) ? bundle.evidence.compositionPatterns : undefined,
+  ];
+
+  for (const source of bundleSources) {
+    patterns.push(...parseCompositionPatternArray(source));
+  }
+
+  for (const artifact of artifacts) {
+    if (
+      artifact.type === "composition_patterns" ||
+      artifact.label.includes("composition") ||
+      artifact.label.includes("pattern")
+    ) {
+      const payload = artifact.payload;
+      if (isRecord(payload) && Array.isArray(payload.patterns)) {
+        patterns.push(...parseCompositionPatternArray(payload.patterns));
+      } else {
+        patterns.push(...parseCompositionPatternArray(payload));
+      }
+    }
+  }
+
+  return dedupeCompositionPatterns(patterns);
+};
+
+const parseCompositionPatternArray = (
+  value: unknown
+): Stage1CompositionPattern[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((entry): entry is Record<string, unknown> => isRecord(entry))
+    .map((entry): Stage1CompositionPattern | null => {
+      const name = toStringValue(entry.name) ?? toStringValue(entry.pattern);
+      if (!name) return null;
+
+      const components = Array.isArray(entry.components)
+        ? entry.components.filter((c): c is string => typeof c === "string")
+        : [];
+      if (components.length === 0) return null;
+
+      return {
+        name,
+        components,
+        frequency: toNumberValue(entry.frequency),
+        confidence: toNumberValue(entry.confidence),
+        description: toStringValue(entry.description) ?? undefined,
+      } satisfies Stage1CompositionPattern;
+    })
+    .filter((entry): entry is Stage1CompositionPattern => entry !== null);
+};
+
+const dedupeCompositionPatterns = (
+  patterns: Stage1CompositionPattern[]
+): Stage1CompositionPattern[] => {
+  const map = new Map<string, Stage1CompositionPattern>();
+  for (const pattern of patterns) {
+    const key = pattern.name.trim().toLowerCase();
+    if (!key || map.has(key)) continue;
+    map.set(key, pattern);
+  }
+  return Array.from(map.values());
 };
 
 const parseBundleInput = (
@@ -991,6 +1130,8 @@ const emptyLoadResult = (error: string): Stage1BundleLoadResult => ({
   tokenSuggestionCount: 0,
   components: [],
   tokenSuggestions: {},
+  enrichedTokens: {},
+  compositionPatterns: [],
   errors: [error],
 });
 
@@ -1000,6 +1141,8 @@ const INITIAL_STATE: Omit<Stage1BundleState, "loadBundle" | "seedTokenState" | "
     manifest: null,
     components: [],
     tokenSuggestions: {},
+    enrichedTokens: {},
+    compositionPatterns: [],
     error: null,
     loadedAt: null,
   };
@@ -1018,8 +1161,13 @@ export const useStage1BundleStore = create<Stage1BundleState>((set, get) => ({
     }
 
     const artifacts = buildArtifactCandidates(parsed.bundle);
-    const tokenSuggestions = extractTokenSuggestions(parsed.bundle, artifacts);
+    const { suggestions: tokenSuggestions, enriched: enrichedTokens } =
+      extractTokenSuggestions(parsed.bundle, artifacts);
     const components = extractComponents(parsed.bundle, artifacts);
+    const compositionPatterns = extractCompositionPatterns(
+      parsed.bundle,
+      artifacts
+    );
     const loadedAt = new Date().toISOString();
 
     set({
@@ -1027,6 +1175,8 @@ export const useStage1BundleStore = create<Stage1BundleState>((set, get) => ({
       manifest: parsed.bundle.manifest,
       components,
       tokenSuggestions,
+      enrichedTokens,
+      compositionPatterns,
       error: null,
       loadedAt,
     });
@@ -1037,6 +1187,8 @@ export const useStage1BundleStore = create<Stage1BundleState>((set, get) => ({
       tokenSuggestionCount: Object.keys(tokenSuggestions).length,
       components,
       tokenSuggestions,
+      enrichedTokens,
+      compositionPatterns,
       errors: [],
     };
   },

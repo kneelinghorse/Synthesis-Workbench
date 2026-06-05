@@ -29,7 +29,14 @@ export function toJSON(document: DesignDocument): string {
  * Parse DesignDocument from JSON string
  */
 export function fromJSON(json: string): DesignDocument {
-  const parsed = JSON.parse(json);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch (error) {
+    throw new Error(
+      `Invalid design JSON: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
   return parseDesignDocument(parsed);
 }
 

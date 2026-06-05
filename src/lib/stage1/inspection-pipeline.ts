@@ -1,4 +1,5 @@
 import {
+  type Stage1InspectionError,
   type Stage1InspectionResult,
   type Stage1McpClient,
 } from "@/lib/mcp/stage1-client";
@@ -20,6 +21,9 @@ export type DiscoverySummary = {
   discoveredComponents: string[];
   tokenPaths: string[];
   errors: string[];
+  inspectionError?: Stage1InspectionError;
+  hasEnrichedTokens: boolean;
+  compositionPatternCount: number;
 };
 
 export type InspectionPipelineResult = {
@@ -29,6 +33,8 @@ export type InspectionPipelineResult = {
   discovery: DiscoverySummary | null;
   /** Error message if any step failed. */
   error?: string;
+  /** Structured error from the upstream inspection, if available. */
+  inspectionError?: Stage1InspectionError;
 };
 
 export type InspectionPipelineOptions = {
@@ -59,10 +65,17 @@ export async function runInspectionPipeline(
   const run = inspectionResult.run;
 
   if (!run) {
+    const upstreamDetail =
+      inspectionResult.error?.message ?? inspectionResult.message;
+    const errorCode = inspectionResult.error?.code;
+    const prefix = errorCode ? `[${errorCode}] ` : "";
     return {
       inspected: false,
       discovery: null,
-      error: "Inspection did not produce a run reference.",
+      error: upstreamDetail
+        ? `${prefix}${upstreamDetail}`
+        : "Inspection did not produce a run reference.",
+      inspectionError: inspectionResult.error,
     };
   }
 
@@ -95,6 +108,11 @@ export async function runInspectionPipeline(
     const components = getComponents();
     const tokenSuggestions = getTokenSuggestions();
 
+    const hasEnrichedTokens =
+      Object.keys(loadResult.enrichedTokens ?? {}).length > 0;
+    const compositionPatternCount =
+      (loadResult.compositionPatterns ?? []).length;
+
     return {
       inspected: true,
       discovery: {
@@ -104,6 +122,9 @@ export async function runInspectionPipeline(
         discoveredComponents: components.map((c) => c.name),
         tokenPaths: Object.keys(tokenSuggestions),
         errors: loadResult.errors,
+        inspectionError: inspectionResult.error,
+        hasEnrichedTokens,
+        compositionPatternCount,
       },
     };
   } catch (err) {

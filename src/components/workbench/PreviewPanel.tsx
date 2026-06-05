@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CompositionErrorOverlay } from "@/components/workbench/CompositionErrorOverlay";
-import { DesignExportButton } from "@/components/workbench/DesignExportButton";
 import { FoundryHealthBanner } from "@/components/workbench/FoundryHealthBanner";
 import { FoundryStatusChip } from "@/components/workbench/FoundryStatusChip";
 import { PreviewPane } from "@/components/workbench/PreviewPane";
@@ -233,7 +232,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [client, isLiveFragmentPreview, syncCanonicalTokens, theme, themeSyncNonce]);
 
   const document = useDocumentStateStore((s) => s.document);
@@ -309,7 +308,6 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
             >
               Reload Preview
             </button>
-            <DesignExportButton />
           </div>
           <div className="flex items-center gap-2 text-xs text-white/50">
             {themeSyncStatus === "loading" && (

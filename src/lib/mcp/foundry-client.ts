@@ -232,16 +232,6 @@ const isBrowserRuntime = () =>
   typeof document !== "undefined" &&
   process.env.NODE_ENV !== "test";
 
-const inferFoundryProxyPath = (explicitUrl: string) => {
-  try {
-    const parsed = new URL(explicitUrl);
-    const pathname = parsed.pathname.replace(/\/+$/, "") || "/";
-    return pathname === "/mcp" ? "/api/foundry/mcp" : "/api/foundry/run";
-  } catch {
-    return "/api/foundry/run";
-  }
-};
-
 const readFoundryMcpBaseUrl = () => {
   const explicit =
     process.env.NEXT_PUBLIC_OODS_FOUNDRY_MCP_URL?.trim() ||
@@ -263,7 +253,8 @@ const readFoundryMcpBaseUrl = () => {
     }
 
     // Default to the Workbench server proxy to avoid CORS / localhost binding issues.
-    return inferFoundryProxyPath(explicit);
+    // Forge is bridge-only — all configured URLs proxy through /api/foundry/run.
+    return "/api/foundry/run";
   }
 
   return explicit;

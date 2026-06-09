@@ -22,6 +22,9 @@ type FoundryFragmentScreenChild = {
   id: string;
   component: string;
   props?: Record<string, unknown>;
+  meta?: {
+    label?: string;
+  };
 };
 
 type FoundryFragmentSchema = {
@@ -276,10 +279,17 @@ export const buildFoundryFragmentRenderInput = (
   for (const [order, component] of components.entries()) {
     const resolvedProps = resolveComponentProps(component, dataContext, bindingErrors);
     const normalizedComponent = normalizeComponentName(component.ref);
+    // Forward a slot label so Forge emits data-oods-label on the slot node. Use
+    // the raw label/title prop (not resolvedProps) so the anchor stays stable
+    // across data changes — the comment layer pins slot-kind anchors to it.
+    // (s20-m06; durable slot name from Forge lands via option (b) in s20-m07.)
+    const slotLabel =
+      toStringValue(component.props.label) ?? toStringValue(component.props.title);
     children.push({
       id: component.id,
       component: normalizedComponent,
       props: Object.keys(resolvedProps).length > 0 ? resolvedProps : undefined,
+      meta: slotLabel ? { label: slotLabel } : undefined,
     });
     componentIndex.push({
       id: component.id,

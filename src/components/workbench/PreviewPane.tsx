@@ -13,10 +13,17 @@ import {
   createTokenStateUpdateMessage,
   isPreviewMessage,
 } from "@/lib/preview/message-types";
+import { anchorFromPreview } from "@/lib/stores/comment-state";
 import { useDataContextStore } from "@/lib/stores/data-context";
 import { usePreviewStateStore } from "@/lib/stores/preview-state";
 import { useTokenStateStore } from "@/lib/stores/token-state";
 import { cn } from "@/lib/utils";
+
+import {
+  CommentLayer,
+  type LiveAnchor,
+  type PendingSelection,
+} from "./CommentLayer";
 
 type PreviewPaneProps = {
   html?: string;
@@ -112,6 +119,10 @@ export const PreviewPane = ({
   );
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [isReady, setIsReady] = useState(false);
+  // Comment-layer state, fed entirely by iframe -> parent messages (the
+  // sandboxed iframe DOM is unreadable from here).
+  const [anchors, setAnchors] = useState<LiveAnchor[]>([]);
+  const [selection, setSelection] = useState<PendingSelection | null>(null);
   const lastHtmlRef = useRef("");
   const initialCssVarsRef = useRef(cssVars);
   const initialHtmlRef = useRef(html);
@@ -228,12 +239,13 @@ export const PreviewPane = ({
       if (!isPreviewMessage(event.data)) {
         return;
       }
+      // Only trust messages from the live preview iframe. A real cross-window
+      // postMessage always carries a source, so when one is present we reject it
+      // unless it matches our iframe window — even if our ref is momentarily
+      // null (otherwise a stray sourced message could drive PREVIEW_SELECTION /
+      // PREVIEW_ANCHORS state). Source-less synthetic/same-context events pass.
       const iframeWindow = iframeRef.current?.contentWindow;
-      if (
-        iframeWindow &&
-        event.source &&
-        event.source !== iframeWindow
-      ) {
+      if (event.source && (!iframeWindow || event.source !== iframeWindow)) {
         return;
       }
 
@@ -242,6 +254,25 @@ export const PreviewPane = ({
         clearHandshakeTimeout();
         setConnectionStatus("connected");
         setIsReady(true);
+        return;
+      }
+
+      if (event.data.type === PREVIEW_MESSAGE_TYPES.PREVIEW_ANCHORS) {
+        // Defensive: isPreviewMessage only validates source+type, not payload.
+        const { anchors: nextAnchors } = event.data.payload;
+        if (Array.isArray(nextAnchors)) {
+          setAnchors(nextAnchors);
+        }
+        return;
+      }
+
+      if (event.data.type === PREVIEW_MESSAGE_TYPES.PREVIEW_SELECTION) {
+        const { nodeId, label, rect, text } = event.data.payload;
+        const anchor = rect ? anchorFromPreview(nodeId, label) : null;
+        if (anchor) {
+          setSelection({ anchor, rect, text: text ?? "" });
+        }
+        return;
       }
     };
 
@@ -270,6 +301,9 @@ export const PreviewPane = ({
     }
 
     pendingHtmlRef.current = html;
+    // A new document is inbound — dismiss any composer pinned to the old DOM so
+    // a draft can't be saved against an anchor that's about to be replaced.
+    setSelection(null);
     if (isReady) {
       scheduleFlush();
     }
@@ -300,6 +334,9 @@ export const PreviewPane = ({
     setIsReady(false);
     setConnectionStatus("connecting");
     startHandshakeTimeout();
+    // The reloaded document re-broadcasts its anchors; drop stale overlay state.
+    setAnchors([]);
+    setSelection(null);
     pendingCssVarsRef.current = cssVars;
     pendingHtmlRef.current = html;
     pendingDataContextRef.current = dataContext;
@@ -318,7 +355,7 @@ export const PreviewPane = ({
   return (
     <div
       className={cn(
-        "h-full w-full overflow-hidden rounded-3xl bg-white/5 backdrop-blur",
+        "relative h-full w-full overflow-hidden rounded-3xl bg-white/5 backdrop-blur",
         className
       )}
     >
@@ -329,6 +366,11 @@ export const PreviewPane = ({
         ref={iframeRef}
         onLoad={handleIframeLoad}
         className="h-full w-full border-0"
+      />
+      <CommentLayer
+        anchors={anchors}
+        selection={selection}
+        onDismissSelection={() => setSelection(null)}
       />
     </div>
   );

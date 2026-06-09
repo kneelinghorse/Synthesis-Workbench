@@ -5,6 +5,12 @@ export const PREVIEW_MESSAGE_TYPES = {
   TOKEN_STATE_UPDATE: "TOKEN_STATE_UPDATE",
   COMPONENT_UPDATE: "COMPONENT_UPDATE",
   DATA_CONTEXT_UPDATE: "DATA_CONTEXT_UPDATE",
+  // iframe -> parent: the human clicked an element carrying a Forge anchor.
+  PREVIEW_SELECTION: "PREVIEW_SELECTION",
+  // iframe -> parent: current viewport rects of every anchored element, so the
+  // parent can position comment pins. Re-broadcast after each COMPONENT_UPDATE,
+  // scroll, and resize (the parent cannot read the sandboxed iframe's DOM).
+  PREVIEW_ANCHORS: "PREVIEW_ANCHORS",
 } as const;
 
 export const PREVIEW_ROOT_ID = "preview-root";
@@ -43,11 +49,49 @@ export type DataContextUpdateMessage = {
   };
 };
 
+/** Viewport rect of an anchored element, in the iframe's own coordinate space. */
+export type PreviewAnchorRect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+/**
+ * A Forge anchor located in the preview DOM. `nodeId` is `data-oods-node-id`
+ * (the deterministic instance anchor); `label` is `data-oods-label` (the slot
+ * anchor). At least one is non-null.
+ */
+export type PreviewAnchor = {
+  nodeId: string | null;
+  label: string | null;
+};
+
+export type PreviewSelectionMessage = {
+  source: typeof PREVIEW_MESSAGE_SOURCE;
+  type: typeof PREVIEW_MESSAGE_TYPES.PREVIEW_SELECTION;
+  payload: PreviewAnchor & {
+    rect: PreviewAnchorRect;
+    /** Trimmed text content of the clicked element, for comment context. */
+    text: string;
+  };
+};
+
+export type PreviewAnchorsMessage = {
+  source: typeof PREVIEW_MESSAGE_SOURCE;
+  type: typeof PREVIEW_MESSAGE_TYPES.PREVIEW_ANCHORS;
+  payload: {
+    anchors: Array<PreviewAnchor & { rect: PreviewAnchorRect }>;
+  };
+};
+
 export type PreviewMessage =
   | PreviewReadyMessage
   | TokenStateUpdateMessage
   | ComponentUpdateMessage
-  | DataContextUpdateMessage;
+  | DataContextUpdateMessage
+  | PreviewSelectionMessage
+  | PreviewAnchorsMessage;
 
 export const createPreviewReadyMessage = (): PreviewReadyMessage => ({
   source: PREVIEW_MESSAGE_SOURCE,
@@ -83,6 +127,24 @@ export const createDataContextUpdateMessage = (
   type: PREVIEW_MESSAGE_TYPES.DATA_CONTEXT_UPDATE,
   payload: {
     context,
+  },
+});
+
+export const createPreviewSelectionMessage = (
+  payload: PreviewSelectionMessage["payload"]
+): PreviewSelectionMessage => ({
+  source: PREVIEW_MESSAGE_SOURCE,
+  type: PREVIEW_MESSAGE_TYPES.PREVIEW_SELECTION,
+  payload,
+});
+
+export const createPreviewAnchorsMessage = (
+  anchors: PreviewAnchorsMessage["payload"]["anchors"]
+): PreviewAnchorsMessage => ({
+  source: PREVIEW_MESSAGE_SOURCE,
+  type: PREVIEW_MESSAGE_TYPES.PREVIEW_ANCHORS,
+  payload: {
+    anchors,
   },
 });
 

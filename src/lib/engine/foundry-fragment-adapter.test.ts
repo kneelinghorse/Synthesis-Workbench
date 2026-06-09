@@ -144,6 +144,46 @@ const DASHBOARD_DOC: DesignDocument = {
   },
 };
 
+const SLOT_LABEL_DOC: DesignDocument = {
+  metadata: { title: "Slot label doc", version: "1.0" },
+  root: {
+    nodeType: "layout",
+    layout: { type: "stack", gap: 16 },
+    children: [
+      {
+        nodeType: "component",
+        id: "slot-save",
+        ref: "oods:Button",
+        props: { label: "Save" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-card",
+        ref: "oods:Card",
+        props: { title: "Revenue", value: "$42k" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-both",
+        ref: "oods:Button",
+        props: { label: "Confirm", title: "Submit the form" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-bound",
+        ref: "oods:Button",
+        props: { label: "$data.cta.text" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-none",
+        ref: "oods:Text",
+        props: { text: "No anchor name" },
+      },
+    ],
+  },
+};
+
 describe("foundry fragment adapter", () => {
   it("builds a single-screen fragment request with component children", () => {
     const built = buildFoundryFragmentRenderInput(FRAGMENT_DOC, {
@@ -181,6 +221,50 @@ describe("foundry fragment adapter", () => {
       "title-1",
       "cta-1",
       "cta-2",
+    ]);
+  });
+
+  it("forwards a stable slot label (raw label/title) as child meta.label", () => {
+    // meta.label drives Forge's data-oods-label slot anchor (verified live:
+    // child meta.label -> data-oods-label on the rendered element). The comment
+    // layer (s20-m03) pins slot-kind anchors to it, so the anchor must be the
+    // RAW prop, not the binding-resolved value: slot-bound keeps its
+    // "$data.cta.text" anchor even though the visible prop resolves to "Buy
+    // now". label wins over title; absent => no meta so Forge omits the anchor.
+    const built = buildFoundryFragmentRenderInput(SLOT_LABEL_DOC, {
+      dataContext: { cta: { text: "Buy now" } },
+    });
+
+    expect(built.renderInput.schema.screens[0].children).toEqual([
+      {
+        id: "slot-save",
+        component: "Button",
+        props: { label: "Save" },
+        meta: { label: "Save" },
+      },
+      {
+        id: "slot-card",
+        component: "Card",
+        props: { title: "Revenue", value: "$42k" },
+        meta: { label: "Revenue" },
+      },
+      {
+        id: "slot-both",
+        component: "Button",
+        props: { label: "Confirm", title: "Submit the form" },
+        meta: { label: "Confirm" },
+      },
+      {
+        id: "slot-bound",
+        component: "Button",
+        props: { label: "Buy now" },
+        meta: { label: "$data.cta.text" },
+      },
+      {
+        id: "slot-none",
+        component: "Text",
+        props: { text: "No anchor name" },
+      },
     ]);
   });
 

@@ -21,6 +21,7 @@ import {
   ToolOutputCardTitle,
   type ToolOutputStatusTone,
 } from "@/components/tool-ui/ToolOutputCard";
+import { useCommentStateStore } from "@/lib/stores/comment-state";
 import { useDocumentStateStore } from "@/lib/stores/document-state";
 import {
   SET_DOCUMENT_TOOL_NAME,
@@ -29,6 +30,8 @@ import {
   rejectSetDocument,
   confirmPatchNode,
   rejectPatchNode,
+  patchNodeCommentLink,
+  setDocumentCommentLink,
   countNodes,
   countComponents,
   findNodeById,
@@ -117,7 +120,15 @@ const SetDocumentToolCard = ({
     decidedRef.current = true;
     if (accept) {
       setBusy(true);
-      addResult(await confirmSetDocument(args));
+      const outcome = await confirmSetDocument(args);
+      addResult(outcome);
+      // Accepting the rewrite resolves the comments it addresses so they leave
+      // the agent's context and aren't re-proposed next turn. The link is null
+      // if the apply didn't take, so a no-op never closes a comment.
+      const link = setDocumentCommentLink(args, outcome);
+      if (link) {
+        useCommentStateStore.getState().resolveCommentsForChange(link);
+      }
     } else {
       addResult(rejectSetDocument());
     }
@@ -289,7 +300,20 @@ const PatchNodeToolCard = ({
       return;
     }
     decidedRef.current = true;
-    addResult(accept ? confirmPatchNode(args) : rejectPatchNode(args));
+    if (accept) {
+      const outcome = confirmPatchNode(args);
+      addResult(outcome);
+      // Accepting the patch resolves the comments it addresses — both those the
+      // agent declared and any pinned to this node id (the anchor-match net) —
+      // so the loop (open comment → re-propose) stops. Null link if the patch
+      // didn't apply (e.g. node gone), so a failed patch leaves comments open.
+      const link = patchNodeCommentLink(args, outcome);
+      if (link) {
+        useCommentStateStore.getState().resolveCommentsForChange(link);
+      }
+    } else {
+      addResult(rejectPatchNode(args));
+    }
   };
 
   const statusTone = resolveDocumentToolStatus({

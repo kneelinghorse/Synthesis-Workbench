@@ -35,6 +35,13 @@ const OBJECT_SCHEMA = {
   additionalProperties: true,
 } as const;
 
+const ADDRESSES_COMMENT_IDS_SCHEMA = {
+  type: "array",
+  items: { type: "string" },
+  description:
+    "Ids of the pinned review comments this change resolves (copy the id shown in [brackets] in the 'Pinned review comments' list). On Accept these comments are marked resolved so they stop being re-proposed.",
+} as const;
+
 export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
   {
     name: RENDER_COMPONENT_TOOL_NAME,
@@ -95,6 +102,7 @@ export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
           type: "boolean",
           description: "When true, persist the document via project design APIs.",
         },
+        addressesCommentIds: ADDRESSES_COMMENT_IDS_SCHEMA,
       },
       required: ["requestId", "document"],
       additionalProperties: false,
@@ -119,6 +127,7 @@ export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
           type: "string",
           description: "Optional replacement component reference.",
         },
+        addressesCommentIds: ADDRESSES_COMMENT_IDS_SCHEMA,
       },
       required: ["requestId", "nodeId"],
       additionalProperties: false,

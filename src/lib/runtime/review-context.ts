@@ -52,6 +52,10 @@ const describeAnchor = (comment: Comment): string =>
     ? `node ${comment.anchor.componentId ?? "?"}`
     : `slot "${comment.anchor.slotLabel ?? "?"}"`;
 
+// Keep the "already handled" digest bounded so a long session can't re-bloat
+// the per-turn prompt with the full resolution history.
+const RESOLVED_COMMENTS_CAP = 5;
+
 /** Render the OPEN (unresolved) comments as an actionable list, or "" if none. */
 export const formatReviewComments = (comments: Comment[]): string => {
   const open = comments.filter((comment) => !comment.resolved);
@@ -61,11 +65,44 @@ export const formatReviewComments = (comments: Comment[]): string => {
   const lines = [
     "## Pinned review comments",
     "The human pinned these critiques to elements in the preview. Address each by " +
-      "patching the named node — keep its id so the pin stays anchored:",
+      "patching the named node — keep its id so the pin stays anchored. When you " +
+      "propose a change that resolves one, set that tool call's " +
+      "`addressesCommentIds` to the comment id(s) shown in [brackets] so the pin " +
+      "clears on Accept and you do not re-propose it:",
     "",
   ];
   for (const comment of open) {
-    lines.push(`- [${describeAnchor(comment)}] ${comment.text}`);
+    lines.push(`- [${comment.id}] ${describeAnchor(comment)}: ${comment.text}`);
+  }
+  return lines.join("\n");
+};
+
+/**
+ * Render the most-recently-resolved comments as a "do not re-propose" digest.
+ * This gives the agent closure when a critique is addressed — it both stops the
+ * re-proposal loop (the comment has left the open list above) AND prevents the
+ * "can't find the issue" confusion when a comment is resolved out from under an
+ * in-flight conversation. Bounded to the latest few. Returns "" when none.
+ */
+export const formatResolvedComments = (
+  comments: Comment[],
+  limit = RESOLVED_COMMENTS_CAP,
+): string => {
+  const resolved = comments
+    .filter((comment) => comment.resolved)
+    .sort((a, b) => (b.resolvedAt ?? "").localeCompare(a.resolvedAt ?? ""))
+    .slice(0, limit);
+  if (resolved.length === 0) {
+    return "";
+  }
+  const lines = [
+    "## Resolved review comments (handled — do not re-propose)",
+    "These critiques are already addressed. Treat them as DONE — do not propose " +
+      "changes for them again:",
+    "",
+  ];
+  for (const comment of resolved) {
+    lines.push(`- ${describeAnchor(comment)}: ${comment.text}`);
   }
   return lines.join("\n");
 };
@@ -116,6 +153,14 @@ export const formatReviewContext = (input: {
 
   if (commentsSection) {
     lines.push("", commentsSection);
+  }
+
+  // The resolved digest only rides along when the context is already non-empty
+  // (a document or open comments cleared the early return above) — a lone
+  // resolved comment never resurrects an otherwise-empty prompt section.
+  const resolvedSection = formatResolvedComments(comments);
+  if (resolvedSection) {
+    lines.push("", resolvedSection);
   }
 
   return lines.join("\n");

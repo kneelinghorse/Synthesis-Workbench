@@ -24,12 +24,32 @@ export type CommentAnchor = {
   slotLabel?: string;
 };
 
+/** How a comment was resolved: a human click vs. an accepted agent change. */
+export type CommentResolvedBy = "user" | "change";
+
 export type Comment = {
   id: string;
   anchor: CommentAnchor;
   text: string;
   createdAt: string;
   resolved: boolean;
+  /** When the comment was resolved (ISO). Absent while open. */
+  resolvedAt?: string;
+  /** What closed it — a manual resolve ("user") or an accepted change ("change"). */
+  resolvedBy?: CommentResolvedBy;
+};
+
+/**
+ * Describes which comments an accepted change addresses. Carried from the
+ * agent's tool call (`commentIds`, the durable explicit linkage that also
+ * covers set_document) and the patch target (`nodeId`, the instance-anchor
+ * safety net). See {@link commentsAddressedByChange}.
+ */
+export type CommentChangeLink = {
+  /** Comment ids the agent declared this change resolves (`addressesCommentIds`). */
+  commentIds?: string[];
+  /** patch_node target id — auto-matches instance-anchored comments pinned to it. */
+  nodeId?: string;
 };
 
 type CommentState = {
@@ -42,8 +62,19 @@ type CommentState = {
   /** Pin a new comment to an anchor. No-op for empty text. */
   addComment: (anchor: CommentAnchor, text: string) => void;
 
-  /** Toggle a comment's resolved flag (defaults to resolved=true). */
-  resolveComment: (id: string, resolved?: boolean) => void;
+  /** Toggle a comment's resolved flag (defaults to resolved=true, by="user"). */
+  resolveComment: (
+    id: string,
+    resolved?: boolean,
+    by?: CommentResolvedBy,
+  ) => void;
+
+  /**
+   * Resolve every OPEN comment a just-accepted change addresses, in one bump.
+   * This is what breaks the re-proposal loop: once resolved, a comment leaves
+   * the agent's open list (`formatReviewComments`) so it stops being re-proposed.
+   */
+  resolveCommentsForChange: (change: CommentChangeLink) => void;
 
   /** Remove a comment by id. */
   deleteComment: (id: string) => void;
@@ -86,17 +117,43 @@ export const useCommentStateStore = create<CommentState>((set) => ({
       };
     }),
 
-  resolveComment: (id, resolved = true) =>
+  resolveComment: (id, resolved = true, by = "user") =>
     set((state) => {
       let changed = false;
       const comments = state.comments.map((comment) => {
         if (comment.id === id && comment.resolved !== resolved) {
           changed = true;
-          return { ...comment, resolved };
+          // Re-opening clears the resolution metadata so the comment drops out
+          // of the "resolved — do not re-propose" digest and reads as open again.
+          return resolved
+            ? {
+                ...comment,
+                resolved,
+                resolvedAt: new Date().toISOString(),
+                resolvedBy: by,
+              }
+            : { ...comment, resolved, resolvedAt: undefined, resolvedBy: undefined };
         }
         return comment;
       });
       return changed ? { comments, revision: state.revision + 1 } : state;
+    }),
+
+  resolveCommentsForChange: (change) =>
+    set((state) => {
+      const targetIds = new Set(
+        commentsAddressedByChange(state.comments, change),
+      );
+      if (targetIds.size === 0) {
+        return state;
+      }
+      const resolvedAt = new Date().toISOString();
+      const comments = state.comments.map((comment) =>
+        targetIds.has(comment.id)
+          ? { ...comment, resolved: true, resolvedAt, resolvedBy: "change" as const }
+          : comment,
+      );
+      return { comments, revision: state.revision + 1 };
     }),
 
   deleteComment: (id) =>
@@ -133,6 +190,37 @@ export const anchorFromPreview = (
     return { kind: "slot", slotLabel: label };
   }
   return null;
+};
+
+/**
+ * Which OPEN comments does an accepted change resolve? A change addresses a
+ * comment when the agent explicitly named it (`commentIds` — the durable
+ * linkage that also covers a full `set_document` rewrite) OR — for a
+ * `patch_node` — the patched node carries the instance anchor a comment is
+ * pinned to (`nodeId === componentId`, the safety net for when the agent omits
+ * the id). Already-resolved comments never match, so accepting a later change
+ * can't re-resolve (and re-stamp) a closed one. Pure + side-effect-free.
+ */
+export const commentsAddressedByChange = (
+  comments: Comment[],
+  change: CommentChangeLink,
+): string[] => {
+  const declared = new Set(change.commentIds ?? []);
+  const matched: string[] = [];
+  for (const comment of comments) {
+    if (comment.resolved) {
+      continue;
+    }
+    const byDeclaredId = declared.has(comment.id);
+    const byAnchor =
+      Boolean(change.nodeId) &&
+      comment.anchor.kind === "instance" &&
+      comment.anchor.componentId === change.nodeId;
+    if (byDeclaredId || byAnchor) {
+      matched.push(comment.id);
+    }
+  }
+  return matched;
 };
 
 /** Stable key for an anchor — used for grouping and equality. */

@@ -5,8 +5,10 @@ import {
   anchorKey,
   anchorMatchesPreview,
   anchorsEqual,
+  commentsAddressedByChange,
   resetCommentState,
   useCommentStateStore,
+  type Comment,
   type CommentAnchor,
 } from "./comment-state";
 
@@ -78,6 +80,107 @@ describe("comment-state store", () => {
     expect(store().comments).toHaveLength(1);
     expect(store().comments[0].anchor).toEqual(SLOT_ANCHOR);
     expect(store().revision).toBe(revBefore + 1);
+  });
+
+  it("stamps resolution provenance, and clears it on re-open", () => {
+    store().addComment(INSTANCE_ANCHOR, "fix");
+    const id = store().comments[0].id;
+
+    store().resolveComment(id); // manual resolve defaults to by="user"
+    expect(store().comments[0]).toMatchObject({
+      resolved: true,
+      resolvedBy: "user",
+    });
+    expect(store().comments[0].resolvedAt).toBeTruthy();
+
+    // Re-opening must wipe the metadata so it doesn't linger in the
+    // "resolved — do not re-propose" digest and read as still-handled.
+    store().resolveComment(id, false);
+    expect(store().comments[0].resolved).toBe(false);
+    expect(store().comments[0].resolvedAt).toBeUndefined();
+    expect(store().comments[0].resolvedBy).toBeUndefined();
+  });
+
+  it("resolveCommentsForChange closes the comments an accepted change addresses", () => {
+    // The Derek repro: a card comment is pinned to its node id; the agent
+    // proposes a patch_node targeting that id (WITHOUT declaring the comment id)
+    // and the human Accepts. The patch must close the pinned comment so the
+    // agent stops re-proposing it next turn.
+    store().addComment(INSTANCE_ANCHOR, "rename to feedback card"); // anchor btn-1
+    store().addComment(SLOT_ANCHOR, "untouched");
+    const revBefore = store().revision;
+
+    store().resolveCommentsForChange({ nodeId: "btn-1" });
+
+    const [patched, untouched] = store().comments;
+    expect(patched.resolved).toBe(true);
+    expect(patched.resolvedBy).toBe("change");
+    expect(patched.resolvedAt).toBeTruthy();
+    // A comment on a different element is left open.
+    expect(untouched.resolved).toBe(false);
+    expect(store().revision).toBe(revBefore + 1);
+  });
+
+  it("resolveCommentsForChange is a no-op (no revision bump) when nothing matches", () => {
+    store().addComment(INSTANCE_ANCHOR, "open"); // btn-1
+    const revBefore = store().revision;
+
+    // A patch to an unrelated node, with no declared ids, resolves nothing —
+    // and must NOT bump the revision (a spurious bump would churn re-renders).
+    store().resolveCommentsForChange({ nodeId: "other-node", commentIds: [] });
+
+    expect(store().comments[0].resolved).toBe(false);
+    expect(store().revision).toBe(revBefore);
+  });
+});
+
+describe("commentsAddressedByChange", () => {
+  const open = (over: Partial<Comment> = {}): Comment => ({
+    id: "c1",
+    anchor: { kind: "instance", componentId: "btn-1" },
+    text: "x",
+    createdAt: "2026-06-09T00:00:00.000Z",
+    resolved: false,
+    ...over,
+  });
+
+  it("matches a comment the agent explicitly declared (the set_document path)", () => {
+    const comments = [open({ id: "a" }), open({ id: "b", anchor: SLOT_ANCHOR })];
+    // set_document carries no nodeId — only the declared ids link it.
+    expect(commentsAddressedByChange(comments, { commentIds: ["b"] })).toEqual([
+      "b",
+    ]);
+  });
+
+  it("auto-matches an instance-anchored comment by patch nodeId even with no declared id", () => {
+    const comments = [open({ id: "a", anchor: { kind: "instance", componentId: "btn-1" } })];
+    expect(commentsAddressedByChange(comments, { nodeId: "btn-1" })).toEqual([
+      "a",
+    ]);
+  });
+
+  it("never auto-matches a SLOT-anchored comment by nodeId (no false positives)", () => {
+    // A slot anchor's label is not a node id; patch_node carries only a nodeId,
+    // so a slot comment must be linked explicitly, never by the anchor net.
+    const comments = [open({ id: "a", anchor: { kind: "slot", slotLabel: "btn-1" } })];
+    expect(commentsAddressedByChange(comments, { nodeId: "btn-1" })).toEqual([]);
+  });
+
+  it("ignores already-resolved comments so a later accept can't re-resolve them", () => {
+    const comments = [open({ id: "a", resolved: true })];
+    expect(
+      commentsAddressedByChange(comments, { commentIds: ["a"], nodeId: "btn-1" }),
+    ).toEqual([]);
+  });
+
+  it("unions declared ids and the anchor match without duplicating", () => {
+    const comments = [
+      open({ id: "a", anchor: { kind: "instance", componentId: "btn-1" } }), // both paths hit
+      open({ id: "b", anchor: { kind: "slot", slotLabel: "Title" } }), // declared only
+    ];
+    expect(
+      commentsAddressedByChange(comments, { commentIds: ["a", "b"], nodeId: "btn-1" }),
+    ).toEqual(["a", "b"]);
   });
 });
 

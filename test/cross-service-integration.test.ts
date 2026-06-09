@@ -57,6 +57,7 @@ function createMockFoundryClient(): FoundryMcpClient {
       raw: null,
     })),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    fetchStructuredData: vi.fn(),
   };
 }
 
@@ -66,9 +67,9 @@ function createMockFoundryClient(): FoundryMcpClient {
 
 const MOCK_STAGE1_BUNDLE: Stage1BundlePayload = {
   manifest: {
-    hostname: "test-app.example.com",
-    timestamp: "2026-02-26T12:00:00Z",
-    runId: "test-run-001",
+    projectId: "test-app",
+    generatedAt: "2026-02-26T12:00:00Z",
+    bundleVersion: "test-run-001",
   },
   components: [
     { name: "Header", count: 1 },
@@ -482,9 +483,9 @@ describe("Cross-Service Integration: Graceful Degradation", () => {
     const store = useStage1BundleStore.getState();
     const result = store.loadBundle({
       manifest: {
-        hostname: "empty.example.com",
-        timestamp: "2026-02-26T12:00:00Z",
-        runId: "empty-run",
+        projectId: "empty",
+        generatedAt: "2026-02-26T12:00:00Z",
+        bundleVersion: "empty-run",
       },
       components: [],
       artifacts: [],

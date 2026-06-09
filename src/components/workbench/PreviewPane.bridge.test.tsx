@@ -8,6 +8,10 @@ import {
   PREVIEW_MESSAGE_TYPES,
   createPreviewReadyMessage,
 } from "@/lib/preview/message-types";
+import type {
+  ComponentUpdateMessage,
+  PreviewMessage,
+} from "@/lib/preview/message-types";
 import { useDataContextStore } from "@/lib/stores/data-context";
 import { usePreviewStateStore } from "@/lib/stores/preview-state";
 import { resetTokenState, useTokenStateStore } from "@/lib/stores/token-state";
@@ -239,7 +243,7 @@ describe("PreviewPane PostMessage bridge", () => {
 
   it("delivers latest html after a transient component-update postMessage failure", async () => {
     let failNextComponentUpdate = true;
-    const postMessage = vi.fn((message: { type?: string }) => {
+    const postMessage = vi.fn((message: PreviewMessage) => {
       if (
         message?.type === PREVIEW_MESSAGE_TYPES.COMPONENT_UPDATE &&
         failNextComponentUpdate
@@ -275,7 +279,10 @@ describe("PreviewPane PostMessage bridge", () => {
 
     const componentUpdates = postMessage.mock.calls
       .map((call) => call[0])
-      .filter((msg) => msg?.type === PREVIEW_MESSAGE_TYPES.COMPONENT_UPDATE);
+      .filter(
+        (msg): msg is ComponentUpdateMessage =>
+          msg?.type === PREVIEW_MESSAGE_TYPES.COMPONENT_UPDATE
+      );
 
     expect(componentUpdates.length).toBeGreaterThan(1);
     expect(componentUpdates[componentUpdates.length - 1]?.payload?.html).toBe(

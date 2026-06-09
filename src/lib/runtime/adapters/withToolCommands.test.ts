@@ -49,7 +49,15 @@ const createAssistantToolMessage = (
       result,
     },
   ],
+  status: {
+    type: "complete",
+    reason: "stop",
+  },
   metadata: {
+    unstable_state: null,
+    unstable_annotations: [],
+    unstable_data: [],
+    steps: [],
     custom: {},
   },
 });
@@ -109,10 +117,12 @@ const collectRunUpdates = async (
 };
 
 const createAdapter = () => {
-  const run: ChatModelAdapter["run"] = vi.fn(async () => ({
-    content: [{ type: "text", text: "fallback" }],
-    status: { type: "complete", reason: "stop" },
-  }));
+  const run: ChatModelAdapter["run"] = vi.fn(
+    async (): Promise<ChatModelRunResult> => ({
+      content: [{ type: "text", text: "fallback" }],
+      status: { type: "complete", reason: "stop" },
+    })
+  );
   return { run };
 };
 
@@ -127,7 +137,10 @@ describe("withToolCommands", () => {
 
   it("delegates free-text prompts as streamed adapter updates", async () => {
     const adapter = {
-      run: vi.fn(async function* () {
+      run: vi.fn(async function* (): AsyncGenerator<
+        ChatModelRunResult,
+        void
+      > {
         yield {
           content: [{ type: "text", text: "partial response" }],
           status: { type: "incomplete", reason: "cancelled" as const },

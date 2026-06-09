@@ -4,7 +4,11 @@ import {
   runInspectionPipeline,
   type InspectionPipelineResult,
 } from "./inspection-pipeline";
-import type { Stage1InspectionResult } from "@/lib/mcp/stage1-client";
+import type {
+  Stage1InspectionResult,
+  Stage1McpClient,
+} from "@/lib/mcp/stage1-client";
+import type { Stage1BundleLoadResult } from "@/types/stage1-bundle";
 
 /**
  * These tests exercise the pipeline logic with fully injected dependencies
@@ -22,6 +26,20 @@ const makeInspectionResult = (
   },
   payload: { raw: "data" },
   message: "Inspection complete",
+  ...overrides,
+});
+
+const makeLoadResult = (
+  overrides: Partial<Stage1BundleLoadResult> = {}
+): Stage1BundleLoadResult => ({
+  ok: true,
+  componentCount: 0,
+  tokenSuggestionCount: 0,
+  components: [],
+  tokenSuggestions: {},
+  enrichedTokens: {},
+  compositionPatterns: [],
+  errors: [],
   ...overrides,
 });
 
@@ -90,12 +108,14 @@ describe("runInspectionPipeline", () => {
     };
 
     // We inject a loadBundle function and component/token readers
-    const mockLoadBundle = vi.fn(() => ({
-      ok: true,
-      componentCount: 3,
-      tokenSuggestionCount: 8,
-      errors: [] as string[],
-    }));
+    const mockLoadBundle = vi.fn(() =>
+      makeLoadResult({
+        ok: true,
+        componentCount: 3,
+        tokenSuggestionCount: 8,
+        errors: [] as string[],
+      })
+    );
 
     const mockComponents = [
       { name: "Button" },
@@ -110,9 +130,9 @@ describe("runInspectionPipeline", () => {
     };
 
     // Mock the MCP client to build the bundle
-    const mockClient = {
+    const mockClient: Stage1McpClient = {
       listRuns: vi.fn(),
-      getArtifact: vi.fn(async () => mockBundle),
+      getArtifact: vi.fn(async () => mockBundle) as Stage1McpClient["getArtifact"],
       inspectApp: vi.fn(),
       inspectSurface: vi.fn(),
     };
@@ -148,16 +168,21 @@ describe("runInspectionPipeline", () => {
   });
 
   it("reports partial success when bundle loads with errors", async () => {
-    const mockLoadBundle = vi.fn(() => ({
-      ok: false,
-      componentCount: 1,
-      tokenSuggestionCount: 0,
-      errors: ["Unknown artifact format"],
-    }));
+    const mockLoadBundle = vi.fn(() =>
+      makeLoadResult({
+        ok: false,
+        componentCount: 1,
+        tokenSuggestionCount: 0,
+        errors: ["Unknown artifact format"],
+      })
+    );
 
-    const mockClient = {
+    const mockClient: Stage1McpClient = {
       listRuns: vi.fn(),
-      getArtifact: vi.fn(async () => ({ manifest: {}, artifacts: [] })),
+      getArtifact: vi.fn(async () => ({
+        manifest: {},
+        artifacts: [],
+      })) as Stage1McpClient["getArtifact"],
       inspectApp: vi.fn(),
       inspectSurface: vi.fn(),
     };
@@ -176,11 +201,11 @@ describe("runInspectionPipeline", () => {
   });
 
   it("catches and reports bundle build failures gracefully", async () => {
-    const mockClient = {
+    const mockClient: Stage1McpClient = {
       listRuns: vi.fn(),
       getArtifact: vi.fn(async () => {
         throw new Error("MCP connection refused");
-      }),
+      }) as Stage1McpClient["getArtifact"],
       inspectApp: vi.fn(),
       inspectSurface: vi.fn(),
     };
@@ -195,16 +220,21 @@ describe("runInspectionPipeline", () => {
   });
 
   it("handles empty discovery (no components, no tokens)", async () => {
-    const mockLoadBundle = vi.fn(() => ({
-      ok: true,
-      componentCount: 0,
-      tokenSuggestionCount: 0,
-      errors: [] as string[],
-    }));
+    const mockLoadBundle = vi.fn(() =>
+      makeLoadResult({
+        ok: true,
+        componentCount: 0,
+        tokenSuggestionCount: 0,
+        errors: [] as string[],
+      })
+    );
 
-    const mockClient = {
+    const mockClient: Stage1McpClient = {
       listRuns: vi.fn(),
-      getArtifact: vi.fn(async () => ({ manifest: {}, artifacts: [] })),
+      getArtifact: vi.fn(async () => ({
+        manifest: {},
+        artifacts: [],
+      })) as Stage1McpClient["getArtifact"],
       inspectApp: vi.fn(),
       inspectSurface: vi.fn(),
     };
@@ -225,16 +255,21 @@ describe("runInspectionPipeline", () => {
   });
 
   it("propagates inspectionError to discovery summary", async () => {
-    const mockLoadBundle = vi.fn(() => ({
-      ok: true,
-      componentCount: 0,
-      tokenSuggestionCount: 0,
-      errors: [] as string[],
-    }));
+    const mockLoadBundle = vi.fn(() =>
+      makeLoadResult({
+        ok: true,
+        componentCount: 0,
+        tokenSuggestionCount: 0,
+        errors: [] as string[],
+      })
+    );
 
-    const mockClient = {
+    const mockClient: Stage1McpClient = {
       listRuns: vi.fn(),
-      getArtifact: vi.fn(async () => ({ manifest: {}, artifacts: [] })),
+      getArtifact: vi.fn(async () => ({
+        manifest: {},
+        artifacts: [],
+      })) as Stage1McpClient["getArtifact"],
       inspectApp: vi.fn(),
       inspectSurface: vi.fn(),
     };
@@ -267,16 +302,21 @@ describe("runInspectionPipeline", () => {
   });
 
   it("omits inspectionError from discovery when not present", async () => {
-    const mockLoadBundle = vi.fn(() => ({
-      ok: true,
-      componentCount: 2,
-      tokenSuggestionCount: 5,
-      errors: [] as string[],
-    }));
+    const mockLoadBundle = vi.fn(() =>
+      makeLoadResult({
+        ok: true,
+        componentCount: 2,
+        tokenSuggestionCount: 5,
+        errors: [] as string[],
+      })
+    );
 
-    const mockClient = {
+    const mockClient: Stage1McpClient = {
       listRuns: vi.fn(),
-      getArtifact: vi.fn(async () => ({ manifest: {}, artifacts: [] })),
+      getArtifact: vi.fn(async () => ({
+        manifest: {},
+        artifacts: [],
+      })) as Stage1McpClient["getArtifact"],
       inspectApp: vi.fn(),
       inspectSurface: vi.fn(),
     };

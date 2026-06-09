@@ -4,7 +4,11 @@ import path from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { createTokenStateUpdateMessage } from "@/lib/preview/message-types";
-import type { Stage1McpClient, Stage1RunSummary } from "@/lib/mcp/stage1-client";
+import type {
+  Stage1InspectionResult,
+  Stage1McpClient,
+  Stage1RunSummary,
+} from "@/lib/mcp/stage1-client";
 import { buildStage1BundleFromRun } from "@/lib/stage1/bundle-loader";
 import { resetStage1BundleStore, useStage1BundleStore } from "@/lib/stores/stage1-bundle";
 import {
@@ -13,9 +17,13 @@ import {
   useTokenStateStore,
 } from "@/lib/stores/token-state";
 
+const notImplemented = async (): Promise<Stage1InspectionResult> => {
+  throw new Error("not implemented in test");
+};
+
 const fixtureClient: Stage1McpClient = {
   listRuns: async () => [],
-  getArtifact: async (runDir, artifactName) => {
+  getArtifact: async <T = unknown>(runDir: string, artifactName: string) => {
     const candidatePaths = artifactName.startsWith("../")
       ? [path.resolve(runDir, artifactName)]
       : [
@@ -27,9 +35,9 @@ const fixtureClient: Stage1McpClient = {
       try {
         const raw = await fs.readFile(candidatePath, "utf8");
         try {
-          return JSON.parse(raw);
+          return JSON.parse(raw) as T;
         } catch {
-          return raw;
+          return raw as T;
         }
       } catch {
         continue;
@@ -38,6 +46,8 @@ const fixtureClient: Stage1McpClient = {
 
     throw new Error(`Artifact not found: ${artifactName}`);
   },
+  inspectApp: notImplemented,
+  inspectSurface: notImplemented,
 };
 
 const CORPUS_ROOT = path.resolve(

@@ -32,6 +32,7 @@ import { renderDocument } from "@/lib/engine/composition-renderer";
 // Types
 import type { DesignDocument } from "@/types/document-model";
 import type { Stage1BundlePayload } from "@/types/stage1-bundle";
+import type { FoundryMcpClient } from "@/lib/mcp/foundry-client";
 
 // --- Real Stage1 artifacts (from foundational-docs/examples) ---
 
@@ -268,7 +269,7 @@ const REAL_DATA_DOCUMENT: DesignDocument = {
 
 // --- Mock Foundry client ---
 
-function createRealDataClient() {
+function createRealDataClient(): FoundryMcpClient {
   return {
     render: vi.fn(async (schema: unknown) => {
       const s = schema as {
@@ -298,6 +299,7 @@ function createRealDataClient() {
       return { valid: true, errors: [], warnings: [], raw: schema };
     }),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    fetchStructuredData: vi.fn(),
   };
 }
 
@@ -522,8 +524,9 @@ describe("Real-Data Pipeline Walkthrough (s5-m06)", () => {
       expect(compositionResult.html).toContain('data-component="Button"');
 
       // Verify the render function was called with correct component names
-      expect(client.render).toHaveBeenCalledTimes(10);
-      const renderCalls = client.render.mock.calls.map(
+      const renderMock = client.render as ReturnType<typeof vi.fn>;
+      expect(renderMock).toHaveBeenCalledTimes(10);
+      const renderCalls = renderMock.mock.calls.map(
         (call: unknown[]) => (call[0] as { component: string }).component
       );
       expect(renderCalls.filter((n: string) => n === "NavLink")).toHaveLength(4);

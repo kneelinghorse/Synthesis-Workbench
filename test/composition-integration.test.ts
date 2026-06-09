@@ -37,6 +37,7 @@ function createMockClient(): FoundryMcpClient {
       raw: null,
     })),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    fetchStructuredData: vi.fn(),
   };
 }
 

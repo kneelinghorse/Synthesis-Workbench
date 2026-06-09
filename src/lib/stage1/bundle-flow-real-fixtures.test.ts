@@ -32,6 +32,14 @@ const fixtureClient: Stage1McpClient = {
 
     throw new Error(`Artifact not found: ${artifactName}`);
   },
+  inspectApp: async () => ({
+    run: null,
+    payload: null,
+  }),
+  inspectSurface: async () => ({
+    run: null,
+    payload: null,
+  }),
 };
 
 const loadFixtureRun = async (run: Stage1RunSummary) => {

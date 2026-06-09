@@ -83,10 +83,12 @@ const runOnce = async (
 };
 
 const createAdapter = (): ChatModelAdapter => ({
-  run: vi.fn(async () => ({
-    content: [{ type: "text", text: "fallback" }],
-    status: { type: "complete", reason: "stop" },
-  })),
+  run: vi.fn(
+    async (): Promise<ChatModelRunResult> => ({
+      content: [{ type: "text", text: "fallback" }],
+      status: { type: "complete", reason: "stop" },
+    })
+  ),
 });
 
 // ============================================================================

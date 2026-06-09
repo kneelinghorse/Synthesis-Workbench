@@ -1,7 +1,34 @@
-import type { ChatModelRunOptions, ThreadMessage } from "@assistant-ui/react";
+import type {
+  ChatModelAdapter,
+  ChatModelRunOptions,
+  ChatModelRunResult,
+  ThreadMessage,
+} from "@assistant-ui/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { createTestAdapter } from "./test";
+
+const runOnce = async (
+  adapter: ChatModelAdapter,
+  runOptions: ChatModelRunOptions
+): Promise<ChatModelRunResult> => {
+  const runResult = adapter.run(runOptions);
+  if (
+    typeof runResult === "object" &&
+    runResult !== null &&
+    Symbol.asyncIterator in runResult
+  ) {
+    const update = await (
+      runResult as AsyncGenerator<ChatModelRunResult, void>
+    ).next();
+    if (update.done || !update.value) {
+      throw new Error("Expected at least one run result update.");
+    }
+    return update.value;
+  }
+
+  return await runResult;
+};
 
 const createUserMessage = (id: string, text: string): ThreadMessage => ({
   id,
@@ -36,7 +63,8 @@ const createRunOptions = (messages: ThreadMessage[]): ChatModelRunOptions => ({
 describe("createTestAdapter", () => {
   it("echoes the latest user message", async () => {
     const adapter = createTestAdapter();
-    const result = await adapter.run(
+    const result = await runOnce(
+      adapter,
       createRunOptions([createUserMessage("u-1", "Hello Workbench")])
     );
 
@@ -48,7 +76,8 @@ describe("createTestAdapter", () => {
 
   it("returns the default prompt when no user message exists", async () => {
     const adapter = createTestAdapter();
-    const result = await adapter.run(
+    const result = await runOnce(
+      adapter,
       createRunOptions([createSystemMessage("s-1", "System ready")])
     );
 
@@ -59,7 +88,8 @@ describe("createTestAdapter", () => {
   it("surfaces a simulated runtime error", async () => {
     const onError = vi.fn();
     const adapter = createTestAdapter({ onError });
-    const result = await adapter.run(
+    const result = await runOnce(
+      adapter,
       createRunOptions([createUserMessage("u-2", "/error")])
     );
 

@@ -34,7 +34,7 @@ describe("ResearchContext", () => {
     // ─── Core prompt structure ────────────────────────────────────
 
     it("frames the prompt as a static review-and-iterate surface (no phase machinery)", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );
@@ -55,7 +55,7 @@ describe("ResearchContext", () => {
     });
 
     it("includes document model reference", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );
@@ -69,7 +69,7 @@ describe("ResearchContext", () => {
     // ─── No bundle loaded (discovery suggestions) ─────────────────
 
     it("omits discovery context and reports zero counts when no Stage1 data is present", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );
@@ -83,7 +83,7 @@ describe("ResearchContext", () => {
     // ─── Bundle loaded (discovery context) ────────────────────────
 
     it("includes discovery context when Stage1 data is present", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: { name: string; count: number }[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({
                     components: [{ name: "Primary Button", count: 5 }],
@@ -101,7 +101,7 @@ describe("ResearchContext", () => {
     });
 
     it("includes component confidence and variants in discovery context", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({
                     components: [
@@ -125,7 +125,7 @@ describe("ResearchContext", () => {
     });
 
     it("groups token suggestions by category", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({
                     components: [{ name: "Button" }],
@@ -147,7 +147,7 @@ describe("ResearchContext", () => {
     // ─── Foundry catalog ──────────────────────────────────────────
 
     it("injects Foundry component catalog metadata into the prompt", async () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );
@@ -205,7 +205,7 @@ describe("ResearchContext", () => {
     // ─── OODS component refs ──────────────────────────────────────
 
     it("lists available OODS component refs", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
+        (useStage1BundleStore as unknown as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );

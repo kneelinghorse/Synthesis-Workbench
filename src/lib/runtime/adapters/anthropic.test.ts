@@ -3,6 +3,7 @@ import type {
   ChatModelRunResult,
   ThreadMessage,
 } from "@assistant-ui/react";
+import type { ReadonlyJSONObject } from "assistant-stream/utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { buildAnthropicMessages, createAnthropicAdapter } from "./anthropic";
@@ -28,11 +29,24 @@ const createSystemMessage = (id: string, text: string): ThreadMessage => ({
   },
 });
 
+const assistantMessageStatus = {
+  type: "complete",
+  reason: "stop",
+} as const satisfies ThreadMessage["status"];
+
+const assistantMessageMetadata = {
+  unstable_state: null,
+  unstable_annotations: [],
+  unstable_data: [],
+  steps: [],
+  custom: {},
+} as const satisfies Extract<ThreadMessage, { role: "assistant" }>["metadata"];
+
 const createAssistantToolResultMessage = (
   id: string,
   toolCallId: string,
   toolName: string,
-  args: Record<string, unknown>,
+  args: ReadonlyJSONObject,
   result: unknown
 ): ThreadMessage => ({
   id,
@@ -48,9 +62,8 @@ const createAssistantToolResultMessage = (
       result,
     },
   ],
-  metadata: {
-    custom: {},
-  },
+  status: assistantMessageStatus,
+  metadata: assistantMessageMetadata,
 });
 
 const createRunOptions = (messages: ThreadMessage[]): ChatModelRunOptions => ({
@@ -79,8 +92,13 @@ const collectUpdates = async (
   options: ChatModelRunOptions
 ): Promise<ChatModelRunResult[]> => {
   const updates: ChatModelRunResult[] = [];
-  for await (const update of run(options)) {
-    updates.push(update);
+  const result = run(options);
+  if (Symbol.asyncIterator in result) {
+    for await (const update of result) {
+      updates.push(update);
+    }
+  } else {
+    updates.push(await result);
   }
   return updates;
 };
@@ -440,7 +458,8 @@ describe("createAnthropicAdapter", () => {
           // result is undefined — orphan!
         },
       ],
-      metadata: { custom: {} },
+      status: assistantMessageStatus,
+      metadata: assistantMessageMetadata,
     };
 
     await collectUpdates(
@@ -559,7 +578,8 @@ describe("buildAnthropicMessages — orphan detection", () => {
             // result is undefined — orphaned tool_use
           },
         ],
-        metadata: { custom: {} },
+        status: assistantMessageStatus,
+        metadata: assistantMessageMetadata,
       },
     ];
 
@@ -605,7 +625,8 @@ describe("buildAnthropicMessages — orphan detection", () => {
             // no result — orphan
           },
         ],
-        metadata: { custom: {} },
+        status: assistantMessageStatus,
+        metadata: assistantMessageMetadata,
       },
     ];
 

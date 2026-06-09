@@ -47,6 +47,24 @@ const rectFor = (
 };
 
 /**
+ * Split comments for the side panel: the always-visible OPEN list and the
+ * collapsible RESOLVED/history group (newest-resolved first, so recent closures
+ * surface). Keeping resolved comments out of the open list is what stops them
+ * occluding the canvas (s20-m11). Pure + side-effect-free for testing.
+ */
+export const partitionComments = (
+  comments: Comment[],
+): { open: Comment[]; resolved: Comment[] } => {
+  const open: Comment[] = [];
+  const resolved: Comment[] = [];
+  for (const comment of comments) {
+    (comment.resolved ? resolved : open).push(comment);
+  }
+  resolved.sort((a, b) => (b.resolvedAt ?? "").localeCompare(a.resolvedAt ?? ""));
+  return { open, resolved };
+};
+
+/**
  * Plain-React comment overlay rendered over the preview iframe. Pins are
  * positioned from the iframe-reported anchor rects (the parent can't read the
  * sandboxed DOM), so they re-resolve automatically as PREVIEW_ANCHORS updates
@@ -64,6 +82,15 @@ export const CommentLayer = ({
 
   const [draft, setDraft] = useState("");
   const [openKey, setOpenKey] = useState<string | null>(null);
+  // Side-panel chrome: collapse the whole panel off the canvas, and keep the
+  // resolved/history group hidden until asked for (s20-m11).
+  const [minimized, setMinimized] = useState(false);
+  const [showResolved, setShowResolved] = useState(false);
+
+  const { open: openComments, resolved: resolvedComments } = useMemo(
+    () => partitionComments(comments),
+    [comments],
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
@@ -228,24 +255,74 @@ export const CommentLayer = ({
         </div>
       ) : null}
 
-      {/* Side list of all comments */}
+      {/* Side panel — open comments always shown; resolved tucked into a
+          collapsed history group; the whole panel minimizes off the canvas. */}
       {comments.length > 0 ? (
-        <div className="pointer-events-auto absolute right-3 top-3 z-10 max-h-[calc(100%-1.5rem)] w-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/80 p-3 text-sm text-white shadow-lg backdrop-blur">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
-            Comments · {comments.length}
-          </p>
-          <ul className="space-y-2">
-            {comments.map((comment) => (
-              <CommentRow
-                key={comment.id}
-                comment={comment}
-                detached={!rectFor(comment.anchor, anchors)}
-                showAnchor
-                onResolve={resolveComment}
-                onDelete={deleteComment}
-              />
-            ))}
-          </ul>
+        <div className="pointer-events-auto absolute right-3 top-3 z-10 flex max-h-[calc(100%-1.5rem)] w-60 flex-col overflow-hidden rounded-xl border border-white/10 bg-slate-900/80 text-sm text-white shadow-lg backdrop-blur">
+          <div className="flex items-center justify-between gap-2 px-3 py-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/50">
+              Comments · {openComments.length}
+            </p>
+            <button
+              type="button"
+              onClick={() => setMinimized((value) => !value)}
+              title={minimized ? "Expand comments" : "Minimize comments"}
+              aria-expanded={!minimized}
+              className="rounded px-1.5 leading-none text-white/60 hover:bg-white/10 hover:text-white"
+            >
+              {minimized ? "+" : "–"}
+            </button>
+          </div>
+
+          {!minimized ? (
+            <div className="overflow-auto px-3 pb-3">
+              {openComments.length > 0 ? (
+                <ul className="space-y-2">
+                  {openComments.map((comment) => (
+                    <CommentRow
+                      key={comment.id}
+                      comment={comment}
+                      detached={!rectFor(comment.anchor, anchors)}
+                      showAnchor
+                      onResolve={resolveComment}
+                      onDelete={deleteComment}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-white/40">No open comments.</p>
+              )}
+
+              {resolvedComments.length > 0 ? (
+                <div className="mt-3 border-t border-white/10 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowResolved((value) => !value)}
+                    aria-expanded={showResolved}
+                    title={showResolved ? "Hide resolved" : "Show resolved"}
+                    className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wide text-white/40 hover:text-white/70"
+                  >
+                    <span>Resolved · {resolvedComments.length}</span>
+                    <span aria-hidden>{showResolved ? "▾" : "▸"}</span>
+                  </button>
+                  {showResolved ? (
+                    <ul className="mt-2 space-y-2">
+                      {resolvedComments.map((comment) => (
+                        <CommentRow
+                          key={comment.id}
+                          comment={comment}
+                          detached={!rectFor(comment.anchor, anchors)}
+                          showAnchor
+                          onResolve={resolveComment}
+                          onDelete={deleteComment}
+                        />
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

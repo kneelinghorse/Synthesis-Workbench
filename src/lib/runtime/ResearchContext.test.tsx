@@ -43,7 +43,10 @@ describe("ResearchContext", () => {
         // Review-surface framing replaces the old "drive autonomously" instruction.
         expect(result.current.researchPrompt).toContain("DESIGN WORKBENCH");
         expect(result.current.researchPrompt).toContain("review-and-iterate surface");
-        expect(result.current.researchPrompt).toContain("review → comment → suggest → confirm");
+        expect(result.current.researchPrompt).toContain("review → identify → propose → confirm");
+        // Suggest-and-confirm: the agent proposes via a tool call; the human's
+        // Accept/Reject on the diff card is the gate, not a separate chat "yes".
+        expect(result.current.researchPrompt).toContain("the card is the gate");
         // The 5-phase workflow machinery is gone for good.
         expect(result.current.researchPrompt).not.toContain("Workflow Phases & Tools");
         expect(result.current.researchPrompt).not.toContain("Multi-Step Workflow Examples");

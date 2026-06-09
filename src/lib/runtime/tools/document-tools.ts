@@ -60,6 +60,12 @@ export type SetDocumentToolResult = {
   persistedPath?: string;
   errors?: string[];
   resolvedAt: string;
+  /**
+   * Suggest-and-confirm outcome. 'applied' = the human accepted and the change
+   * was written; 'rejected' = the human discarded the proposal (nothing
+   * mutated). Absent on direct (non-gated) execution.
+   */
+  decision?: "applied" | "rejected";
 };
 
 // ============================================================================
@@ -83,6 +89,8 @@ export type PatchNodeToolResult = {
   nodeId: string;
   errors?: string[];
   resolvedAt: string;
+  /** See SetDocumentToolResult.decision. */
+  decision?: "applied" | "rejected";
 };
 
 // ============================================================================
@@ -355,6 +363,45 @@ export function executePatchNode(
   return {
     patched: true,
     nodeId: args.nodeId,
+    resolvedAt: new Date().toISOString(),
+  };
+}
+
+// ============================================================================
+// Suggest-and-confirm wrappers
+//
+// The agent's set_document / patch_node calls are PROPOSALS surfaced as a diff
+// card. The human accepts (apply) or rejects (discard); only `confirm*` mutates
+// the document store. These keep the React tool UI thin and unit-testable.
+// ============================================================================
+
+export async function confirmSetDocument(
+  args: SetDocumentToolArgs,
+): Promise<SetDocumentToolResult> {
+  const result = await executeSetDocument(args);
+  return { ...result, decision: "applied" };
+}
+
+export function rejectSetDocument(): SetDocumentToolResult {
+  return {
+    saved: false,
+    persisted: false,
+    nodeCount: 0,
+    componentCount: 0,
+    decision: "rejected",
+    resolvedAt: new Date().toISOString(),
+  };
+}
+
+export function confirmPatchNode(args: PatchNodeToolArgs): PatchNodeToolResult {
+  return { ...executePatchNode(args), decision: "applied" };
+}
+
+export function rejectPatchNode(args: PatchNodeToolArgs): PatchNodeToolResult {
+  return {
+    patched: false,
+    nodeId: args.nodeId,
+    decision: "rejected",
     resolvedAt: new Date().toISOString(),
   };
 }

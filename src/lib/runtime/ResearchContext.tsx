@@ -20,6 +20,10 @@ import type {
     Stage1CompositionPattern,
     Stage1EnrichedToken,
 } from "@/types/stage1-bundle";
+import { useCommentStateStore } from "@/lib/stores/comment-state";
+import { useDocumentStateStore } from "@/lib/stores/document-state";
+import { useTokenStateStore } from "@/lib/stores/token-state";
+import { formatReviewContext } from "@/lib/runtime/review-context";
 
 // ============================================================================
 // System Prompt — Static Review Surface
@@ -31,14 +35,14 @@ const CORE_INSTRUCTIONS = `
 This workbench is the human review-and-iterate surface for designs produced by headless OODS Forge.
 Your job is to help the human REVIEW the rendered preview and refine it — not to build a design autonomously.
 
-Work in a review → comment → suggest → confirm loop:
-1. **Review** the current preview and the human's critique of it.
-2. **Comment** — pin specific, actionable observations to the element under discussion.
-3. **Suggest** a concrete change: name the node/prop/token and the exact new value.
-4. **Confirm** — wait for the human to approve before you apply anything.
+Work in a review → identify → propose → confirm loop:
+1. **Review** the current preview, the human's message, and any pinned review comments below.
+2. **Identify** the specific node / prop / token to change — name the node \`id\`.
+3. **Propose** the change by calling a tool: \`patch_node\` for a targeted edit, or \`set_document\` for a structural rewrite. The tool call renders a diff card in the chat.
+4. **Confirm via the card** — the human clicks Accept (apply) or Reject (discard) on that card. That IS the confirmation: only an Accept mutates the document.
 
-Only after the human confirms, use **tool_use** to apply the change (e.g. set_document, patch_node).
-Do not mutate the document before the human agrees, and do not treat your own suggestion as approval.
+Call the tool to PROPOSE — do not ask for a separate yes/no in chat first, and do not treat your own proposal as approval; the card is the gate.
+Prefer \`patch_node\`: it preserves the node \`id\` (and the comments pinned to it). Use \`set_document\` only when the structure itself must change.
 
 ## Document Model
 
@@ -192,6 +196,11 @@ export const ResearchProvider = ({ children }: ResearchProviderProps) => {
     const tokenSuggestions = useStage1BundleStore((state) => state.tokenSuggestions);
     const enrichedTokens = useStage1BundleStore((state) => state.enrichedTokens);
     const compositionPatterns = useStage1BundleStore((state) => state.compositionPatterns);
+    // Live review state — packaged into the prompt so the agent can propose
+    // targeted edits that address the human's pinned comments.
+    const designDocument = useDocumentStateStore((state) => state.document);
+    const comments = useCommentStateStore((state) => state.comments);
+    const tokenChanges = useTokenStateStore((state) => state.changes);
     const [foundryCatalogPrompt, setFoundryCatalogPrompt] = useState<string | null>(
         null
     );
@@ -257,8 +266,28 @@ export const ResearchProvider = ({ children }: ResearchProviderProps) => {
             });
         }
 
+        // Live review state — the working document, token overrides, and the
+        // human's pinned comments — so the agent can propose targeted edits.
+        const reviewContext = formatReviewContext({
+            document: designDocument,
+            tokenChanges,
+            comments,
+        });
+        if (reviewContext) {
+            prompt += "\n\n" + reviewContext;
+        }
+
         return prompt;
-    }, [components, tokenSuggestions, enrichedTokens, compositionPatterns, foundryCatalogPrompt]);
+    }, [
+        components,
+        tokenSuggestions,
+        enrichedTokens,
+        compositionPatterns,
+        foundryCatalogPrompt,
+        designDocument,
+        tokenChanges,
+        comments,
+    ]);
 
     const value = useMemo(
         () => ({

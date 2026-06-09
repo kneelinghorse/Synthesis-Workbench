@@ -39,12 +39,8 @@ import {
   SET_DOCUMENT_TOOL_NAME,
   PATCH_NODE_TOOL_NAME,
   SET_DATA_CONTEXT_TOOL_NAME,
-  executeSetDocument,
-  executePatchNode,
   executeSetDataContext,
-  type SetDocumentToolArgs,
   type SetDocumentToolResult,
-  type PatchNodeToolArgs,
   type PatchNodeToolResult,
   type SetDataContextToolArgs,
   type SetDataContextToolResult,
@@ -985,12 +981,17 @@ export const withToolCommands = (
       return await validateSchema(args as ValidateSchemaToolArgs);
     }
 
-    if (toolName === SET_DOCUMENT_TOOL_NAME) {
-      return executeSetDocument(args as SetDocumentToolArgs);
-    }
-
-    if (toolName === PATCH_NODE_TOOL_NAME) {
-      return executePatchNode(args as PatchNodeToolArgs);
+    // set_document / patch_node are GATED through the suggest-and-confirm tool
+    // UI (DocumentToolUI) — only a human Accept applies the change. This
+    // dispatcher is not wired to the LocalRuntime path, but guard it so a future
+    // mis-wiring can never silently mutate the document without confirmation.
+    if (
+      toolName === SET_DOCUMENT_TOOL_NAME ||
+      toolName === PATCH_NODE_TOOL_NAME
+    ) {
+      return {
+        error: `"${toolName}" is gated through the suggest-and-confirm UI and cannot be auto-executed.`,
+      };
     }
 
     if (toolName === SET_DATA_CONTEXT_TOOL_NAME) {

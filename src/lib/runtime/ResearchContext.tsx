@@ -9,14 +9,12 @@ import {
     type ReactNode,
 } from "react";
 import { useStage1BundleStore } from "@/lib/stores/stage1-bundle";
-import { usePhaseStore } from "@/lib/stores/phase-state";
 import { createFoundryMcpClient } from "@/lib/mcp/foundry-client";
 import {
     formatFoundryCatalogForPrompt,
     normalizeFoundryComponentCatalog,
     WORKBENCH_S44_COMPONENTS,
 } from "@/lib/foundry/catalog";
-import type { PhaseId } from "@/types/phase";
 import type {
     Stage1Component,
     Stage1CompositionPattern,
@@ -24,14 +22,23 @@ import type {
 } from "@/types/stage1-bundle";
 
 // ============================================================================
-// System Prompt — Phase-Based Workflow
+// System Prompt — Static Review Surface
 // ============================================================================
 
 const CORE_INSTRUCTIONS = `
 # DESIGN WORKBENCH — AGENT INSTRUCTIONS
 
-You have native tool-calling capabilities. Use **tool_use** to drive all design operations autonomously.
-Do NOT suggest slash commands — call tools directly.
+This workbench is the human review-and-iterate surface for designs produced by headless OODS Forge.
+Your job is to help the human REVIEW the rendered preview and refine it — not to build a design autonomously.
+
+Work in a review → comment → suggest → confirm loop:
+1. **Review** the current preview and the human's critique of it.
+2. **Comment** — pin specific, actionable observations to the element under discussion.
+3. **Suggest** a concrete change: name the node/prop/token and the exact new value.
+4. **Confirm** — wait for the human to approve before you apply anything.
+
+Only after the human confirms, use **tool_use** to apply the change (e.g. set_document, patch_node).
+Do not mutate the document before the human agrees, and do not treat your own suggestion as approval.
 
 ## Document Model
 
@@ -54,124 +61,6 @@ A DesignDocument has this structure:
 { "nodeType": "layout", "layout": { "type": "grid", "columns": 3, "gap": 16 }, "children": [ ... ] }
 \`\`\`
 `;
-
-const PHASE_TOOL_GUIDE = `
-## Workflow Phases & Tools
-
-### 1. Discover (ingest phase)
-Goal: Understand the target application's design patterns.
-
-- **inspect_app** — Run full app profile: route discovery, a11y scan, performance, network trace. Use when the user provides a URL to analyze. Takes 2-5 minutes.
-- **inspect_surface** — Capture surface snapshot: DOM, screenshots, computed styles, style fingerprint. Use for targeted visual analysis. Takes 30s-2min.
-- **load_bundle** — Load a previously captured Stage1 bundle into the Workbench. Auto-populates component inventory and token suggestions.
-
-After inspection completes, results auto-load into the Workbench — no need to call load_bundle separately.
-
-### 2. Analyze (explore phase)
-Goal: Review what was discovered and plan the composition.
-
-- **component_catalog** — List available OODS components with traits, props, and variants.
-- Review discovered components and token suggestions from Stage1 data.
-- Map discovered patterns to OODS component equivalents.
-
-### 3. Compose (explore/tune phase)
-Goal: Build the design document using OODS components.
-
-- **set_document** — Create or replace the full design document. Auto-renders in Preview.
-- **render_component** — Quick single-component preview from a schema.
-- **patch_node** — Modify a specific node by ID (targeted edits).
-- **set_data_context** — Set runtime data for $data bindings.
-
-### 4. Tune (tune phase)
-Goal: Refine design tokens to match the target application's style.
-
-- **update_token_state** — Apply token path updates (e.g. {"colors.primary": "#2563eb"}).
-- Seed tokens from Stage1 suggestions, then fine-tune individual values.
-
-### 5. Export (done phase)
-Goal: Produce deliverables.
-
-- **export_design** — Export in html, json, yaml, spec, or scss format.
-
-## Composition Rules
-- Every ComponentNode needs a unique "id" for AI-patching.
-- Use LayoutNodes to arrange components (stack for vertical, grid for columns).
-- Nesting is supported: stack inside grid, grid inside stack, etc.
-- Reference components using "oods:Name" format in ComponentNode.ref.
-`;
-
-const WORKFLOW_EXAMPLES = `
-## Multi-Step Workflow Examples
-
-### Discovery → Composition
-1. User: "Analyze https://example.com and build something similar"
-2. Call inspect_app with the URL → wait for completion
-3. Review discovered components and tokens in the auto-loaded results
-4. Call set_document with a DesignDocument using OODS equivalents of discovered components
-5. Call update_token_state to apply discovered color/typography tokens
-6. Call export_design when the user is satisfied
-
-### Quick Composition
-1. User: "Create a card layout with a title, description, and action button"
-2. Call set_document with a LayoutNode containing Card, Text, and Button components
-3. Call patch_node if the user requests changes to specific components
-
-### Token Tuning
-1. User: "Change the primary color to navy blue"
-2. Call update_token_state with {"colors.primary": "#1e3a5f"}
-`;
-
-/**
- * Builds a contextual suggestion block based on current workflow state.
- */
-export function buildWorkflowContext(opts: {
-    phase: PhaseId;
-    hasBundle: boolean;
-    componentCount: number;
-    tokenCount: number;
-}): string {
-    const { phase, hasBundle, componentCount, tokenCount } = opts;
-    const lines: string[] = [];
-
-    lines.push("## Current Workflow State");
-    lines.push(`- **Phase**: ${phase}`);
-    lines.push(`- **Discovery data loaded**: ${hasBundle ? "yes" : "no"}`);
-
-    if (hasBundle) {
-        lines.push(`- **Discovered components**: ${componentCount}`);
-        lines.push(`- **Token suggestions**: ${tokenCount}`);
-    }
-
-    lines.push("");
-    lines.push("### Suggested Next Steps");
-
-    if (!hasBundle && phase === "ingest") {
-        lines.push("- No discovery data loaded yet. Suggest the user provide a URL to inspect, or load an existing Stage1 bundle.");
-        lines.push("- Use **inspect_app** for full application analysis, or **inspect_surface** for quick style capture.");
-        lines.push("- Alternatively, start composing directly with **set_document** if the user has a specific design in mind.");
-    } else if (hasBundle && phase === "ingest") {
-        lines.push("- Discovery data is loaded. Review the discovered components and token suggestions below.");
-        lines.push("- Suggest transitioning to the **explore** phase to start composing designs using discovered patterns.");
-        lines.push("- Map discovered components to OODS equivalents and propose a composition.");
-    } else if (phase === "explore") {
-        lines.push("- Use **set_document** to compose layouts, **render_component** for quick previews.");
-        lines.push("- Use **component_catalog** to review available OODS components.");
-        if (hasBundle) {
-            lines.push("- Leverage discovered components and tokens to inform composition decisions.");
-        }
-    } else if (phase === "tune") {
-        lines.push("- Use **update_token_state** to adjust design tokens.");
-        if (hasBundle && tokenCount > 0) {
-            lines.push("- Token suggestions from discovery are available — apply them as a starting point.");
-        }
-    } else if (phase === "review") {
-        lines.push("- The design is ready for review. Wait for human approval before proceeding.");
-    } else if (phase === "done") {
-        lines.push("- Use **export_design** to produce the final deliverable in the user's preferred format.");
-    }
-
-    return lines.join("\n");
-}
 
 /**
  * Formats discovered Stage1 components with richer metadata.
@@ -303,7 +192,6 @@ export const ResearchProvider = ({ children }: ResearchProviderProps) => {
     const tokenSuggestions = useStage1BundleStore((state) => state.tokenSuggestions);
     const enrichedTokens = useStage1BundleStore((state) => state.enrichedTokens);
     const compositionPatterns = useStage1BundleStore((state) => state.compositionPatterns);
-    const currentPhase = usePhaseStore((state) => state.currentPhase);
     const [foundryCatalogPrompt, setFoundryCatalogPrompt] = useState<string | null>(
         null
     );
@@ -360,22 +248,8 @@ export const ResearchProvider = ({ children }: ResearchProviderProps) => {
             prompt += `\n${foundryCatalogPrompt}\n`;
         }
 
-        // Phase-based tool guide — always included
-        prompt += PHASE_TOOL_GUIDE;
-
-        // Workflow examples — always included
-        prompt += WORKFLOW_EXAMPLES;
-
-        // Dynamic workflow context — phase-aware suggestions
-        const hasBundle = components.length > 0 || Object.keys(tokenSuggestions).length > 0;
-        prompt += "\n" + buildWorkflowContext({
-            phase: currentPhase,
-            hasBundle,
-            componentCount: components.length,
-            tokenCount: Object.keys(tokenSuggestions).length,
-        });
-
         // Stage1 discovery context — when bundle data is loaded
+        const hasBundle = components.length > 0 || Object.keys(tokenSuggestions).length > 0;
         if (hasBundle) {
             prompt += "\n\n" + formatDiscoveryContext(components, tokenSuggestions, {
                 enrichedTokens,
@@ -384,7 +258,7 @@ export const ResearchProvider = ({ children }: ResearchProviderProps) => {
         }
 
         return prompt;
-    }, [components, tokenSuggestions, enrichedTokens, compositionPatterns, currentPhase, foundryCatalogPrompt]);
+    }, [components, tokenSuggestions, enrichedTokens, compositionPatterns, foundryCatalogPrompt]);
 
     const value = useMemo(
         () => ({

@@ -9,7 +9,6 @@ import {
   isFoundryUnavailableError,
 } from "@/lib/engine/preview-renderer";
 import type { FoundryMcpClient } from "@/lib/mcp/foundry-client";
-import { renderStaticDocument } from "@/lib/preview/static-renderer";
 
 /**
  * Hook that bridges document state + data context → Foundry fragment render → preview state.
@@ -57,32 +56,20 @@ export function useCompositionPreview(client: FoundryMcpClient | null) {
     renderTimerRef.current = setTimeout(() => {
       renderTimerRef.current = null;
 
-      const applyStaticFallback = () => {
-        const html = renderStaticDocument(document, { dataContext });
+      // Foundry/Forge is the only renderer. When it is unavailable we no longer
+      // produce a divergent local render — we surface an explicit
+      // "preview unavailable" state (empty html, offline status).
+      const applyUnavailablePreview = () => {
         if (activeRenderRef.current !== renderGeneration) {
           return;
         }
-        setHtml(html);
+        setHtml("");
         setFoundryStatus("offline");
         setCompositionState("success");
       };
 
       if (!client) {
-        try {
-          applyStaticFallback();
-        } catch (err) {
-          if (activeRenderRef.current !== renderGeneration) {
-            return;
-          }
-
-          setCompositionState("error", [
-            {
-              componentId: "_composition",
-              componentRef: "_static_renderer",
-              message: err instanceof Error ? err.message : String(err),
-            },
-          ]);
-        }
+        applyUnavailablePreview();
         return;
       }
 
@@ -110,12 +97,8 @@ export function useCompositionPreview(client: FoundryMcpClient | null) {
           }
 
           if (isFoundryUnavailableError(err)) {
-            try {
-              applyStaticFallback();
-              return;
-            } catch {
-              // Continue to the generic error path if fallback rendering fails.
-            }
+            applyUnavailablePreview();
+            return;
           }
 
           setCompositionState("error", [

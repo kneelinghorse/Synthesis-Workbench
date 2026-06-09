@@ -5,20 +5,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
     ResearchProvider,
     useResearchContext,
-    buildWorkflowContext,
     formatDiscoveryContext,
 } from "./ResearchContext";
 import { useStage1BundleStore } from "@/lib/stores/stage1-bundle";
-import { usePhaseStore } from "@/lib/stores/phase-state";
 import { createFoundryMcpClient } from "@/lib/mcp/foundry-client";
 import React, { ReactNode } from "react";
 
 vi.mock("@/lib/stores/stage1-bundle", () => ({
     useStage1BundleStore: vi.fn(),
-}));
-
-vi.mock("@/lib/stores/phase-state", () => ({
-    usePhaseStore: vi.fn(),
 }));
 
 vi.mock("@/lib/mcp/foundry-client", () => ({
@@ -35,39 +29,26 @@ describe("ResearchContext", () => {
         (createFoundryMcpClient as ReturnType<typeof vi.fn>).mockImplementation(() => {
             throw new Error("Foundry unavailable");
         });
-        (usePhaseStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { currentPhase: string }) => string) =>
-                selector({ currentPhase: "ingest" })
-        );
     });
 
     // ─── Core prompt structure ────────────────────────────────────
 
-    it("includes phase-based workflow sections in prompt", () => {
+    it("frames the prompt as a static review-and-iterate surface (no phase machinery)", () => {
         (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );
 
         const { result } = renderHook(() => useResearchContext(), { wrapper });
+        // Review-surface framing replaces the old "drive autonomously" instruction.
         expect(result.current.researchPrompt).toContain("DESIGN WORKBENCH");
-        expect(result.current.researchPrompt).toContain("Workflow Phases & Tools");
-        expect(result.current.researchPrompt).toContain("1. Discover");
-        expect(result.current.researchPrompt).toContain("2. Analyze");
-        expect(result.current.researchPrompt).toContain("3. Compose");
-        expect(result.current.researchPrompt).toContain("4. Tune");
-        expect(result.current.researchPrompt).toContain("5. Export");
-    });
-
-    it("includes workflow examples in prompt", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
-                selector({ components: [], tokenSuggestions: {} })
-        );
-
-        const { result } = renderHook(() => useResearchContext(), { wrapper });
-        expect(result.current.researchPrompt).toContain("Multi-Step Workflow Examples");
-        expect(result.current.researchPrompt).toContain("Discovery → Composition");
+        expect(result.current.researchPrompt).toContain("review-and-iterate surface");
+        expect(result.current.researchPrompt).toContain("review → comment → suggest → confirm");
+        // The 5-phase workflow machinery is gone for good.
+        expect(result.current.researchPrompt).not.toContain("Workflow Phases & Tools");
+        expect(result.current.researchPrompt).not.toContain("Multi-Step Workflow Examples");
+        expect(result.current.researchPrompt).not.toContain("Current Workflow State");
+        expect(result.current.researchPrompt).not.toContain("export_design");
     });
 
     it("includes document model reference", () => {
@@ -84,15 +65,13 @@ describe("ResearchContext", () => {
 
     // ─── No bundle loaded (discovery suggestions) ─────────────────
 
-    it("suggests inspection tools when no Stage1 data is present", () => {
+    it("omits discovery context and reports zero counts when no Stage1 data is present", () => {
         (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
             (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
                 selector({ components: [], tokenSuggestions: {} })
         );
 
         const { result } = renderHook(() => useResearchContext(), { wrapper });
-        expect(result.current.researchPrompt).toContain("No discovery data loaded");
-        expect(result.current.researchPrompt).toContain("inspect_app");
         expect(result.current.researchPrompt).not.toContain("DESIGN DISCOVERY CONTEXT");
         expect(result.current.componentCount).toBe(0);
         expect(result.current.tokenCount).toBe(0);
@@ -160,52 +139,6 @@ describe("ResearchContext", () => {
         expect(result.current.researchPrompt).toContain("### colors");
         expect(result.current.researchPrompt).toContain("### typography");
         expect(result.current.researchPrompt).toContain("### spacing");
-    });
-
-    // ─── Phase-aware context ──────────────────────────────────────
-
-    it("provides phase-specific suggestions for explore phase", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
-                selector({ components: [], tokenSuggestions: {} })
-        );
-        (usePhaseStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { currentPhase: string }) => string) =>
-                selector({ currentPhase: "explore" })
-        );
-
-        const { result } = renderHook(() => useResearchContext(), { wrapper });
-        expect(result.current.researchPrompt).toContain("Phase**: explore");
-        expect(result.current.researchPrompt).toContain("set_document");
-    });
-
-    it("provides phase-specific suggestions for done phase", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { components: unknown[]; tokenSuggestions: Record<string, string> }) => unknown) =>
-                selector({ components: [], tokenSuggestions: {} })
-        );
-        (usePhaseStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { currentPhase: string }) => string) =>
-                selector({ currentPhase: "done" })
-        );
-
-        const { result } = renderHook(() => useResearchContext(), { wrapper });
-        expect(result.current.researchPrompt).toContain("Phase**: done");
-        expect(result.current.researchPrompt).toContain("export_design");
-    });
-
-    it("suggests bundle-aware actions when data is loaded in ingest phase", () => {
-        (useStage1BundleStore as ReturnType<typeof vi.fn>).mockImplementation(
-            (selector: (state: { components: { name: string }[]; tokenSuggestions: Record<string, string> }) => unknown) =>
-                selector({
-                    components: [{ name: "Card" }],
-                    tokenSuggestions: { "colors.primary": "#000" },
-                })
-        );
-
-        const { result } = renderHook(() => useResearchContext(), { wrapper });
-        expect(result.current.researchPrompt).toContain("Discovery data is loaded");
-        expect(result.current.researchPrompt).toContain("explore");
     });
 
     // ─── Foundry catalog ──────────────────────────────────────────
@@ -282,83 +215,6 @@ describe("ResearchContext", () => {
 });
 
 // ─── Pure function unit tests ─────────────────────────────────
-
-describe("buildWorkflowContext", () => {
-    it("suggests inspection tools when no bundle in ingest phase", () => {
-        const result = buildWorkflowContext({
-            phase: "ingest",
-            hasBundle: false,
-            componentCount: 0,
-            tokenCount: 0,
-        });
-
-        expect(result).toContain("No discovery data loaded");
-        expect(result).toContain("inspect_app");
-        expect(result).toContain("inspect_surface");
-    });
-
-    it("suggests transitioning to explore when bundle is loaded in ingest", () => {
-        const result = buildWorkflowContext({
-            phase: "ingest",
-            hasBundle: true,
-            componentCount: 5,
-            tokenCount: 10,
-        });
-
-        expect(result).toContain("Discovery data is loaded");
-        expect(result).toContain("explore");
-        expect(result).toContain("Discovered components**: 5");
-        expect(result).toContain("Token suggestions**: 10");
-    });
-
-    it("suggests composition tools in explore phase", () => {
-        const result = buildWorkflowContext({
-            phase: "explore",
-            hasBundle: true,
-            componentCount: 3,
-            tokenCount: 5,
-        });
-
-        expect(result).toContain("set_document");
-        expect(result).toContain("component_catalog");
-        expect(result).toContain("Leverage discovered");
-    });
-
-    it("suggests token tuning in tune phase with bundle", () => {
-        const result = buildWorkflowContext({
-            phase: "tune",
-            hasBundle: true,
-            componentCount: 3,
-            tokenCount: 5,
-        });
-
-        expect(result).toContain("update_token_state");
-        expect(result).toContain("Token suggestions from discovery");
-    });
-
-    it("suggests export in done phase", () => {
-        const result = buildWorkflowContext({
-            phase: "done",
-            hasBundle: false,
-            componentCount: 0,
-            tokenCount: 0,
-        });
-
-        expect(result).toContain("export_design");
-    });
-
-    it("suggests waiting for review in review phase", () => {
-        const result = buildWorkflowContext({
-            phase: "review",
-            hasBundle: false,
-            componentCount: 0,
-            tokenCount: 0,
-        });
-
-        expect(result).toContain("review");
-        expect(result).toContain("human approval");
-    });
-});
 
 describe("formatDiscoveryContext", () => {
     it("formats components with name, count, confidence, variants, selectors", () => {

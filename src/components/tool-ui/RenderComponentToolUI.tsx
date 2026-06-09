@@ -1,7 +1,7 @@
 "use client";
 
 import { makeAssistantToolUI, type ToolCallMessagePartProps } from "@assistant-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   ToolOutputCard,
@@ -15,14 +15,12 @@ import {
   ToolOutputCardStatus,
   ToolOutputCardTitle,
 } from "@/components/tool-ui/ToolOutputCard";
-import { PreviewPane } from "@/components/workbench/PreviewPane";
 import {
   RENDER_COMPONENT_TOOL_NAME,
   renderComponent,
   type RenderComponentToolArgs,
   type RenderComponentToolResult,
 } from "@/lib/runtime/tools/oods-tools";
-import { usePreviewStateStore } from "@/lib/stores/preview-state";
 
 const RenderComponentToolCard = ({
   args,
@@ -35,8 +33,6 @@ const RenderComponentToolCard = ({
   RenderComponentToolResult
 >) => {
   const execTriggered = useRef(false);
-  const livePreviewHtml = usePreviewStateStore((state) => state.html);
-  const [previewHtml, setPreviewHtmlState] = useState<string>("");
 
   const resolved = Boolean(result);
   const schema = args?.schema;
@@ -67,16 +63,6 @@ const RenderComponentToolCard = ({
       cancelled = true;
     };
   }, [addResult, args, isError, resolved]);
-
-  useEffect(() => {
-    if (result?.html) {
-      setPreviewHtmlState(result.html);
-      return;
-    }
-    if (livePreviewHtml) {
-      setPreviewHtmlState(livePreviewHtml);
-    }
-  }, [livePreviewHtml, result?.html]);
 
   const warnings = result?.warnings ?? [];
   const errors = result?.errors ?? [];
@@ -137,15 +123,6 @@ const RenderComponentToolCard = ({
             to generate a preview.
           </ToolOutputCardCallout>
         ) : null}
-
-        <div className="space-y-2">
-          <div className="text-xs uppercase tracking-[0.2em] text-white/50">
-            Preview thumbnail
-          </div>
-          <div className="h-48">
-            <PreviewPane html={previewHtml} title="Render preview thumbnail" />
-          </div>
-        </div>
       </ToolOutputCardBody>
     </ToolOutputCard>
   );

@@ -1,6 +1,5 @@
 import { COMPONENT_CATALOG_TOOL_NAME } from "@/lib/runtime/tools/component-catalog-tool";
 import { PATCH_NODE_TOOL_NAME, SET_DATA_CONTEXT_TOOL_NAME, SET_DOCUMENT_TOOL_NAME } from "@/lib/runtime/tools/document-tools";
-import { EXPORT_DESIGN_TOOL_NAME } from "@/lib/runtime/tools/export-tools";
 import { RENDER_COMPONENT_TOOL_NAME } from "@/lib/runtime/tools/oods-tools";
 import {
   LOAD_BUNDLE_TOOL_NAME,
@@ -165,28 +164,6 @@ export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
         },
       },
       required: ["requestId", "changes"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: EXPORT_DESIGN_TOOL_NAME,
-    description: "Export the active design in html/json/yaml/spec/scss formats.",
-    input_schema: {
-      type: "object",
-      properties: {
-        requestId: REQUEST_ID_SCHEMA,
-        title: OPTIONAL_TEXT_SCHEMA,
-        prompt: OPTIONAL_TEXT_SCHEMA,
-        format: {
-          type: "string",
-          description: "Export format: html, json, yaml, spec, or scss.",
-        },
-        slug: {
-          type: "string",
-          description: "Optional slug override for export metadata.",
-        },
-      },
-      required: ["requestId", "format"],
       additionalProperties: false,
     },
   },

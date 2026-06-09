@@ -148,7 +148,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
       if (!client) {
         setThemeSyncStatus("ready");
         setThemeSyncMessage(
-          "Foundry MCP is unavailable. Static Preview mode is active and theme token sync is disabled."
+          "Foundry MCP is unavailable. Live preview and theme token sync are disabled until Forge is reachable."
         );
         return;
       }
@@ -244,6 +244,10 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
       ? null
       : themeSyncMessage;
   const showOfflineEmptyState = isOfflineMode && !html && !document;
+  // A document is loaded but produced no html (Forge offline/unavailable) — show
+  // an explicit "preview unavailable" message instead of a blank pane.
+  const showPreviewUnavailable =
+    !!document && !html && !isRendering && !hasErrors;
   const handleReloadPreview = useCallback(() => {
     setPreviewReloadNonce((previous) => previous + 1);
   }, []);
@@ -261,7 +265,7 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
             </div>
             <div className="mt-1 text-sm text-white/70">
               {isOfflineMode
-                ? "Static fallback render (Foundry offline)."
+                ? "Preview unavailable — Forge is offline."
                 : "Live render output from Foundry."}
             </div>
           </div>
@@ -382,12 +386,23 @@ export const PreviewPanel = ({ className }: { className?: string }) => {
               No design loaded
             </div>
             <p className="mt-2 max-w-sm text-xs leading-relaxed text-white/40">
-              Foundry is offline — static preview mode is active. Load a design
-              document or use the chat to create a component composition. The
-              preview will render using built-in fallback styles.
+              Foundry is offline. Load a design document or use the chat to
+              create a component composition — the preview renders once Forge is
+              reachable.
             </p>
             <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-white/30">
               Try: &ldquo;Create a Card with a heading and a Button&rdquo;
+            </p>
+          </div>
+        ) : showPreviewUnavailable ? (
+          <div className="flex h-full min-h-[320px] flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-black/20 px-6 py-10 text-center">
+            <div className="text-sm font-medium text-white/60">
+              Preview unavailable
+            </div>
+            <p className="mt-2 max-w-sm text-xs leading-relaxed text-white/40">
+              Forge is offline, so this design can&rsquo;t be rendered right now.
+              The document is still loaded — reconnect Forge and reload to see
+              the preview.
             </p>
           </div>
         ) : (

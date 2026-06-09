@@ -1,11 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
-  WORKBENCH_COMPOSER_INPUT_ID,
   isEditableEventTarget,
   resolveWorkbenchShortcutAction,
   type WorkbenchShortcutEvent,
-  writeCommandToComposer,
 } from "./keyboard-shortcuts";
 
 const createShortcutEvent = (
@@ -20,22 +18,6 @@ const createShortcutEvent = (
 });
 
 describe("keyboard shortcut resolver", () => {
-  it("maps primary bracket shortcuts to phase navigation", () => {
-    expect(
-      resolveWorkbenchShortcutAction(
-        createShortcutEvent({ key: "]", metaKey: true }),
-        false
-      )
-    ).toEqual({ type: "phase-step", direction: 1 });
-
-    expect(
-      resolveWorkbenchShortcutAction(
-        createShortcutEvent({ key: "[", ctrlKey: true }),
-        false
-      )
-    ).toEqual({ type: "phase-step", direction: -1 });
-  });
-
   it("maps primary backslash shortcut to preview toggle", () => {
     expect(
       resolveWorkbenchShortcutAction(
@@ -43,36 +25,6 @@ describe("keyboard shortcut resolver", () => {
         false
       )
     ).toEqual({ type: "toggle-preview" });
-  });
-
-  it("maps primary+alt shortcuts to slash command insertion", () => {
-    expect(
-      resolveWorkbenchShortcutAction(
-        createShortcutEvent({ key: "b", metaKey: true, altKey: true }),
-        false
-      )
-    ).toEqual({ type: "insert-command", commandId: "bundle" });
-
-    expect(
-      resolveWorkbenchShortcutAction(
-        createShortcutEvent({ key: "t", metaKey: true, altKey: true }),
-        false
-      )
-    ).toEqual({ type: "insert-command", commandId: "tokens" });
-
-    expect(
-      resolveWorkbenchShortcutAction(
-        createShortcutEvent({ key: "r", metaKey: true, altKey: true }),
-        false
-      )
-    ).toEqual({ type: "insert-command", commandId: "render" });
-
-    expect(
-      resolveWorkbenchShortcutAction(
-        createShortcutEvent({ key: "e", metaKey: true, altKey: true }),
-        false
-      )
-    ).toEqual({ type: "insert-command", commandId: "export" });
   });
 
   it("opens help with ? only outside editable targets", () => {
@@ -118,32 +70,5 @@ describe("editable target detection", () => {
     const nested = wrapper.querySelector("#inner");
 
     expect(isEditableEventTarget(nested)).toBe(true);
-  });
-});
-
-describe("composer command insertion", () => {
-  it("writes command text and emits input event", () => {
-    document.body.innerHTML = `<textarea id="${WORKBENCH_COMPOSER_INPUT_ID}"></textarea>`;
-    const input = document.getElementById(
-      WORKBENCH_COMPOSER_INPUT_ID
-    ) as HTMLTextAreaElement | null;
-    if (!input) {
-      throw new Error("Expected composer textarea.");
-    }
-
-    const inputSpy = vi.fn();
-    input.addEventListener("input", inputSpy);
-
-    const wrote = writeCommandToComposer("/bundle");
-
-    expect(wrote).toBe(true);
-    expect(input.value).toBe("/bundle");
-    expect(inputSpy).toHaveBeenCalledTimes(1);
-    expect(document.activeElement).toBe(input);
-  });
-
-  it("returns false when composer input is missing", () => {
-    document.body.innerHTML = "";
-    expect(writeCommandToComposer("/bundle")).toBe(false);
   });
 });

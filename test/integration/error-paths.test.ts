@@ -16,7 +16,6 @@ import type {
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Stores
-import { usePhaseStore, resetPhaseState } from "@/lib/stores/phase-state";
 import { useDocumentStateStore } from "@/lib/stores/document-state";
 import { resetPreviewState } from "@/lib/stores/preview-state";
 
@@ -24,9 +23,7 @@ import { resetPreviewState } from "@/lib/stores/preview-state";
 import { validateSchema } from "@/lib/runtime/tools/validate-tools";
 import { renderComponent } from "@/lib/runtime/tools/oods-tools";
 import { executeSetDocument, executePatchNode } from "@/lib/runtime/tools/document-tools";
-import { executeExportDesign } from "@/lib/runtime/tools/export-tools";
 import { withToolCommands } from "@/lib/runtime/adapters/withToolCommands";
-import { buildPhaseGateError } from "@/lib/runtime/tools/phase-tool-map";
 
 // Fixtures
 import { DASHBOARD_DOCUMENT, createStrictValidateClient } from "../fixtures";
@@ -98,7 +95,6 @@ const createAdapter = (): ChatModelAdapter => ({
 
 describe("Error Paths", () => {
   beforeEach(() => {
-    resetPhaseState();
     useDocumentStateStore.getState().reset();
     resetPreviewState();
   });
@@ -164,77 +160,6 @@ describe("Error Paths", () => {
     });
   });
 
-  describe("out-of-phase tool rejection", () => {
-    it("rejects /bundle in explore phase with clear error message", async () => {
-      usePhaseStore.setState({ currentPhase: "explore" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("err-1", "/bundle {}")])
-      );
-
-      const text = result.content?.find((p) => p.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("load_bundle");
-        expect(text.text).toContain("explore");
-        expect(text.text).toContain("ingest");
-      }
-      // Should NOT have a tool-call in the result
-      expect(result.content?.find((p) => p.type === "tool-call")).toBeUndefined();
-    });
-
-    it("rejects /export in tune phase", async () => {
-      usePhaseStore.setState({ currentPhase: "tune" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("err-2", "/export html")])
-      );
-
-      const text = result.content?.find((p) => p.type === "text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("export_design");
-        expect(text.text).toContain("tune");
-        expect(text.text).toContain("done");
-      }
-    });
-
-    it("rejects /tokens in ingest phase", async () => {
-      // Default phase is ingest
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("err-3", "/tokens colors.primary=#ff0000"),
-        ])
-      );
-
-      const text = result.content?.find((p) => p.type === "text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("update_token_state");
-        expect(text.text).toContain("ingest");
-      }
-    });
-
-    it("buildPhaseGateError produces descriptive messages", async () => {
-      const msg = buildPhaseGateError("render_component", "ingest");
-      expect(msg).toContain("render_component");
-      expect(msg).toContain("ingest");
-      expect(msg).toContain("explore");
-      expect(msg).toContain("tune");
-    });
-
-    it("buildPhaseGateError handles unknown tools", async () => {
-      const msg = buildPhaseGateError("unknown_tool", "ingest");
-      expect(msg).toContain("unknown_tool");
-      expect(msg).toContain("not recognized");
-    });
-  });
-
   describe("document tool error paths", () => {
     it("rejects set_document with no document", async () => {
       const result = await executeSetDocument({
@@ -272,33 +197,6 @@ describe("Error Paths", () => {
       expect(result.patched).toBe(false);
       expect(result.errors![0]).toContain("nonexistent-node");
       expect(result.errors![0]).toContain("not found");
-    });
-  });
-
-  describe("export error paths", () => {
-    it("fails when no document is loaded", async () => {
-      const result = executeExportDesign({
-        requestId: "export-no-doc",
-        format: "html",
-      });
-
-      expect(result.exported).toBe(false);
-      expect(result.errors![0]).toContain("No active design document");
-    });
-
-    it("fails for unsupported format", async () => {
-      await executeSetDocument({
-        requestId: "export-bad-format-doc",
-        document: DASHBOARD_DOCUMENT,
-      });
-
-      const result = executeExportDesign({
-        requestId: "export-bad-format",
-        format: "pdf" as never,
-      });
-
-      expect(result.exported).toBe(false);
-      expect(result.errors![0]).toContain("Unsupported export format");
     });
   });
 

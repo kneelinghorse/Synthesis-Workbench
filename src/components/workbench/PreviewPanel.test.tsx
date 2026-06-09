@@ -248,14 +248,14 @@ describe("PreviewPanel error actions", () => {
     });
   });
 
-  it("shows offline static preview indicators when Foundry is unavailable", () => {
+  it("shows offline preview indicators when Foundry is unavailable", () => {
     vi.mocked(getFoundryMcpClient).mockReturnValue(null as any);
     render(<PreviewPanel />);
 
-    expect(screen.getByText("Offline (Static)")).toBeTruthy();
+    expect(screen.getByText("Offline")).toBeTruthy();
     expect(
       screen.getByText(
-        "Foundry MCP is unavailable. Static Preview mode is active and theme token sync is disabled."
+        "Foundry MCP is unavailable. Live preview and theme token sync are disabled until Forge is reachable."
       )
     ).toBeTruthy();
   });

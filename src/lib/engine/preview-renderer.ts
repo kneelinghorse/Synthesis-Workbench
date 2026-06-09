@@ -8,7 +8,6 @@ import {
   parseFoundryFragmentRenderOutput,
 } from "@/lib/engine/foundry-fragment-adapter";
 import type { FoundryMcpClient } from "@/lib/mcp/foundry-client";
-import { renderStaticDocument } from "@/lib/preview/static-renderer";
 import type { DesignDocument } from "@/types/document-model";
 
 export const PREVIEW_RENDERER_MODES = [
@@ -48,12 +47,14 @@ const toContractErrors = (
       message: `${check.id}: ${check.detail}`,
     }));
 
-const staticFallback = (
-  document: DesignDocument,
+// When Foundry is unavailable or the fragment contract fails, we no longer
+// render a divergent local fallback. We surface an explicit "preview
+// unavailable" result (empty html) and carry the errors through so the UI can
+// explain why nothing rendered.
+const unavailablePreview = (
   errors: CompositionError[],
-  options?: { dataContext?: DataContext },
 ): PreviewRenderResult => ({
-  html: renderStaticDocument(document, { dataContext: options?.dataContext }),
+  html: "",
   errors,
   foundryStatus: "dry-run",
   mode: "fragments",
@@ -72,10 +73,10 @@ const fragmentPreviewRenderer: PreviewRenderer = {
         validation,
         prepared.componentIndex,
       );
-      return staticFallback(document, [
+      return unavailablePreview([
         ...prepared.bindingErrors,
         ...validationErrors,
-      ], options);
+      ]);
     }
 
     const output = await client.render(prepared.renderInput);
@@ -87,10 +88,10 @@ const fragmentPreviewRenderer: PreviewRenderer = {
     });
 
     if (!contract.pass) {
-      return staticFallback(document, [
+      return unavailablePreview([
         ...prepared.bindingErrors,
         ...toContractErrors(contract.checks),
-      ], options);
+      ]);
     }
 
     const parsedOutput = parseFoundryFragmentRenderOutput(

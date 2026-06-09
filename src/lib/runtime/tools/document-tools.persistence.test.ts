@@ -4,7 +4,7 @@ import * as path from "path";
 import * as yaml from "js-yaml";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GET, POST } from "@/app/api/designs/route";
+import { POST } from "@/app/api/designs/route";
 import { createProject } from "@/lib/persistence/project-catalog";
 import { useDataContextStore } from "@/lib/stores/data-context";
 import { useDocumentStateStore } from "@/lib/stores/document-state";
@@ -65,9 +65,6 @@ describe("executeSetDocument persistence", () => {
       if (url.pathname === "/api/designs" && method === "POST") {
         return POST(request);
       }
-      if (url.pathname === "/api/designs" && method === "GET") {
-        return GET(request);
-      }
 
       throw new Error(`Unhandled fetch route: ${method} ${url.pathname}`);
     });
@@ -98,26 +95,14 @@ describe("executeSetDocument persistence", () => {
     );
     await fs.access(result.persistedPath as string);
 
-    const loadResponse = await GET(
-      new Request(
-        createApiUrl("/api/designs?projectSlug=test-project&slug=roundtrip-home")
-      )
-    );
-    expect(loadResponse.ok).toBe(true);
-    const payload = (await loadResponse.json()) as {
-      loaded: boolean;
-      document: { metadata: { title?: string } };
-      slug: string;
-      projectSlug: string;
-    };
-
-    expect(payload.loaded).toBe(true);
-    expect(payload.slug).toBe("roundtrip-home");
-    expect(payload.projectSlug).toBe("test-project");
-    expect(payload.document.metadata.title).toBe("Roundtrip Home");
+    // Round-trip: read the persisted YAML back from disk (the GET load route was removed).
+    const persisted = yaml.load(
+      await fs.readFile(result.persistedPath as string, "utf-8")
+    ) as { metadata?: { title?: string } };
+    expect(persisted.metadata?.title).toBe("Roundtrip Home");
   });
 
-  it("updates project activeDesignSlug on save and load", async () => {
+  it("updates project activeDesignSlug on save", async () => {
     const saveAlpha = await POST(
       new Request(createApiUrl("/api/designs"), {
         method: "POST",
@@ -149,15 +134,5 @@ describe("executeSetDocument persistence", () => {
       activeDesignSlug?: string;
     };
     expect(manifestAfterSave.activeDesignSlug).toBe("beta");
-
-    const loadAlpha = await GET(
-      new Request(createApiUrl("/api/designs?projectSlug=test-project&slug=alpha"))
-    );
-    expect(loadAlpha.ok).toBe(true);
-
-    const manifestAfterLoad = yaml.load(await fs.readFile(manifestPath, "utf-8")) as {
-      activeDesignSlug?: string;
-    };
-    expect(manifestAfterLoad.activeDesignSlug).toBe("alpha");
   });
 });

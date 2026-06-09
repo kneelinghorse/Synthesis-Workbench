@@ -267,7 +267,7 @@ describe("useCompositionPreview", () => {
     expect(input.schema?.screens?.[0]?.children).toHaveLength(4);
   });
 
-  it("falls back to static preview rendering when Foundry client is unavailable", async () => {
+  it("shows an unavailable preview (empty html) when Foundry client is unavailable", async () => {
     render(<HookHarness client={null} />);
 
     act(() => {
@@ -278,15 +278,14 @@ describe("useCompositionPreview", () => {
     });
 
     await waitFor(() => {
-      const html = usePreviewStateStore.getState().html;
-      expect(html).toContain('data-static-preview="true"');
-      expect(html).toContain("Offline heading");
+      expect(useDocumentStateStore.getState().compositionStatus).toBe("success");
     });
+    // No divergent local render — the preview is explicitly empty/unavailable.
+    expect(usePreviewStateStore.getState().html).toBe("");
     expect(usePreviewStateStore.getState().foundryStatus).toBe("offline");
-    expect(useDocumentStateStore.getState().compositionStatus).toBe("success");
   });
 
-  it("falls back to static preview when Foundry becomes unavailable during render", async () => {
+  it("shows an unavailable preview when Foundry becomes unavailable during render", async () => {
     const connectionError = Object.assign(new Error("Foundry connection dropped"), {
       code: "CONNECTION_FAILED",
     });
@@ -309,13 +308,13 @@ describe("useCompositionPreview", () => {
     });
 
     await waitFor(() => {
-      expect(usePreviewStateStore.getState().html).toContain('data-static-preview="true"');
+      expect(useDocumentStateStore.getState().compositionStatus).toBe("success");
     });
+    expect(usePreviewStateStore.getState().html).toBe("");
     expect(usePreviewStateStore.getState().foundryStatus).toBe("offline");
-    expect(useDocumentStateStore.getState().compositionStatus).toBe("success");
   });
 
-  it("does not use static fallback for non-availability Foundry errors", async () => {
+  it("surfaces non-availability Foundry errors instead of masking them", async () => {
     const toolError = Object.assign(new Error("Schema validation failed"), {
       code: "TOOL_ERROR",
     });
@@ -337,10 +336,12 @@ describe("useCompositionPreview", () => {
     await waitFor(() => {
       expect(useDocumentStateStore.getState().compositionStatus).toBe("error");
     });
-    expect(usePreviewStateStore.getState().html).not.toContain('data-static-preview="true"');
+    // The error is surfaced, not masked into the offline "success" state.
+    expect(useDocumentStateStore.getState().compositionStatus).not.toBe("success");
+    expect(usePreviewStateStore.getState().html).toBe("");
   });
 
-  it("falls back to static rendering when fragment contract check fails", async () => {
+  it("marks preview unavailable (dry-run) when fragment contract check fails", async () => {
     // Return a raw response without proper fragment structure
     const client: FoundryMcpClient = {
       render: vi.fn(async () => ({
@@ -360,10 +361,10 @@ describe("useCompositionPreview", () => {
       );
     });
 
-    // Fragment contract fails → static fallback → "dry-run" status
+    // Fragment contract fails → unavailable preview (empty html) → "dry-run" status
     await waitFor(() => {
       expect(usePreviewStateStore.getState().foundryStatus).toBe("dry-run");
     });
-    expect(usePreviewStateStore.getState().html).toContain('data-static-preview="true"');
+    expect(usePreviewStateStore.getState().html).toBe("");
   });
 });

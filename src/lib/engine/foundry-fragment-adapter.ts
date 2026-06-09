@@ -169,8 +169,24 @@ const renderErrorFallback = (component: ComponentNode, message: string): string 
     component.ref,
   )}] Render failed: ${escapeHtml(message)}</div>`;
 
-const wrapComponent = (component: ComponentNode, html: string): string =>
-  `<div data-component-id="${component.id}" data-component-ref="${component.ref}">${html}</div>`;
+// The comment layer's click handler selects via
+// `closest("[data-oods-node-id],[data-oods-label]")`. Forge emits
+// data-oods-node-id on rendered AND empty shells, so most fragments are already
+// comment-clickable. The anchorless paths — a missing-fragment error fallback,
+// or any shell Forge returns without an anchor — would not be. Add a fallback
+// anchor on the wrapper ONLY when the inner html carries none, so every
+// component is selectable without duplicating Forge's own anchor (s20-m09).
+// Require the trailing `=` so we match the attribute itself, not a hyphenated
+// superset like `data-oods-node-id-extra` (the `\b` after "id" would otherwise
+// match before the hyphen). Forge always emits these as `name="value"`.
+const FRAGMENT_ANCHOR_RE = /\bdata-oods-(?:node-id|label)=/;
+
+const wrapComponent = (component: ComponentNode, html: string): string => {
+  const anchorAttr = FRAGMENT_ANCHOR_RE.test(html)
+    ? ""
+    : ` data-oods-node-id="${component.id}"`;
+  return `<div data-component-id="${component.id}" data-component-ref="${component.ref}"${anchorAttr}>${html}</div>`;
+};
 
 const parseIssueNodeId = (
   value: unknown,

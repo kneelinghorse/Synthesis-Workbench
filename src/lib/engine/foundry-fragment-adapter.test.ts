@@ -471,4 +471,83 @@ describe("foundry fragment adapter", () => {
       /<article[^>]*data-oods-component="Card"[^>]*><\/article>/,
     );
   });
+
+  it("guarantees a clickable Forge anchor for a component whose fragment has none", () => {
+    // Clickability (s20-m09): the comment layer selects via
+    // closest("[data-oods-node-id]"). A fragment Forge returns WITHOUT an anchor
+    // (here the mock <p>/<button> carry only data-oods-component) must still be
+    // commentable — the wrapper supplies a fallback data-oods-node-id = node id.
+    const rawPayload = {
+      status: "ok",
+      output: { format: "fragments", strict: false },
+      fragments: {
+        "title-1": {
+          nodeId: "title-1",
+          component: "Text",
+          html: '<p data-oods-component="Text">Title</p>',
+          cssRefs: [],
+        },
+        "cta-1": {
+          nodeId: "cta-1",
+          component: "Button",
+          html: '<button data-oods-component="Button">Primary</button>',
+          cssRefs: [],
+        },
+        "cta-2": {
+          nodeId: "cta-2",
+          component: "Button",
+          html: '<button data-oods-component="Button">Secondary</button>',
+          cssRefs: [],
+        },
+      },
+      css: {},
+      errors: [],
+    };
+
+    const built = buildFoundryFragmentRenderInput(FRAGMENT_DOC);
+    const parsed = parseFoundryFragmentRenderOutput(rawPayload, built.componentIndex);
+    const composed = composeDocumentFromFoundryFragments(FRAGMENT_DOC, parsed);
+
+    expect(composed.html).toContain('data-oods-node-id="title-1"');
+    expect(composed.html).toContain('data-oods-node-id="cta-1"');
+    expect(composed.html).toContain('data-oods-node-id="cta-2"');
+  });
+
+  it("does not duplicate the anchor when the fragment already carries one", () => {
+    // The happy path: real Forge fragments DO carry data-oods-node-id. The
+    // wrapper must NOT add a second (which would broadcast a redundant anchor).
+    const rawPayload = {
+      status: "ok",
+      output: { format: "fragments", strict: false },
+      fragments: {
+        "title-1": {
+          nodeId: "title-1",
+          component: "Text",
+          html: '<p data-oods-component="Text" data-oods-node-id="title-1">Title</p>',
+          cssRefs: [],
+        },
+        "cta-1": {
+          nodeId: "cta-1",
+          component: "Button",
+          html: '<button data-oods-component="Button" data-oods-node-id="cta-1">Primary</button>',
+          cssRefs: [],
+        },
+        "cta-2": {
+          nodeId: "cta-2",
+          component: "Button",
+          html: '<button data-oods-component="Button" data-oods-node-id="cta-2">Secondary</button>',
+          cssRefs: [],
+        },
+      },
+      css: {},
+      errors: [],
+    };
+
+    const built = buildFoundryFragmentRenderInput(FRAGMENT_DOC);
+    const parsed = parseFoundryFragmentRenderOutput(rawPayload, built.componentIndex);
+    const composed = composeDocumentFromFoundryFragments(FRAGMENT_DOC, parsed);
+
+    expect((composed.html.match(/data-oods-node-id="title-1"/g) ?? []).length).toBe(1);
+    expect((composed.html.match(/data-oods-node-id="cta-1"/g) ?? []).length).toBe(1);
+  });
 });

@@ -169,31 +169,63 @@ const renderStackEnhancement: FragmentEnhancer = (props) => {
   return `<div data-fragment-enhanced="true" data-enhancer="Stack" style="display:flex;flex-direction:${direction};gap:var(--ref-space-stack-compact,12px);">${itemMarkup}</div>`;
 };
 
+// Props that commonly carry a component's human-readable copy, in priority
+// order. The generic fallback surfaces the FIRST non-empty one as text rather
+// than dumping every prop as `key: value` rows — that dump reads as a metadata
+// listing, not a rendered component (the s20-m09 bug: a heading showed as
+// "text / content: … / variant: heading"). Fires only when Forge returned an
+// empty shell, typically because the agent used an unknown prop name.
+const CONTENT_PROP_KEYS = [
+  "text",
+  "content",
+  "value",
+  "label",
+  "title",
+  "heading",
+  "message",
+  "body",
+  "caption",
+  "description",
+  "placeholder",
+];
+
+// Like firstProp, but ONLY strings and finite numbers count as copy: a boolean
+// content prop (e.g. {text:false}) must not render the word "false" — it falls
+// through to the unrenderable affordance. (0 is legitimate copy and renders.)
+const firstRenderableCopy = (
+  props: Record<string, unknown>,
+  keys: string[],
+): string => {
+  for (const key of keys) {
+    const raw = props[key];
+    if (typeof raw === "string" && raw.trim()) {
+      return raw.trim();
+    }
+    if (typeof raw === "number" && Number.isFinite(raw)) {
+      return String(raw);
+    }
+  }
+  return "";
+};
+
 const renderGenericEnhancement = (
   componentType: string,
   props: Record<string, unknown>,
 ): string => {
-  const entries = Object.entries(props)
-    .map(([key, value]) => [key, toDisplayValue(value)] as const)
-    .filter(([, value]) => value.length > 0)
-    .slice(0, 4);
+  const content = firstRenderableCopy(props, CONTENT_PROP_KEYS);
+  if (content) {
+    // Sane minimal render: show the copy the agent supplied.
+    return `<div data-fragment-enhanced="true" data-enhancer="Generic" style="${baseBodyStyle}">${escapeHtml(
+      content,
+    )}</div>`;
+  }
 
-  const rows =
-    entries.length > 0
-      ? entries
-          .map(
-            ([key, value]) =>
-              `<div style="display:flex;gap:6px;align-items:baseline;"><span style="font-size:var(--ref-typography-sizes-xs,12px);color:var(--ref-color-neutral-600,#475569);">${escapeHtml(
-                key,
-              )}:</span><span style="${baseBodyStyle}">${escapeHtml(value)}</span></div>`,
-          )
-          .join("")
-      : `<div style="${baseBodyStyle}">No mapped content.</div>`;
-
-  return `<div data-fragment-enhanced="true" data-enhancer="Generic" style="display:flex;flex-direction:column;gap:var(--ref-space-stack-compact,12px);">
-    <div style="${baseTitleStyle}">${escapeHtml(componentType)}</div>
-    ${rows}
-  </div>`;
+  // No human-readable prop to show — an explicit, muted "unrenderable" affordance
+  // naming the component, NOT a raw prop dump. The shell keeps its anchor, so the
+  // human can still comment on it.
+  return `<div data-fragment-enhanced="true" data-enhancer="Generic" style="${baseBodyStyle};color:var(--ref-color-neutral-500,#64748b);font-style:italic;">${escapeHtml(
+    componentType || "Component",
+  )} — no preview content</div>`;
 };
 
 const extractTextContent = (value: string): string =>

@@ -64,4 +64,21 @@ describe("ChatWorkbenchShell", () => {
       screen.queryByRole("dialog", { name: "Keyboard shortcuts" })
     ).toBeNull();
   });
+
+  it("pins the workspace to the viewport so chat scroll can't push the canvas off-screen", () => {
+    // s20-m12: on desktop the shell must be a fixed-height container whose
+    // columns scroll internally. jsdom can't measure layout, so this guards the
+    // exact classes that enforce it — removing any reintroduces the page-growth
+    // bug (growing chat pushed the canvas down the page).
+    const { container } = render(<ChatWorkbenchShell />);
+
+    const main = container.querySelector("main");
+    expect(main?.className).toContain("lg:h-screen");
+    expect(main?.className).toContain("lg:overflow-hidden");
+
+    // The columns row must be allowed to shrink below its content height.
+    const columnsRow = main?.querySelector("section");
+    expect(columnsRow?.className).toContain("flex-1");
+    expect(columnsRow?.className).toContain("lg:min-h-0");
+  });
 });

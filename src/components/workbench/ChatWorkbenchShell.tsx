@@ -98,9 +98,12 @@ export const ChatWorkbenchShell = () => {
   }, [showNotice]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0c0f] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#0b0c0f] text-white lg:h-screen">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_at_15%_0%,rgba(95,167,150,0.16),transparent_60%),radial-gradient(900px_at_85%_15%,rgba(214,168,94,0.18),transparent_60%)]" />
-      <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10 sm:px-10">
+      {/* On lg the shell is pinned to the viewport (h-screen + overflow-hidden) so
+          the columns scroll INTERNALLY — growing chat can't push the canvas down
+          the page (s20-m12). Mobile keeps the natural min-h-screen stacking. */}
+      <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10 sm:px-10 lg:h-screen lg:overflow-hidden">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">
@@ -152,7 +155,9 @@ export const ChatWorkbenchShell = () => {
 
         <section
           className={cn(
-            "grid flex-1 gap-6",
+            // lg:min-h-0 lets the columns row shrink below its content height so
+            // each column scrolls internally instead of growing the page.
+            "grid flex-1 gap-6 lg:min-h-0",
             previewVisible ? "lg:grid-cols-[1.1fr_0.9fr]" : "lg:grid-cols-1"
           )}
         >

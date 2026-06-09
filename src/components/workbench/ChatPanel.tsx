@@ -22,7 +22,10 @@ const RuntimeErrorBanner = () => {
 const ChatSurface = () => (
   <div className="flex h-full flex-col gap-4">
     <RuntimeErrorBanner />
-    <div className="flex-1 rounded-3xl border border-white/10 bg-white/5 backdrop-blur">
+    {/* lg:min-h-0 bounds this to the column height so the Thread's own viewport
+        scrolls internally (the composer stays pinned) rather than the message
+        list growing the page (s20-m12). overflow-hidden clips to the rounding. */}
+    <div className="flex-1 rounded-3xl border border-white/10 bg-white/5 backdrop-blur lg:min-h-0 lg:overflow-hidden">
       <Thread />
     </div>
   </div>

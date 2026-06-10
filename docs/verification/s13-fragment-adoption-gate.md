@@ -1,11 +1,11 @@
 # Sprint-13 Fragment Contract Adoption Gate
 
 ## Run Metadata
-- Date: 2026-02-26
+- Date: 2026-06-10
 - Foundry endpoint: `http://127.0.0.1:4466/run`
 - Live probes required: yes
 - Live probes executed: yes
-- Gate decision: **CONDITIONAL GO**
+- Gate decision: **GO**
 
 ## Contract Harness Results
 
@@ -15,13 +15,13 @@
 | recorded-fragments-partial-isolated | fixture | PASS | isolated | 1 | 1 | none |
 | recorded-fragments-success | fixture | PASS | none | 2 | 0 | none |
 | live-fragments-success | live | PASS | none | 2 | 0 | none |
-| live-fragments-isolation-probe | live | PASS | global-failure | 0 | 1 | none |
+| live-fragments-isolation-probe | live | PASS | isolated | 1 | 1 | none |
 | live-fragments-strict-probe | live | PASS | global-failure | 0 | 1 | none |
 
 ## Adapter Switch Guidance
 
-- Fragment isolation probe mode: global-failure
-- Adapter switch may proceed only with component pre-validation enabled before fragment requests.
+- Fragment isolation probe mode: isolated
+- Adapter switch can proceed once feature-flag rollout controls are in place.
 
 ## Notes
 

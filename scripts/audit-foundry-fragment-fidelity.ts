@@ -500,7 +500,7 @@ const renderComponentProbe = async (
   while (attempt < maxAttempts) {
     attempt += 1;
     try {
-      const result = await callBridgeTool<RenderResult>("repl.render", input);
+      const result = await callBridgeTool<RenderResult>("repl", { action: "render", ...input });
       const fragments =
         isRecord(result.fragments) ? (result.fragments as Record<string, FragmentEntry>) : {};
       const fragment = fragments[nodeId] ?? Object.values(fragments)[0];
@@ -598,7 +598,7 @@ const runCardVariant = async (
   } as const;
 
   try {
-    const result = await callBridgeTool<RenderResult>("repl.render", input);
+    const result = await callBridgeTool<RenderResult>("repl", { action: "render", ...input });
     const fragments =
       isRecord(result.fragments) ? (result.fragments as Record<string, FragmentEntry>) : {};
     const fragment = fragments[nodeId] ?? Object.values(fragments)[0];

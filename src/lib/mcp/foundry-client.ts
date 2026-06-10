@@ -724,10 +724,10 @@ export const createFoundryMcpClient = (
       return addBreadcrumb(
         () =>
           retryWithBackoff(async () => {
-            const payload = await callTool<unknown>(
-              "repl.render",
-              normalizeReplToolArgs(schema, { defaultApply: true })
-            );
+            const payload = await callTool<unknown>("repl", {
+              action: "render",
+              ...normalizeReplToolArgs(schema, { defaultApply: true }),
+            });
             return normalizeRenderOutput(payload);
           }, retryOptions),
         "rendering design schema via Foundry"
@@ -737,10 +737,10 @@ export const createFoundryMcpClient = (
       return addBreadcrumb(
         () =>
           retryWithBackoff(async () => {
-            const payload = await callTool<unknown>(
-              "repl.validate",
-              normalizeReplToolArgs(schema)
-            );
+            const payload = await callTool<unknown>("repl", {
+              action: "validate",
+              ...normalizeReplToolArgs(schema),
+            });
             return normalizeValidateOutput(payload);
           }, retryOptions),
         "validating design schema via Foundry"

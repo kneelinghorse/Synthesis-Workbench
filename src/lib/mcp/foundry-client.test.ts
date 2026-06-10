@@ -64,8 +64,8 @@ describe("foundry MCP client", () => {
     expect(fetchSpy.mock.calls[0]?.[0]).toBe("http://foundry.test/mcp");
     expect(requestBody.method).toBe("tools.call");
     expect(requestBody.params).toMatchObject({
-      name: "repl.render",
-      arguments: { mode: "full", apply: true, schema: { type: "component" } },
+      name: "repl",
+      arguments: { action: "render", mode: "full", apply: true, schema: { type: "component" } },
     });
   });
 
@@ -95,8 +95,8 @@ describe("foundry MCP client", () => {
     ) as Record<string, unknown>;
     expect(fetchSpy.mock.calls[0]?.[0]).toBe("http://foundry.test/run");
     expect(requestBody).toEqual({
-      tool: "repl.render",
-      input: { mode: "full", apply: true, schema: { type: "component" } },
+      tool: "repl",
+      input: { action: "render", mode: "full", apply: true, schema: { type: "component" } },
     });
   });
 
@@ -128,8 +128,9 @@ describe("foundry MCP client", () => {
       String(fetchSpy.mock.calls[0]?.[1]?.body ?? "{}")
     ) as Record<string, unknown>;
     expect(requestBody).toEqual({
-      tool: "repl.render",
+      tool: "repl",
       input: {
+        action: "render",
         mode: "full",
         apply: true,
         schema: {
@@ -170,8 +171,9 @@ describe("foundry MCP client", () => {
       String(fetchSpy.mock.calls[0]?.[1]?.body ?? "{}")
     ) as Record<string, unknown>;
     expect(requestBody).toEqual({
-      tool: "repl.render",
+      tool: "repl",
       input: {
+        action: "render",
         mode: "full",
         apply: false,
         schema: {
@@ -253,8 +255,9 @@ describe("foundry MCP client", () => {
       String(fetchSpy.mock.calls[0]?.[1]?.body ?? "{}")
     ) as Record<string, unknown>;
     expect(requestBody).toEqual({
-      tool: "repl.render",
+      tool: "repl",
       input: {
+        action: "render",
         mode: "full",
         apply: true,
         output: {
@@ -360,8 +363,8 @@ describe("foundry MCP client", () => {
       String(fetchSpy.mock.calls[0]?.[1]?.body ?? "{}")
     ) as Record<string, unknown>;
     expect(requestBody).toEqual({
-      tool: "repl.validate",
-      input: { mode: "full", schema: { type: "component" } },
+      tool: "repl",
+      input: { action: "validate", mode: "full", schema: { type: "component" } },
     });
   });
 

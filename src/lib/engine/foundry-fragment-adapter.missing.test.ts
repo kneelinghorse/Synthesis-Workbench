@@ -3,8 +3,8 @@ import {
   buildFoundryFragmentRenderInput,
   composeDocumentFromFoundryFragments,
   parseFoundryFragmentRenderOutput,
-} from "./src/lib/engine/foundry-fragment-adapter";
-import type { DesignDocument } from "./src/types/document-model";
+} from "./foundry-fragment-adapter";
+import type { DesignDocument } from "../../types/document-model";
 
 const TEST_DOC: DesignDocument = {
   metadata: { title: "Test doc" },
@@ -51,7 +51,7 @@ describe("missing fragment scenario", () => {
 
     // Should have error recorded
     expect(composed.errors.length).toBeGreaterThan(0);
-    
+
     // The missing comp-2 should have a clickable anchor
     expect(composed.html).toContain('data-oods-node-id="comp-2"');
     expect(composed.html).toContain('data-component-error="true"');

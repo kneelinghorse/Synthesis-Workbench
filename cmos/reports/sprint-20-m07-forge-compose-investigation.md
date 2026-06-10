@@ -72,11 +72,11 @@ Verified twice:
 - **Adapter option (b)** (`src/lib/engine/foundry-fragment-adapter.ts` + `ComponentNode`): add `meta?:{ label?:string }` to `ComponentNode`, persisted from Forge's composed `meta.label` (the slot name), replacing the s20-m06 `props.label/title` stopgap (decision 115). The adapter already forwards a child `meta.label` to Forge (line ~286); make it round-trip the durable slot name on ingest.
 - **Low-confidence slots** are a natural review-surface signal: `design_compose` returns per-slot `confidence` + `reviewHint`, and `repl_render` has `output.showConfidence` → `data-oods-confidence` / `oods-low-confidence`. Consider surfacing these as review affordances (ties into the reframe).
 
-## 6. Open questions for Derek (before/at m07 start)
+## 6. Decisions + remaining gates
 
-1. **What does "regenerate via Forge" mean operationally** — seed-then-iterate (recommended, §4) or per-turn recompose (lossy)? This decides the whole mission shape.
-2. If content-preserving recompose is wanted, is that a **Workbench merge** or a **Forge cross-project ask**?
-3. Wait for **Forge sprint-106 m01** ping before relying on the hardened label-durability contract (the shape is already observable; the guarantee isn't formal yet).
+1. **DECIDED 2026-06-09 (Derek): Option B = seed-then-iterate.** "Regenerate via headless Forge" means **seed the initial document via `design_compose` (real Forge structure + durable slot labels), then iterate LOCALLY** with the existing `patch_node`/`set_document` (preserving the human's content + ids). It is **not** a per-turn recompose-from-intent (which `design_compose`'s lossy scaffold would make destructive). Forge compose is invoked for an explicit structural/from-scratch regeneration, accepted as a reset. → The m07 build does **not** need a content-preserving recompose; it needs (a) the `FoundryMcpClient.compose` seed path, (b) ingesting the composed schema with `meta.label` (adapter option (b)), and (c) the entity-slot anchor model (§5).
+2. **Not pursued now:** a content-preserving recompose (re-pick layout/components while keeping copy) — would be a Workbench-owned merge or a new Forge capability. Out of scope for m07 unless Derek revisits.
+3. **Remaining gate:** wait for the **Forge sprint-106 m01** ping before relying on the *hardened* label-durability contract (the shape is already observable; the formal guarantee isn't landed yet — empty inbox at investigation time).
 
 ---
 

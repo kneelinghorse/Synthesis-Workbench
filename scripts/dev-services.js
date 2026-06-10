@@ -133,8 +133,9 @@ const isFoundryRunHealthy = async () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        tool: "repl.render",
+        tool: "repl",
         input: {
+          action: "render",
           mode: "full",
           apply: false,
           schema: {

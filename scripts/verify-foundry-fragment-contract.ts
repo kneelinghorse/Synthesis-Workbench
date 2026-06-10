@@ -145,16 +145,16 @@ const callReplRenderRaw = async (
   const body =
     endpoint.transport === "bridge"
       ? {
-          tool: "repl.render",
-          input,
+          tool: "repl",
+          input: { action: "render", ...input },
         }
       : {
           jsonrpc: "2.0",
           id: `fragment-harness-${Date.now()}`,
           method: "tools.call",
           params: {
-            name: "repl.render",
-            arguments: input,
+            name: "repl",
+            arguments: { action: "render", ...input },
           },
         };
 

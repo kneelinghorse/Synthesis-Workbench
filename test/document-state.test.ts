@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useDocumentStateStore } from "../src/lib/stores/document-state";
 import type { DesignDocument } from "../src/types/document-model";
+import { isLayoutNode } from "../src/types/document-model";
 import type { CompositionError } from "../src/lib/engine/composition-renderer";
 
 // ============================================================================
@@ -195,10 +196,8 @@ describe("document-state store", () => {
       expect(getState().revision).toBe(2);
       expect(getState().compositionStatus).toBe("idle");
       expect(getState().compositionErrors).toEqual([]);
-      expect(
-        getState().document?.root.nodeType === "layout" &&
-          getState().document.root.children
-      ).toEqual([]);
+      const root = getState().document?.root;
+      expect(root && isLayoutNode(root) && root.children).toEqual([]);
     });
 
     it("is a no-op when no document is loaded", () => {

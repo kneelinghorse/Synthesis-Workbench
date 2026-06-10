@@ -144,6 +144,46 @@ const DASHBOARD_DOC: DesignDocument = {
   },
 };
 
+const SLOT_LABEL_DOC: DesignDocument = {
+  metadata: { title: "Slot label doc", version: "1.0" },
+  root: {
+    nodeType: "layout",
+    layout: { type: "stack", gap: 16 },
+    children: [
+      {
+        nodeType: "component",
+        id: "slot-save",
+        ref: "oods:Button",
+        props: { label: "Save" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-card",
+        ref: "oods:Card",
+        props: { title: "Revenue", value: "$42k" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-both",
+        ref: "oods:Button",
+        props: { label: "Confirm", title: "Submit the form" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-bound",
+        ref: "oods:Button",
+        props: { label: "$data.cta.text" },
+      },
+      {
+        nodeType: "component",
+        id: "slot-none",
+        ref: "oods:Text",
+        props: { text: "No anchor name" },
+      },
+    ],
+  },
+};
+
 describe("foundry fragment adapter", () => {
   it("builds a single-screen fragment request with component children", () => {
     const built = buildFoundryFragmentRenderInput(FRAGMENT_DOC, {
@@ -181,6 +221,50 @@ describe("foundry fragment adapter", () => {
       "title-1",
       "cta-1",
       "cta-2",
+    ]);
+  });
+
+  it("forwards a stable slot label (raw label/title) as child meta.label", () => {
+    // meta.label drives Forge's data-oods-label slot anchor (verified live:
+    // child meta.label -> data-oods-label on the rendered element). The comment
+    // layer (s20-m03) pins slot-kind anchors to it, so the anchor must be the
+    // RAW prop, not the binding-resolved value: slot-bound keeps its
+    // "$data.cta.text" anchor even though the visible prop resolves to "Buy
+    // now". label wins over title; absent => no meta so Forge omits the anchor.
+    const built = buildFoundryFragmentRenderInput(SLOT_LABEL_DOC, {
+      dataContext: { cta: { text: "Buy now" } },
+    });
+
+    expect(built.renderInput.schema.screens[0].children).toEqual([
+      {
+        id: "slot-save",
+        component: "Button",
+        props: { label: "Save" },
+        meta: { label: "Save" },
+      },
+      {
+        id: "slot-card",
+        component: "Card",
+        props: { title: "Revenue", value: "$42k" },
+        meta: { label: "Revenue" },
+      },
+      {
+        id: "slot-both",
+        component: "Button",
+        props: { label: "Confirm", title: "Submit the form" },
+        meta: { label: "Confirm" },
+      },
+      {
+        id: "slot-bound",
+        component: "Button",
+        props: { label: "Buy now" },
+        meta: { label: "$data.cta.text" },
+      },
+      {
+        id: "slot-none",
+        component: "Text",
+        props: { text: "No anchor name" },
+      },
     ]);
   });
 
@@ -386,5 +470,84 @@ describe("foundry fragment adapter", () => {
     expect(composed.html).not.toMatch(
       /<article[^>]*data-oods-component="Card"[^>]*><\/article>/,
     );
+  });
+
+  it("guarantees a clickable Forge anchor for a component whose fragment has none", () => {
+    // Clickability (s20-m09): the comment layer selects via
+    // closest("[data-oods-node-id]"). A fragment Forge returns WITHOUT an anchor
+    // (here the mock <p>/<button> carry only data-oods-component) must still be
+    // commentable — the wrapper supplies a fallback data-oods-node-id = node id.
+    const rawPayload = {
+      status: "ok",
+      output: { format: "fragments", strict: false },
+      fragments: {
+        "title-1": {
+          nodeId: "title-1",
+          component: "Text",
+          html: '<p data-oods-component="Text">Title</p>',
+          cssRefs: [],
+        },
+        "cta-1": {
+          nodeId: "cta-1",
+          component: "Button",
+          html: '<button data-oods-component="Button">Primary</button>',
+          cssRefs: [],
+        },
+        "cta-2": {
+          nodeId: "cta-2",
+          component: "Button",
+          html: '<button data-oods-component="Button">Secondary</button>',
+          cssRefs: [],
+        },
+      },
+      css: {},
+      errors: [],
+    };
+
+    const built = buildFoundryFragmentRenderInput(FRAGMENT_DOC);
+    const parsed = parseFoundryFragmentRenderOutput(rawPayload, built.componentIndex);
+    const composed = composeDocumentFromFoundryFragments(FRAGMENT_DOC, parsed);
+
+    expect(composed.html).toContain('data-oods-node-id="title-1"');
+    expect(composed.html).toContain('data-oods-node-id="cta-1"');
+    expect(composed.html).toContain('data-oods-node-id="cta-2"');
+  });
+
+  it("does not duplicate the anchor when the fragment already carries one", () => {
+    // The happy path: real Forge fragments DO carry data-oods-node-id. The
+    // wrapper must NOT add a second (which would broadcast a redundant anchor).
+    const rawPayload = {
+      status: "ok",
+      output: { format: "fragments", strict: false },
+      fragments: {
+        "title-1": {
+          nodeId: "title-1",
+          component: "Text",
+          html: '<p data-oods-component="Text" data-oods-node-id="title-1">Title</p>',
+          cssRefs: [],
+        },
+        "cta-1": {
+          nodeId: "cta-1",
+          component: "Button",
+          html: '<button data-oods-component="Button" data-oods-node-id="cta-1">Primary</button>',
+          cssRefs: [],
+        },
+        "cta-2": {
+          nodeId: "cta-2",
+          component: "Button",
+          html: '<button data-oods-component="Button" data-oods-node-id="cta-2">Secondary</button>',
+          cssRefs: [],
+        },
+      },
+      css: {},
+      errors: [],
+    };
+
+    const built = buildFoundryFragmentRenderInput(FRAGMENT_DOC);
+    const parsed = parseFoundryFragmentRenderOutput(rawPayload, built.componentIndex);
+    const composed = composeDocumentFromFoundryFragments(FRAGMENT_DOC, parsed);
+
+    expect((composed.html.match(/data-oods-node-id="title-1"/g) ?? []).length).toBe(1);
+    expect((composed.html.match(/data-oods-node-id="cta-1"/g) ?? []).length).toBe(1);
   });
 });

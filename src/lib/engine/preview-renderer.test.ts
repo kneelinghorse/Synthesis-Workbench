@@ -188,7 +188,7 @@ describe("preview renderer abstraction", () => {
     expect(renderInput.schema?.screens?.[0]?.children).toHaveLength(2);
   });
 
-  it("falls back to static rendering when fragment pre-validation fails", async () => {
+  it("returns an unavailable preview when fragment pre-validation fails", async () => {
     const client = createClient(undefined, {
       validate: vi.fn(async () => ({
         valid: false,
@@ -205,8 +205,8 @@ describe("preview renderer abstraction", () => {
 
     expect(result.mode).toBe("fragments");
     expect(result.foundryStatus).toBe("dry-run");
-    // Static fallback produces data-static-preview markers
-    expect(result.html).toContain('data-static-preview="true"');
+    // No divergent local render — html is empty; errors are still surfaced.
+    expect(result.html).toBe("");
     expect(result.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -221,7 +221,7 @@ describe("preview renderer abstraction", () => {
     expect((client.render as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
   });
 
-  it("falls back to static rendering when fragment contract check fails", async () => {
+  it("returns an unavailable preview when fragment contract check fails", async () => {
     const client = createClient(async () => ({
       html: "<div>Bad response</div>",
       warnings: [],
@@ -233,7 +233,7 @@ describe("preview renderer abstraction", () => {
 
     expect(result.mode).toBe("fragments");
     expect(result.foundryStatus).toBe("dry-run");
-    expect(result.html).toContain('data-static-preview="true"');
+    expect(result.html).toBe("");
     expect(result.errors.length).toBeGreaterThan(0);
   });
 

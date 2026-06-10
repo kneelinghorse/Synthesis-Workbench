@@ -20,7 +20,6 @@ import { useDataContextStore } from "@/lib/stores/data-context";
 import { executeSetDocument } from "@/lib/runtime/tools/document-tools";
 import { renderComponent } from "@/lib/runtime/tools/oods-tools";
 import { validateSchema } from "@/lib/runtime/tools/validate-tools";
-import { executeExportDesign } from "@/lib/runtime/tools/export-tools";
 
 // Engine
 import { renderDocument } from "@/lib/engine/composition-renderer";
@@ -134,77 +133,4 @@ describe("Pipeline Integration", () => {
     });
   });
 
-  it("chains bundle load → token seed → document → export in sequence", async () => {
-    const client = createSuccessClient();
-    (getFoundryMcpClient as ReturnType<typeof vi.fn>).mockReturnValue(client);
-
-    // 1. Load bundle and seed tokens
-    useStage1BundleStore.getState().loadBundle(DASHBOARD_BUNDLE);
-    useStage1BundleStore.getState().seedTokenState();
-
-    // 2. Set document
-    await executeSetDocument({
-      requestId: "chain-doc",
-      document: DASHBOARD_DOCUMENT,
-    });
-
-    // 3. Render composition and set preview
-    const composed = await renderDocument(DASHBOARD_DOCUMENT, client);
-    usePreviewStateStore.getState().setHtml(composed.html);
-
-    // 4. Export HTML (reads from stores)
-    const htmlExport = executeExportDesign({
-      requestId: "chain-export-html",
-      format: "html",
-      slug: "dashboard",
-    });
-    expect(htmlExport.exported).toBe(true);
-    expect(htmlExport.format).toBe("html");
-    expect(htmlExport.content).toContain("<!DOCTYPE html>");
-    expect(htmlExport.content).toContain("--colors-primary: #2563eb");
-    expect(htmlExport.content).toContain("Navbar");
-
-    // 5. Export JSON
-    const jsonExport = executeExportDesign({
-      requestId: "chain-export-json",
-      format: "json",
-      slug: "dashboard",
-    });
-    expect(jsonExport.exported).toBe(true);
-    const parsed = JSON.parse(jsonExport.content);
-    expect(parsed.document.metadata.title).toBe("Dashboard");
-    expect(parsed.tokenState.colors.primary).toBe("#2563eb");
-    expect(parsed.exportedAt).toBeDefined();
-
-    // 6. Export YAML
-    const yamlExport = executeExportDesign({
-      requestId: "chain-export-yaml",
-      format: "yaml",
-      slug: "dashboard",
-    });
-    expect(yamlExport.exported).toBe(true);
-    expect(yamlExport.content).toBeTruthy();
-  });
-
-  it("sets data context and verifies it's included in JSON export", async () => {
-    // Set document with inline data
-    await executeSetDocument({
-      requestId: "data-doc",
-      document: DASHBOARD_DOCUMENT,
-      data: { user: { name: "Alice", role: "Admin" } },
-    });
-
-    // Verify data context store was updated
-    const ctx = useDataContextStore.getState().context;
-    expect(ctx.user).toEqual({ name: "Alice", role: "Admin" });
-
-    // Export JSON and verify data context is included
-    const jsonExport = executeExportDesign({
-      requestId: "data-export",
-      format: "json",
-    });
-    expect(jsonExport.exported).toBe(true);
-    const parsed = JSON.parse(jsonExport.content);
-    expect(parsed.dataContext.user).toEqual({ name: "Alice", role: "Admin" });
-  });
 });

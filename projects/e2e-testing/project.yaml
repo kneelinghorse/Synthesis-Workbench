@@ -1,0 +1,11 @@
+schemaVersion: 1.0.0
+metadata:
+  name: E2E_testing
+  slug: e2e-testing
+  createdAt: '2026-02-28T02:25:05.520Z'
+  updatedAt: '2026-02-28T02:25:05.520Z'
+relationships:
+  designs: []
+  tokensFile: state/tokens.yaml
+  bundleFile: state/bundle.yaml
+  dataContextsFile: state/data-contexts.yaml

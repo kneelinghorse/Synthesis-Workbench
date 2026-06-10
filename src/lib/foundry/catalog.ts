@@ -52,6 +52,15 @@ export const WORKBENCH_S44_COMPONENTS = [
 ] as const;
 const WORKBENCH_S44_COMPONENT_SET = new Set<string>(WORKBENCH_S44_COMPONENTS);
 
+// Forge silently drops props it doesn't recognise and renders the component as
+// an EMPTY shell (verified: Text with `text` renders its copy; Text with
+// `content`/`variant` renders empty with the props echoed as data-prop-*). The
+// catalog's live propSchema is empty for these primitives, so without this hint
+// the agent invents prop names and the element renders blank (s20-m09). Keep it
+// grounded — only state what's verified against the live renderer.
+const PRIMITIVE_PROP_GUIDANCE =
+  "Prop contract: a component's visible copy goes in its content prop — Text uses `text` (a string). Props Forge does not recognise are silently dropped and the component renders EMPTY, so never invent props like `content` or `variant`; use the prop names shown above.";
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -191,6 +200,7 @@ export const formatFoundryCatalogForPrompt = (
     lines.push(
       `Workbench composition constraint: use only these refs -> ${WORKBENCH_S44_COMPONENTS.map((name) => `oods:${name}`).join(", ")}`
     );
+    lines.push(PRIMITIVE_PROP_GUIDANCE);
     lines.push("");
   }
   lines.push(
@@ -352,6 +362,7 @@ const formatFallbackCatalogForPrompt = (
     lines.push(
       `Workbench composition constraint: use only these refs -> ${WORKBENCH_S44_COMPONENTS.map((name) => `oods:${name}`).join(", ")}`
     );
+    lines.push(PRIMITIVE_PROP_GUIDANCE);
     lines.push("");
   }
   lines.push(

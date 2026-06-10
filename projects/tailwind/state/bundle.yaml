@@ -1,0 +1,237 @@
+sourceRun:
+  runId: c8f2b671-61e1-4573-a334-9a04cdc5b22d
+  hostname: derekn.com
+  capturedAt: '2026-02-27T17:25:04.384Z'
+  manifestPath: >-
+    /Users/systemsystems/portfolio/Design-Tools/Stage1/packages/mcp-bridge/out/stage1/derekn.com/c8f2b671-61e1-4573-a334-9a04cdc5b22d/manifest.json
+  bundlePath: >-
+    /Users/systemsystems/portfolio/Design-Tools/Stage1/packages/mcp-bridge/out/stage1/derekn.com/c8f2b671-61e1-4573-a334-9a04cdc5b22d
+  associatedAt: '2026-02-28T02:26:08.001Z'
+bundle:
+  manifest:
+    schema_version: null
+    content:
+      run_id: c8f2b671-61e1-4573-a334-9a04cdc5b22d
+      mode: app
+      targets:
+        - name: derekn.com
+          url: https://derekn.com/
+      project_id: stage1-derekn.com-2026-02-27
+      auth:
+        type: none
+        redaction:
+          applied: false
+          rules: []
+      passes:
+        - id: web.crawl
+          version: 1.0.0
+          cache_key: error
+          status: failed
+          ms: 2013
+        - id: web.network_trace
+          version: 1.0.0
+          cache_key: web.network_trace-v1-https://derekn.com/
+          status: ok
+          ms: 968
+        - id: a11y.scan
+          version: 1.0.0
+          cache_key: a11y.scan-v1-https://derekn.com/
+          status: ok
+          ms: 1521
+        - id: perf.scan
+          version: 1.0.0
+          cache_key: perf.scan-v1-https://derekn.com/-desktop-5
+          status: ok
+          ms: 7110
+        - id: web.computed_styles
+          version: 1.0.0
+          cache_key: web.computed_styles-v1-https://derekn.com/
+          status: ok
+          ms: 419
+        - id: style.fingerprint
+          version: 1.0.0
+          cache_key: style.fingerprint-v1-https://derekn.com/
+          status: ok
+          ms: 3
+        - id: ia.outline
+          version: 1.0.0
+          cache_key: error
+          status: failed
+          ms: 0
+        - id: app.profile
+          version: 1.0.0
+          cache_key: error
+          status: failed
+          ms: 1
+      inputs:
+        perf:
+          preset: desktop
+          pages:
+            - route: /
+              url: https://derekn.com/
+              performance_score: 0.91
+              metrics:
+                fcp_ms: 1748
+                lcp_ms: 3345
+                cls: 0
+                tbt_ms: 0
+                speed_index_ms: 1748
+                interactive_ms: 1748
+              top_opportunities:
+                - id: render-blocking-resources
+                  title: Eliminate render-blocking resources
+                  savings_ms: 180
+                - id: unused-javascript
+                  title: Reduce unused JavaScript
+                  savings_ms: 150
+                - id: server-response-time
+                  title: Initial server response time was short
+                  savings_ms: 43.834
+                - id: redirects
+                  title: Avoid multiple page redirects
+                  savings_ms: 0
+                - id: uses-rel-preload
+                  title: Preload key requests
+                  savings_ms: 0
+                - id: uses-rel-preconnect
+                  title: Preconnect to required origins
+                  savings_ms: 0
+              evidence_ref: evidence/perf/root.json
+          evidence:
+            perf_manifest_path: evidence/perf/perf_manifest.json
+          artifact:
+            perf_report_ref: perf_report.json
+      outputs:
+        evidence_dir: >-
+          /Users/systemsystems/portfolio/Design-Tools/Stage1/packages/mcp-bridge/out/stage1/derekn.com/c8f2b671-61e1-4573-a334-9a04cdc5b22d/evidence
+        artifacts_dir: >-
+          /Users/systemsystems/portfolio/Design-Tools/Stage1/packages/mcp-bridge/out/stage1/derekn.com/c8f2b671-61e1-4573-a334-9a04cdc5b22d/artifacts
+      environment:
+        timestamp: '2026-02-27T17:25:04.384Z'
+        stage: dev
+      hashes: {}
+    generatedAt: '2026-02-27T17:25:04.384Z'
+    mode: app
+    targets:
+      - id: derekn.com
+        name: derekn.com
+  artifacts:
+    - path: style_fingerprint.json
+      type: style_fingerprint.json
+      payload:
+        schema_version: 1.0.0
+        content:
+          kind: style_fingerprint
+          version: 1.0.0
+          generated_at: '2026-02-27T17:25:16.416Z'
+          sample_counts:
+            pages: 2
+            elements: 172
+          type_scale:
+            font_families:
+              - value: Times
+                count: 162
+              - value: Arial
+                count: 10
+            font_sizes:
+              - px: 13.33
+                min: 13.33
+                max: 13.33
+                count: 10
+                token: true
+              - px: 16
+                min: 16
+                max: 16
+                count: 154
+                token: true
+              - px: 18.72
+                min: 18.72
+                max: 18.72
+                count: 6
+                token: true
+              - px: 64
+                min: 64
+                max: 64
+                count: 2
+                token: false
+            line_heights:
+              - px: 70.4
+                min: 70.4
+                max: 70.4
+                count: 2
+                token: false
+          spacing_scale:
+            padding:
+              - px: 0
+                min: 0
+                max: 1
+                count: 680
+                token: true
+              - px: 6
+                min: 6
+                max: 6
+                count: 8
+                token: true
+            margin:
+              - px: 0
+                min: 0
+                max: 0
+                count: 638
+                token: true
+              - px: 8
+                min: 8
+                max: 8
+                count: 8
+                token: true
+              - px: 10.72
+                min: 10.72
+                max: 10.72
+                count: 1
+                token: false
+              - px: 13.28
+                min: 13.28
+                max: 13.28
+                count: 6
+                token: true
+              - px: 16
+                min: 16
+                max: 16
+                count: 25
+                token: true
+              - px: 18.72
+                min: 18.72
+                max: 18.72
+                count: 6
+                token: true
+              - px: 42.88
+                min: 42.88
+                max: 42.88
+                count: 2
+                token: false
+              - px: 232
+                min: 232
+                max: 232
+                count: 2
+                token: false
+          colors:
+            text:
+              - value: '#000000'
+                count: 109
+                token: true
+              - value: '#0000ee'
+                count: 63
+                token: true
+            background:
+              - value: '#00000000'
+                count: 168
+                token: true
+              - value: '#efefef'
+                count: 4
+                token: true
+          radii:
+            - px: 0
+              min: 0
+              max: 0
+              count: 688
+              token: true
+updatedAt: '2026-02-28T02:26:08.001Z'

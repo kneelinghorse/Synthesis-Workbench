@@ -25,7 +25,8 @@ const buildPreviewInjectScript = () => {
   // allow-same-origin).  The iframe's origin is opaque ("null"), so there is
   // no meaningful origin to resolve.  Using "*" is safe because:
   //   1. The parent controls 100% of this iframe's content (srcDoc).
-  //   2. The only messages sent are PREVIEW_READY — no secrets.
+  //   2. Messages carry only preview content the parent already owns
+  //      (readiness pings, clicked-anchor metadata, element rects) — no secrets.
   const postToParent = (payload) => {
     if (!window.parent) return;
     window.parent.postMessage(payload, "*");
@@ -120,7 +121,93 @@ const buildPreviewInjectScript = () => {
     const target = document.querySelector(payload.target);
     if (!target) return;
     target.innerHTML = typeof payload.html === "string" ? payload.html : "";
+    // The subtree was replaced — anchor rects are now stale; re-broadcast.
+    scheduleAnchorBroadcast();
   };
+
+  // ---- Comment-layer anchor bridge (iframe -> parent) ------------------------
+  // The parent cannot read this sandboxed iframe's DOM, so the iframe is the
+  // sole source of truth for anchor positions and selection.
+  const ANCHOR_SELECTOR = "[data-oods-node-id],[data-oods-label]";
+
+  const readRect = (el) => {
+    const r = el.getBoundingClientRect();
+    return { top: r.top, left: r.left, width: r.width, height: r.height };
+  };
+
+  const readAnchor = (el) => ({
+    nodeId: el.getAttribute("data-oods-node-id"),
+    label: el.getAttribute("data-oods-label"),
+  });
+
+  const collectAnchors = () => {
+    const anchors = [];
+    document.querySelectorAll(ANCHOR_SELECTOR).forEach((el) => {
+      anchors.push({
+        nodeId: readAnchor(el).nodeId,
+        label: readAnchor(el).label,
+        rect: readRect(el),
+      });
+    });
+    return anchors;
+  };
+
+  let anchorFrame = null;
+  let lastAnchorsJson = "";
+  const broadcastAnchors = () => {
+    anchorFrame = null;
+    const anchors = collectAnchors();
+    // Skip redundant broadcasts (resize / RAF ticks with no actual movement) to
+    // avoid churning the parent. During a scroll the rects genuinely change each
+    // frame, so live pin tracking stays smooth — we deliberately do NOT
+    // time-throttle (that would lag the pins behind the content).
+    const json = JSON.stringify(anchors);
+    if (json === lastAnchorsJson) {
+      return;
+    }
+    lastAnchorsJson = json;
+    postToParent({
+      source: SOURCE,
+      type: TYPES.PREVIEW_ANCHORS,
+      payload: { anchors },
+    });
+  };
+  const scheduleAnchorBroadcast = () => {
+    if (anchorFrame !== null) return;
+    anchorFrame = requestAnimationFrame(broadcastAnchors);
+  };
+
+  // CAPTURE-phase, document-level delegation is MANDATORY: COMPONENT_UPDATE
+  // replaces #preview-root via innerHTML (destroying any element-level
+  // listeners). Delegating on document — which is never replaced — survives.
+  document.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target;
+      if (!target || typeof target.closest !== "function") return;
+      const anchorEl = target.closest(ANCHOR_SELECTOR);
+      if (!anchorEl) return;
+      const text = (anchorEl.textContent || "").trim().slice(0, 200);
+      postToParent({
+        source: SOURCE,
+        type: TYPES.PREVIEW_SELECTION,
+        payload: {
+          nodeId: readAnchor(anchorEl).nodeId,
+          label: readAnchor(anchorEl).label,
+          rect: readRect(anchorEl),
+          text,
+        },
+      });
+    },
+    true
+  );
+
+  window.addEventListener("scroll", scheduleAnchorBroadcast, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener("resize", scheduleAnchorBroadcast);
+  // ---------------------------------------------------------------------------
 
   const applyDataContext = (payload) => {
     const nextContext =
@@ -162,10 +249,15 @@ const buildPreviewInjectScript = () => {
     }
   });
 
-  if (document.readyState === "complete" || document.readyState === "interactive") {
+  const startPreview = () => {
     startReadyPings();
+    scheduleAnchorBroadcast();
+  };
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    startPreview();
   } else {
-    window.addEventListener("DOMContentLoaded", startReadyPings, { once: true });
+    window.addEventListener("DOMContentLoaded", startPreview, { once: true });
   }
 })();
 </script>

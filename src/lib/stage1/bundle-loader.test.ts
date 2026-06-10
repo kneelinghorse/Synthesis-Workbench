@@ -1,19 +1,30 @@
 import { describe, expect, it } from "vitest";
 
-import type { Stage1McpClient, Stage1RunSummary } from "@/lib/mcp/stage1-client";
+import type {
+  Stage1InspectionResult,
+  Stage1McpClient,
+  Stage1RunSummary,
+} from "@/lib/mcp/stage1-client";
+import type { Stage1BundleArtifactPayload } from "@/types/stage1-bundle";
 import { buildStage1BundleFromRun } from "./bundle-loader";
+
+const notImplemented = async (): Promise<Stage1InspectionResult> => {
+  throw new Error("not implemented in test");
+};
 
 const createMockClient = (
   resolver: (artifactName: string) => unknown
 ): Stage1McpClient => ({
   listRuns: async () => [],
-  getArtifact: async (_runDir, artifactName) => {
+  getArtifact: async <T = unknown>(_runDir: string, artifactName: string) => {
     const result = resolver(artifactName);
     if (result instanceof Error) {
       throw result;
     }
-    return result;
+    return result as T;
   },
+  inspectApp: notImplemented,
+  inspectSurface: notImplemented,
 });
 
 describe("buildStage1BundleFromRun", () => {
@@ -54,9 +65,11 @@ describe("buildStage1BundleFromRun", () => {
 
     expect(bundle.manifest.contractVersion).toBe("1.0.0");
     expect(bundle.artifacts).toHaveLength(2);
-    expect(bundle.artifacts?.map((a) => a.type)).toEqual(
-      expect.arrayContaining(["style_fingerprint", "token_guess"])
-    );
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.map(
+        (a: Stage1BundleArtifactPayload) => a.type
+      )
+    ).toEqual(expect.arrayContaining(["style_fingerprint", "token_guess"]));
   });
 
   it("excludes unknown artifact types when type-based resolution is used", async () => {
@@ -87,7 +100,9 @@ describe("buildStage1BundleFromRun", () => {
 
     const bundle = await buildStage1BundleFromRun(run, client);
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.type).toBe("style_fingerprint");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.type
+    ).toBe("style_fingerprint");
   });
 
   it("falls back to regex matching when no type fields are present", async () => {
@@ -116,7 +131,9 @@ describe("buildStage1BundleFromRun", () => {
 
     const bundle = await buildStage1BundleFromRun(run, client);
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.path).toBe("style_fingerprint.json");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.path
+    ).toBe("style_fingerprint.json");
   });
 
   it("falls back to standard artifacts when report-index is missing", async () => {
@@ -146,7 +163,9 @@ describe("buildStage1BundleFromRun", () => {
     const bundle = await buildStage1BundleFromRun(run, client);
 
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.path).toBe("style_fingerprint.json");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.path
+    ).toBe("style_fingerprint.json");
   });
 
   it("extracts projectId from manifest", async () => {
@@ -268,10 +287,14 @@ describe("buildStage1BundleFromRun", () => {
     const bundle = await buildStage1BundleFromRun(run, client);
 
     expect(bundle.artifacts).toHaveLength(2);
-    expect(bundle.artifacts?.map((a) => a.type)).toEqual(
-      expect.arrayContaining(["token_guess", "component_clusters"])
-    );
-    expect(bundle.artifacts?.[0]?.path).toContain("app.example.com");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.map(
+        (a: Stage1BundleArtifactPayload) => a.type
+      )
+    ).toEqual(expect.arrayContaining(["token_guess", "component_clusters"]));
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.path
+    ).toContain("app.example.com");
   });
 
   it("matches multi-target artifacts when report-index uses id/url fields", async () => {
@@ -315,8 +338,12 @@ describe("buildStage1BundleFromRun", () => {
 
     const bundle = await buildStage1BundleFromRun(run, client);
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.type).toBe("token_guess");
-    expect(bundle.artifacts?.[0]?.path).toContain("app.example.com");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.type
+    ).toBe("token_guess");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.path
+    ).toContain("app.example.com");
   });
 
   it("ignores non-matching target in multi-target mode", async () => {
@@ -352,7 +379,9 @@ describe("buildStage1BundleFromRun", () => {
     const bundle = await buildStage1BundleFromRun(run, client);
     // No matching target and no top-level artifacts → falls back to direct paths
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.path).toBe("style_fingerprint.json");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.path
+    ).toBe("style_fingerprint.json");
   });
 
   it("tries alternate report-index candidates when primary candidate returns text missing response", async () => {
@@ -389,7 +418,9 @@ describe("buildStage1BundleFromRun", () => {
 
     const bundle = await buildStage1BundleFromRun(run, client);
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.type).toBe("token_guess");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.type
+    ).toBe("token_guess");
   });
 
   it("falls back cleanly when report-index fields have unexpected shapes", async () => {
@@ -417,7 +448,9 @@ describe("buildStage1BundleFromRun", () => {
 
     const bundle = await buildStage1BundleFromRun(run, client);
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.path).toBe("style_fingerprint.json");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.path
+    ).toBe("style_fingerprint.json");
   });
 
   it("returns a manifest-only bundle when no artifacts can be resolved", async () => {
@@ -489,9 +522,9 @@ describe("buildStage1BundleFromRun", () => {
 
     const client: Stage1McpClient = {
       listRuns: async () => [],
-      getArtifact: async (_runDir, artifactName) => {
+      getArtifact: async <T = unknown>(_runDir: string, artifactName: string) => {
         if (artifactName === "manifest.json") {
-          return { contractVersion: "1.0.0" };
+          return { contractVersion: "1.0.0" } as T;
         }
         if (artifactName === "report-index.json") {
           return {
@@ -499,21 +532,25 @@ describe("buildStage1BundleFromRun", () => {
               { type: "token_guess", path: "token-guess.json" },
               { type: "style_fingerprint", path: "style_fingerprint.json" },
             ],
-          };
+          } as T;
         }
         if (artifactName === "token-guess.json") {
           throw { message: "artifact missing: token-guess.json" };
         }
         if (artifactName === "style_fingerprint.json") {
-          return { kind: "style_fingerprint", version: "1.0.0" };
+          return { kind: "style_fingerprint", version: "1.0.0" } as T;
         }
         throw new Error("not found");
       },
+      inspectApp: notImplemented,
+      inspectSurface: notImplemented,
     };
 
     const bundle = await buildStage1BundleFromRun(run, client);
     expect(bundle.artifacts).toHaveLength(1);
-    expect(bundle.artifacts?.[0]?.type).toBe("style_fingerprint");
+    expect(
+      (bundle.artifacts as Stage1BundleArtifactPayload[] | undefined)?.[0]?.type
+    ).toBe("style_fingerprint");
   });
 
   it("throws when runDir is missing", async () => {

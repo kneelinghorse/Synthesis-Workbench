@@ -46,6 +46,19 @@ function createMockClient(
     }),
     validate: vi.fn(async () => ({ errors: [], warnings: [], valid: true, raw: null })),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    fetchStructuredData: vi.fn(async () => ({
+      dataset: 'components' as const,
+      version: null,
+      generatedAt: null,
+      etag: 'mock-etag',
+      matched: false,
+      payloadIncluded: false,
+      path: 'mock/path.json',
+      manifestPath: null,
+      sizeBytes: 0,
+      schemaValidated: false,
+      raw: null,
+    })),
     ...overrides,
   };
 }
@@ -371,7 +384,7 @@ describe('renderDocument - OODS Dispatch', () => {
 
   it('should render all components in parallel (not sequentially)', async () => {
     const renderOrder: string[] = [];
-    let resolvers: Array<() => void> = [];
+    const resolvers: Array<() => void> = [];
 
     const client = createMockClient({
       render: vi.fn((schema: unknown) => {
@@ -653,7 +666,7 @@ describe('renderDocument - Output Structure', () => {
     expect(result.html).toContain('data-component-ref="oods:Button"');
     // The container wraps the rendered HTML
     expect(result.html).toMatch(
-      /data-component-id="solo-btn".*data-component-ref="oods:Button"[^>]*>.*Button rendered/s,
+      /data-component-id="solo-btn"[\s\S]*data-component-ref="oods:Button"[^>]*>[\s\S]*Button rendered/,
     );
   });
 

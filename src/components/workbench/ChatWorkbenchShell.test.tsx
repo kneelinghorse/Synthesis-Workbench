@@ -1,28 +1,18 @@
 /** @vitest-environment jsdom */
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ChatWorkbenchShell } from "./ChatWorkbenchShell";
-import { resetPhaseState, usePhaseStore } from "@/lib/stores/phase-state";
 import { WORKBENCH_COMPOSER_INPUT_ID } from "@/lib/workbench/keyboard-shortcuts";
-
-vi.mock("./ProjectBrowser", () => ({
-  ProjectBrowser: () => <div data-testid="project-browser" />,
-}));
-
-vi.mock("./TemplateBrowser", () => ({
-  TemplateBrowser: () => <div data-testid="template-browser" />,
-}));
-
-vi.mock("./FirstRunOnboarding", () => ({
-  FirstRunOnboarding: () => <div data-testid="first-run-onboarding" />,
-}));
 
 vi.mock("./ChatPanel", () => ({
   ChatPanel: () => (
     <div data-testid="chat-panel">
-      <textarea id={WORKBENCH_COMPOSER_INPUT_ID} aria-label="Workbench composer mock" />
+      <textarea
+        id={WORKBENCH_COMPOSER_INPUT_ID}
+        aria-label="Workbench composer mock"
+      />
     </div>
   ),
 }));
@@ -31,36 +21,13 @@ vi.mock("./PreviewPanel", () => ({
   PreviewPanel: () => <div data-testid="preview-panel" />,
 }));
 
-describe("ChatWorkbenchShell shortcuts", () => {
-  beforeEach(() => {
-    resetPhaseState();
-  });
+vi.mock("./ProjectSwitcher", () => ({
+  ProjectSwitcher: () => <div data-testid="project-switcher" />,
+}));
 
+describe("ChatWorkbenchShell", () => {
   afterEach(() => {
     cleanup();
-  });
-
-  it("steps phases forward and backward from keyboard shortcuts", () => {
-    render(<ChatWorkbenchShell />);
-
-    expect(usePhaseStore.getState().currentPhase).toBe("ingest");
-
-    fireEvent.keyDown(window, { key: "]", metaKey: true });
-    expect(usePhaseStore.getState().currentPhase).toBe("explore");
-
-    fireEvent.keyDown(window, { key: "[", metaKey: true });
-    expect(usePhaseStore.getState().currentPhase).toBe("ingest");
-  });
-
-  it("toggles workflow mode between strict and flexible", () => {
-    render(<ChatWorkbenchShell />);
-    expect(usePhaseStore.getState().workflowMode).toBe("strict");
-
-    fireEvent.click(screen.getByRole("button", { name: "Flexible" }));
-    expect(usePhaseStore.getState().workflowMode).toBe("flexible");
-
-    fireEvent.click(screen.getByRole("button", { name: "Strict" }));
-    expect(usePhaseStore.getState().workflowMode).toBe("strict");
   });
 
   it("toggles preview panel with primary+backslash", () => {
@@ -72,19 +39,6 @@ describe("ChatWorkbenchShell shortcuts", () => {
 
     fireEvent.keyDown(window, { key: "\\", metaKey: true });
     expect(screen.getByTestId("preview-panel")).toBeTruthy();
-  });
-
-  it("injects slash commands into composer with primary+alt shortcuts", () => {
-    render(<ChatWorkbenchShell />);
-    const composer = screen.getByLabelText(
-      "Workbench composer mock"
-    ) as HTMLTextAreaElement;
-
-    fireEvent.keyDown(window, { key: "b", metaKey: true, altKey: true });
-    expect(composer.value).toBe("/bundle");
-
-    fireEvent.keyDown(window, { key: "e", metaKey: true, altKey: true });
-    expect(composer.value).toBe("/export html");
   });
 
   it("opens help with ? and closes with Escape", () => {
@@ -109,5 +63,22 @@ describe("ChatWorkbenchShell shortcuts", () => {
     expect(
       screen.queryByRole("dialog", { name: "Keyboard shortcuts" })
     ).toBeNull();
+  });
+
+  it("pins the workspace to the viewport so chat scroll can't push the canvas off-screen", () => {
+    // s20-m12: on desktop the shell must be a fixed-height container whose
+    // columns scroll internally. jsdom can't measure layout, so this guards the
+    // exact classes that enforce it — removing any reintroduces the page-growth
+    // bug (growing chat pushed the canvas down the page).
+    const { container } = render(<ChatWorkbenchShell />);
+
+    const main = container.querySelector("main");
+    expect(main?.className).toContain("lg:h-screen");
+    expect(main?.className).toContain("lg:overflow-hidden");
+
+    // The columns row must be allowed to shrink below its content height.
+    const columnsRow = main?.querySelector("section");
+    expect(columnsRow?.className).toContain("flex-1");
+    expect(columnsRow?.className).toContain("lg:min-h-0");
   });
 });

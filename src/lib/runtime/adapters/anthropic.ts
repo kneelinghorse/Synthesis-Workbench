@@ -152,7 +152,7 @@ const parseJsonObject = (raw: string): Record<string, unknown> => {
   }
 };
 
-const buildAnthropicMessages = (
+export const buildAnthropicMessages = (
   messages: readonly ThreadMessage[]
 ): BuiltAnthropicMessages => {
   const systemParts: string[] = [];
@@ -236,6 +236,54 @@ const buildAnthropicMessages = (
       });
     }
   });
+
+  // Defensive orphan detection: ensure every tool_use has a matching
+  // tool_result. Orphans can appear when the runtime re-invokes run()
+  // before a tool result is populated, or when interception logic
+  // short-circuits a multi-step chain.
+  for (let i = 0; i < chatMessages.length; i++) {
+    const msg = chatMessages[i];
+    if (msg.role !== "assistant" || typeof msg.content === "string") continue;
+
+    const toolUseIds = (msg.content as AnthropicContentBlock[])
+      .filter(
+        (b): b is AnthropicToolUseContentBlock => b.type === "tool_use"
+      )
+      .map((b) => b.id);
+
+    if (toolUseIds.length === 0) continue;
+
+    const nextMsg = chatMessages[i + 1];
+    const existingResultIds = new Set<string>();
+    if (nextMsg?.role === "user" && Array.isArray(nextMsg.content)) {
+      for (const block of nextMsg.content as AnthropicContentBlock[]) {
+        if (block.type === "tool_result") {
+          existingResultIds.add(block.tool_use_id);
+        }
+      }
+    }
+
+    const orphanIds = toolUseIds.filter((id) => !existingResultIds.has(id));
+    if (orphanIds.length === 0) continue;
+
+    const syntheticResults: AnthropicToolResultContentBlock[] = orphanIds.map(
+      (id) => ({
+        type: "tool_result" as const,
+        tool_use_id: id,
+        content: "[Tool result not available]",
+        is_error: true,
+      })
+    );
+
+    if (nextMsg?.role === "user" && Array.isArray(nextMsg.content)) {
+      (nextMsg.content as AnthropicContentBlock[]).push(...syntheticResults);
+    } else {
+      chatMessages.splice(i + 1, 0, {
+        role: "user",
+        content: syntheticResults,
+      });
+    }
+  }
 
   const system = systemParts.join("\n\n").trim();
   return {

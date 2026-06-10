@@ -7,23 +7,13 @@ import type {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { withToolCommands } from "./withToolCommands";
-import { DEMO_TOOL_NAME } from "@/lib/runtime/tools/demo-tool";
-import { PHASE_TRANSITION_TOOL_NAME } from "@/lib/runtime/tools/phase-transition-tool";
-import { REVIEW_GATE_TOOL_NAME } from "@/lib/runtime/tools/review-gate-tool";
-import { SIGNAL_TOOL_NAME } from "@/lib/runtime/tools/signal-tool";
 import { LOAD_BUNDLE_TOOL_NAME } from "@/lib/runtime/tools/stage1-tools";
 import { TOKEN_ADJUSTMENT_TOOL_NAME } from "@/lib/runtime/tools/token-tools";
 import { FOUNDRY_TOKEN_SYNC_TOOL_NAME } from "@/lib/runtime/tools/foundry-token-sync-tool";
 import { RENDER_COMPONENT_TOOL_NAME } from "@/lib/runtime/tools/oods-tools";
 import { VALIDATE_SCHEMA_TOOL_NAME } from "@/lib/runtime/tools/validate-tools";
-import {
-  SET_DOCUMENT_TOOL_NAME,
-  SET_DATA_CONTEXT_TOOL_NAME,
-} from "@/lib/runtime/tools/document-tools";
-import { EXPORT_DESIGN_TOOL_NAME } from "@/lib/runtime/tools/export-tools";
-import { SAVE_TEMPLATE_TOOL_NAME } from "@/lib/runtime/tools/template-tools";
+import { SET_DATA_CONTEXT_TOOL_NAME } from "@/lib/runtime/tools/document-tools";
 import { COMPONENT_CATALOG_TOOL_NAME } from "@/lib/runtime/tools/component-catalog-tool";
-import { usePhaseStore, resetPhaseState } from "@/lib/stores/phase-state";
 import { useProjectStateStore } from "@/lib/stores/project-state";
 import * as catalogModule from "@/lib/foundry/catalog";
 
@@ -41,7 +31,8 @@ const createUserMessage = (id: string, text: string): ThreadMessage => ({
 const createAssistantToolMessage = (
   id: string,
   toolName: string,
-  result: unknown
+  result: unknown,
+  slashCommand = false
 ): ThreadMessage => ({
   id,
   createdAt: new Date(),
@@ -49,14 +40,24 @@ const createAssistantToolMessage = (
   content: [
     {
       type: "tool-call",
-      toolCallId: `${toolName}-${id}`,
+      toolCallId: slashCommand
+        ? `slash:${toolName}-${id}`
+        : `${toolName}-${id}`,
       toolName,
       args: {},
       argsText: "{}",
       result,
     },
   ],
+  status: {
+    type: "complete",
+    reason: "stop",
+  },
   metadata: {
+    unstable_state: null,
+    unstable_annotations: [],
+    unstable_data: [],
+    steps: [],
     custom: {},
   },
 });
@@ -116,16 +117,17 @@ const collectRunUpdates = async (
 };
 
 const createAdapter = () => {
-  const run: ChatModelAdapter["run"] = vi.fn(async () => ({
-    content: [{ type: "text", text: "fallback" }],
-    status: { type: "complete", reason: "stop" },
-  }));
+  const run: ChatModelAdapter["run"] = vi.fn(
+    async (): Promise<ChatModelRunResult> => ({
+      content: [{ type: "text", text: "fallback" }],
+      status: { type: "complete", reason: "stop" },
+    })
+  );
   return { run };
 };
 
 describe("withToolCommands", () => {
   beforeEach(() => {
-    resetPhaseState();
     useProjectStateStore.getState().reset();
   });
 
@@ -133,25 +135,12 @@ describe("withToolCommands", () => {
     vi.unstubAllGlobals();
   });
 
-  it("returns a demo tool call when /tool is requested", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([createUserMessage("u-1", "/tool confirm wiring")])
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a demo tool call.");
-    }
-    expect(toolCall.toolName).toBe(DEMO_TOOL_NAME);
-    expect(result.status).toMatchObject({ type: "requires-action" });
-  });
-
   it("delegates free-text prompts as streamed adapter updates", async () => {
     const adapter = {
-      run: vi.fn(async function* () {
+      run: vi.fn(async function* (): AsyncGenerator<
+        ChatModelRunResult,
+        void
+      > {
         yield {
           content: [{ type: "text", text: "partial response" }],
           status: { type: "incomplete", reason: "cancelled" as const },
@@ -175,57 +164,7 @@ describe("withToolCommands", () => {
     expect(updates[1].status).toMatchObject({ type: "complete", reason: "stop" });
   });
 
-  it("returns a signal tool call when /signal is requested", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([createUserMessage("u-2", "/signal status check")])
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a signal tool call.");
-    }
-    expect(toolCall.toolName).toBe(SIGNAL_TOOL_NAME);
-    expect(result.status).toMatchObject({ type: "requires-action" });
-  });
-
-  it("returns a phase tool call when /phase is requested", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([createUserMessage("u-3", "/phase go to explore")])
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a phase tool call.");
-    }
-    expect(toolCall.toolName).toBe(PHASE_TRANSITION_TOOL_NAME);
-    expect(result.status).toMatchObject({ type: "requires-action" });
-  });
-
-  it("returns a review gate tool call when /review is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "review" });
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([createUserMessage("u-4", "/review approve this")])
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a review gate tool call.");
-    }
-    expect(toolCall.toolName).toBe(REVIEW_GATE_TOOL_NAME);
-    expect(result.status).toMatchObject({ type: "requires-action" });
-  });
-
   it("returns a token tool call when /tokens is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "tune" });
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
     const result = await runOnce(wrapped, 
@@ -249,7 +188,6 @@ describe("withToolCommands", () => {
   });
 
   it("returns a Foundry token sync tool call when /tokens import is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "tune" });
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
     const result = await runOnce(wrapped, 
@@ -286,7 +224,6 @@ describe("withToolCommands", () => {
   });
 
   it("returns a render tool call when /render is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
     const result = await runOnce(wrapped, 
@@ -305,7 +242,6 @@ describe("withToolCommands", () => {
   });
 
   it("returns a validate tool call when /validate is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
     const result = await runOnce(wrapped, 
@@ -448,130 +384,6 @@ describe("withToolCommands", () => {
     }
   });
 
-  it("returns a set_document tool call when /doc template is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([
-        createUserMessage("u-doc-template-1", "/doc template dashboard"),
-      ])
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a set_document tool call.");
-    }
-    expect(toolCall.toolName).toBe(SET_DOCUMENT_TOOL_NAME);
-    expect(toolCall.args).toMatchObject({
-      document: {
-        metadata: {
-          title: "Dashboard Starter",
-        },
-      },
-    });
-
-    const args = toolCall.args as {
-      document?: { root?: { nodeType?: string } };
-    };
-    expect(args.document?.root?.nodeType).toBe("layout");
-  });
-
-  it("routes /doc load through /api/designs and emits set_document", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
-    useProjectStateStore.getState().setActiveProject("test-project", "seed");
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({
-        loaded: true,
-        slug: "ops-home",
-        projectSlug: "test-project",
-        document: {
-          metadata: { title: "Loaded Ops Home" },
-          root: {
-            nodeType: "layout",
-            layout: { type: "stack", gap: 12 },
-            children: [],
-          },
-        },
-        dataContext: { total: 42 },
-      }),
-    }));
-    vi.stubGlobal("fetch", fetchMock);
-
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([createUserMessage("u-doc-load-1", "/doc load ops-home")])
-    );
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/api/designs?slug=ops-home&projectSlug=test-project"
-    );
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a set_document tool call.");
-    }
-    expect(toolCall.toolName).toBe(SET_DOCUMENT_TOOL_NAME);
-    expect(toolCall.args).toMatchObject({
-      slug: "ops-home",
-      projectSlug: "test-project",
-      persist: false,
-      data: { total: 42 },
-      document: {
-        metadata: { title: "Loaded Ops Home" },
-      },
-    });
-  });
-
-  it("returns a save_template tool call when /template save is requested", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([
-        createUserMessage(
-          "u-template-save-1",
-          '/template save {"name":"Ops Dashboard","description":"Ops starter","category":"dashboard","slug":"ops-dashboard"}'
-        ),
-      ])
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    const toolCall = result.content?.find((part) => part.type === "tool-call");
-    if (!toolCall || toolCall.type !== "tool-call") {
-      throw new Error("Expected a save_template tool call.");
-    }
-    expect(toolCall.toolName).toBe(SAVE_TEMPLATE_TOOL_NAME);
-    expect(toolCall.args).toMatchObject({
-      name: "Ops Dashboard",
-      description: "Ops starter",
-      category: "dashboard",
-      slug: "ops-dashboard",
-    });
-  });
-
-  it("returns a descriptive error when /doc template is unknown", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([
-        createUserMessage("u-doc-template-2", "/doc template does-not-exist"),
-      ])
-    );
-
-    expect(result.status).toMatchObject({ type: "complete", reason: "stop" });
-    const text = result.content?.find((part) => part.type === "text");
-    expect(text?.type).toBe("text");
-    if (text?.type === "text") {
-      expect(text.text).toContain("Unknown template");
-      expect(text.text).toContain("dashboard");
-    }
-  });
-
   it("injects component catalog context into system prompt", async () => {
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter, {
@@ -593,22 +405,6 @@ describe("withToolCommands", () => {
     if (systemMessage?.content[0]?.type === "text") {
       expect(systemMessage.content[0].text).toContain("Base runtime prompt.");
       expect(systemMessage.content[0].text).toContain("OODS COMPONENT CATALOG");
-    }
-  });
-
-  it("returns a usage error when /template save args are missing", async () => {
-    usePhaseStore.setState({ currentPhase: "explore" });
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const result = await runOnce(wrapped, 
-      createRunOptions([createUserMessage("u-template-save-2", "/template save")])
-    );
-
-    expect(result.status).toMatchObject({ type: "complete", reason: "stop" });
-    const text = result.content?.find((part) => part.type === "text");
-    expect(text?.type).toBe("text");
-    if (text?.type === "text") {
-      expect(text.text).toContain("Template save requires JSON args");
     }
   });
 
@@ -652,10 +448,11 @@ describe("withToolCommands", () => {
         errors: [],
         warnings: [],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -677,10 +474,11 @@ describe("withToolCommands", () => {
         errors: ["Missing component field"],
         warnings: ["Deprecated prop"],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -694,94 +492,6 @@ describe("withToolCommands", () => {
     }
   });
 
-  it("summarizes demo tool results", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const assistantMessage = createAssistantToolMessage("a-1", DEMO_TOOL_NAME, {
-      acknowledged: true,
-      notes: "Confirmed.",
-      resolvedAt: "2025-01-01T00:00:00.000Z",
-    });
-
-    const result = await runOnce(wrapped, 
-      createRunOptions([assistantMessage], assistantMessage)
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    expect(result.content?.[0]).toMatchObject({
-      type: "text",
-      text: expect.stringContaining("Demo tool result captured"),
-    });
-  });
-
-  it("summarizes signal tool results", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const assistantMessage = createAssistantToolMessage("a-2", SIGNAL_TOOL_NAME, {
-      signal: "green",
-      resolvedAt: "2025-01-01T00:00:00.000Z",
-    });
-
-    const result = await runOnce(wrapped, 
-      createRunOptions([assistantMessage], assistantMessage)
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    expect(result.content?.[0]).toMatchObject({
-      type: "text",
-      text: "Signal recorded: green.",
-    });
-  });
-
-  it("summarizes phase tool results", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const assistantMessage = createAssistantToolMessage(
-      "a-3",
-      PHASE_TRANSITION_TOOL_NAME,
-      {
-        previousPhase: "ingest",
-        nextPhase: "explore",
-        approved: true,
-        resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
-    );
-
-    const result = await runOnce(wrapped, 
-      createRunOptions([assistantMessage], assistantMessage)
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    expect(result.content?.[0]).toMatchObject({
-      type: "text",
-      text: "Phase transitioned: ingest -> explore.",
-    });
-  });
-
-  it("summarizes review gate tool results", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const assistantMessage = createAssistantToolMessage(
-      "a-4",
-      REVIEW_GATE_TOOL_NAME,
-      {
-        phase: "review",
-        decision: "approved",
-        resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
-    );
-
-    const result = await runOnce(wrapped, 
-      createRunOptions([assistantMessage], assistantMessage)
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    expect(result.content?.[0]).toMatchObject({
-      type: "text",
-      text: "Review gate decision recorded: review -> approved.",
-    });
-  });
-
   it("summarizes token adjustment tool results", async () => {
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
@@ -793,10 +503,11 @@ describe("withToolCommands", () => {
         appliedCount: 2,
         invalidPaths: [],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -823,10 +534,11 @@ describe("withToolCommands", () => {
         unmappedFoundryPaths: [],
         entries: [],
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -848,10 +560,11 @@ describe("withToolCommands", () => {
         componentCount: 4,
         tokenSuggestionCount: 6,
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -872,10 +585,11 @@ describe("withToolCommands", () => {
         rendered: true,
         html: "<div />",
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
-    const result = await runOnce(wrapped, 
+    const result = await runOnce(wrapped,
       createRunOptions([assistantMessage], assistantMessage)
     );
 
@@ -886,34 +600,7 @@ describe("withToolCommands", () => {
     });
   });
 
-  it("summarizes save template tool results", async () => {
-    const adapter = createAdapter();
-    const wrapped = withToolCommands(adapter);
-    const assistantMessage = createAssistantToolMessage(
-      "a-template-save-1",
-      SAVE_TEMPLATE_TOOL_NAME,
-      {
-        saved: true,
-        slug: "ops-dashboard",
-        requiredComponents: ["oods:Tabs", "oods:Card"],
-        nodeCount: 6,
-        componentCount: 4,
-        resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
-    );
-
-    const result = await runOnce(wrapped, 
-      createRunOptions([assistantMessage], assistantMessage)
-    );
-
-    expect(adapter.run).not.toHaveBeenCalled();
-    expect(result.content?.[0]).toMatchObject({
-      type: "text",
-      text: "Template saved: ops-dashboard (2 required components).",
-    });
-  });
-
-  it("summarizes set_data_context tool results", async () => {
+  it("summarizes set_data_context tool results (slash-triggered)", async () => {
     const adapter = createAdapter();
     const wrapped = withToolCommands(adapter);
     const assistantMessage = createAssistantToolMessage(
@@ -923,7 +610,8 @@ describe("withToolCommands", () => {
         updated: true,
         keyCount: 2,
         resolvedAt: "2025-01-01T00:00:00.000Z",
-      }
+      },
+      true
     );
 
     const result = await runOnce(
@@ -938,530 +626,29 @@ describe("withToolCommands", () => {
     });
   });
 
-  describe("phase gating", () => {
-    it("allows /bundle in ingest phase (default)", async () => {
-      // Default phase is ingest, bundle is allowed in ingest
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-1", "/bundle {}")])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(LOAD_BUNDLE_TOOL_NAME);
+  it("delegates LLM-initiated tool results back to LLM (no interception)", async () => {
+    const adapter = createAdapter();
+    const wrapped = withToolCommands(adapter);
+    // LLM-initiated tool call — no slash: prefix → should NOT be intercepted
+    const assistantMessage = createAssistantToolMessage(
+      "a-llm-chain",
+      SET_DATA_CONTEXT_TOOL_NAME,
+      {
+        updated: true,
+        keyCount: 3,
+        resolvedAt: "2025-01-01T00:00:00.000Z",
       }
-    });
+    );
 
-    it("blocks /render in ingest phase with descriptive error", async () => {
-      // Default phase is ingest, render is not allowed in ingest
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("u-pg-2", '/render {"type":"component"}'),
-        ])
-      );
+    const result = await runOnce(
+      wrapped,
+      createRunOptions([assistantMessage], assistantMessage)
+    );
 
-      expect(adapter.run).not.toHaveBeenCalled();
-      expect(result.status).toMatchObject({
-        type: "complete",
-        reason: "stop",
-      });
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("render_component");
-        expect(text.text).toContain("ingest");
-        expect(text.text).toContain("explore");
-        expect(text.text).toContain("tune");
-      }
-    });
-
-    it("blocks /review in ingest phase", async () => {
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-3", "/review approve")])
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("review_gate");
-        expect(text.text).toContain("ingest");
-      }
-    });
-
-    it("blocks /tokens in ingest phase", async () => {
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("u-pg-4", "/tokens color.primary=#fff"),
-        ])
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("update_token_state");
-        expect(text.text).toContain("ingest");
-      }
-    });
-
-    it("allows /tokens in ingest phase when workflow mode is flexible", async () => {
-      usePhaseStore.setState({ currentPhase: "ingest", workflowMode: "flexible" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(
-        wrapped,
-        createRunOptions([
-          createUserMessage("u-pg-4-flex", "/tokens color.primary=#fff"),
-        ])
-      );
-
-      const toolCall = result.content?.find((part) => part.type === "tool-call");
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(TOKEN_ADJUSTMENT_TOOL_NAME);
-      }
-    });
-
-    it("allows /doc in ingest phase", async () => {
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-5", "/doc {}")])
-      );
-
-      const toolCall = result.content?.find((part) => part.type === "tool-call");
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(SET_DOCUMENT_TOOL_NAME);
-      }
-    });
-
-    it("blocks /template in ingest phase", async () => {
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage(
-            "u-pg-template-1",
-            '/template save {"name":"Ops","description":"Ops","category":"dashboard"}'
-          ),
-        ])
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("save_template");
-        expect(text.text).toContain("ingest");
-      }
-    });
-
-    it("allows /phase in every phase (always available)", async () => {
-      const phases = [
-        "ingest",
-        "explore",
-        "tune",
-        "review",
-        "done",
-      ] as const;
-
-      for (const phase of phases) {
-        resetPhaseState();
-        if (phase !== "ingest") {
-          usePhaseStore.setState({ currentPhase: phase });
-        }
-        const adapter = createAdapter();
-        const wrapped = withToolCommands(adapter);
-        const result = await runOnce(wrapped, 
-          createRunOptions([
-            createUserMessage(`u-phase-${phase}`, "/phase explore"),
-          ])
-        );
-
-        const toolCall = result.content?.find(
-          (part) => part.type === "tool-call"
-        );
-        expect(toolCall?.type).toBe("tool-call");
-        if (toolCall?.type === "tool-call") {
-          expect(toolCall.toolName).toBe(PHASE_TRANSITION_TOOL_NAME);
-        }
-      }
-    });
-
-    it("allows /signal in every phase (always available)", async () => {
-      const phases = [
-        "ingest",
-        "explore",
-        "tune",
-        "review",
-        "done",
-      ] as const;
-
-      for (const phase of phases) {
-        resetPhaseState();
-        if (phase !== "ingest") {
-          usePhaseStore.setState({ currentPhase: phase });
-        }
-        const adapter = createAdapter();
-        const wrapped = withToolCommands(adapter);
-        const result = await runOnce(wrapped, 
-          createRunOptions([
-            createUserMessage(`u-signal-${phase}`, "/signal check"),
-          ])
-        );
-
-        const toolCall = result.content?.find(
-          (part) => part.type === "tool-call"
-        );
-        expect(toolCall?.type).toBe("tool-call");
-        if (toolCall?.type === "tool-call") {
-          expect(toolCall.toolName).toBe(SIGNAL_TOOL_NAME);
-        }
-      }
-    });
-
-    it("allows /render in explore phase", async () => {
-      usePhaseStore.setState({ currentPhase: "explore" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("u-pg-6", '/render {"type":"component"}'),
-        ])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(RENDER_COMPONENT_TOOL_NAME);
-      }
-    });
-
-    it("allows /render in tune phase", async () => {
-      usePhaseStore.setState({ currentPhase: "tune" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("u-pg-7", '/render {"type":"component"}'),
-        ])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(RENDER_COMPONENT_TOOL_NAME);
-      }
-    });
-
-    it("allows /tokens in tune phase", async () => {
-      usePhaseStore.setState({ currentPhase: "tune" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("u-pg-8", "/tokens color.primary=#111"),
-        ])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(TOKEN_ADJUSTMENT_TOOL_NAME);
-      }
-    });
-
-    it("allows /review in review phase", async () => {
-      usePhaseStore.setState({ currentPhase: "review" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-9", "/review approve")])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(REVIEW_GATE_TOOL_NAME);
-      }
-    });
-
-    it("blocks /bundle in explore phase", async () => {
-      usePhaseStore.setState({ currentPhase: "explore" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-10", "/bundle {}")])
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("load_bundle");
-        expect(text.text).toContain("explore");
-        expect(text.text).toContain("ingest");
-      }
-    });
-
-    it("blocks /review in tune phase", async () => {
-      usePhaseStore.setState({ currentPhase: "tune" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-11", "/review approve")])
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("review_gate");
-        expect(text.text).toContain("tune");
-      }
-    });
-
-    it("phase-gates executeTool for out-of-phase tools", async () => {
-      // Default phase is ingest, render_component not allowed
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await wrapped.executeTool!({
-        toolName: RENDER_COMPONENT_TOOL_NAME,
-        args: { requestId: "test", schema: {} },
-        toolCallId: "tc-1",
-        abortSignal: new AbortController().signal,
-      });
-
-      expect(result).toHaveProperty("error");
-      expect((result as { error: string }).error).toContain(
-        "render_component"
-      );
-      expect((result as { error: string }).error).toContain("ingest");
-    });
-
-    it("phase-gates executeTool allows in-phase tools to proceed", async () => {
-      // In ingest phase, load_bundle should pass through to adapter.executeTool
-      const adapter = createAdapter();
-      const mockExecuteTool = vi.fn(async () => ({
-        loaded: true,
-        componentCount: 2,
-        tokenSuggestionCount: 3,
-      }));
-      (adapter as ChatModelAdapter).executeTool = mockExecuteTool;
-      const wrapped = withToolCommands(adapter as ChatModelAdapter);
-
-      await wrapped.executeTool!({
-        toolName: LOAD_BUNDLE_TOOL_NAME,
-        args: { requestId: "test", bundleJson: "{}" },
-        toolCallId: "tc-2",
-        abortSignal: new AbortController().signal,
-      });
-
-      // load_bundle doesn't have a local executor, so it delegates
-      expect(mockExecuteTool).toHaveBeenCalled();
-    });
-
-    it("blocks /export in ingest phase", async () => {
-      // Default phase is ingest, export_design only available in done
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-export-1", "/export html")])
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("export_design");
-        expect(text.text).toContain("ingest");
-        expect(text.text).toContain("done");
-      }
-    });
-
-    it("allows /export in done phase", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-pg-export-2", "/export json")])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      expect(toolCall?.type).toBe("tool-call");
-      if (toolCall?.type === "tool-call") {
-        expect(toolCall.toolName).toBe(EXPORT_DESIGN_TOOL_NAME);
-      }
-    });
-  });
-
-  describe("/export command", () => {
-    it("returns an export tool call with default html format", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-export-1", "/export")])
-      );
-
-      expect(adapter.run).not.toHaveBeenCalled();
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      if (!toolCall || toolCall.type !== "tool-call") {
-        throw new Error("Expected an export tool call.");
-      }
-      expect(toolCall.toolName).toBe(EXPORT_DESIGN_TOOL_NAME);
-      expect(toolCall.args).toMatchObject({ format: "html" });
-      expect(result.status).toMatchObject({ type: "requires-action" });
-    });
-
-    it("parses format from input", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-export-2", "/export yaml")])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      if (!toolCall || toolCall.type !== "tool-call") {
-        throw new Error("Expected an export tool call.");
-      }
-      expect(toolCall.args).toMatchObject({ format: "yaml" });
-    });
-
-    it("parses SCSS format and slug from input", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-export-2b", "/export scss design-system")])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      if (!toolCall || toolCall.type !== "tool-call") {
-        throw new Error("Expected an export tool call.");
-      }
-      expect(toolCall.args).toMatchObject({ format: "scss", slug: "design-system" });
-    });
-
-    it("parses spec format from input", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([createUserMessage("u-export-2c", "/export spec")])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      if (!toolCall || toolCall.type !== "tool-call") {
-        throw new Error("Expected an export tool call.");
-      }
-      expect(toolCall.args).toMatchObject({ format: "spec" });
-    });
-
-    it("parses format and slug from input", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-      const result = await runOnce(wrapped, 
-        createRunOptions([
-          createUserMessage("u-export-3", "/export json my-design"),
-        ])
-      );
-
-      const toolCall = result.content?.find(
-        (part) => part.type === "tool-call"
-      );
-      if (!toolCall || toolCall.type !== "tool-call") {
-        throw new Error("Expected an export tool call.");
-      }
-      expect(toolCall.args).toMatchObject({
-        format: "json",
-        slug: "my-design",
-      });
-    });
-
-    it("summarizes export result on success", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-
-      const assistantMsg = createAssistantToolMessage(
-        "a-export-1",
-        EXPORT_DESIGN_TOOL_NAME,
-        {
-          exported: true,
-          format: "html",
-          slug: "test",
-          content: "<html>...</html>",
-          resolvedAt: new Date().toISOString(),
-        }
-      );
-
-      const result = await runOnce(wrapped, 
-        createRunOptions([assistantMsg], assistantMsg)
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("Export complete");
-        expect(text.text).toContain("HTML");
-      }
-    });
-
-    it("summarizes export result on failure", async () => {
-      usePhaseStore.setState({ currentPhase: "done" });
-      const adapter = createAdapter();
-      const wrapped = withToolCommands(adapter);
-
-      const assistantMsg = createAssistantToolMessage(
-        "a-export-2",
-        EXPORT_DESIGN_TOOL_NAME,
-        {
-          exported: false,
-          format: "html",
-          slug: "test",
-          content: "",
-          errors: ["No active design document."],
-          resolvedAt: new Date().toISOString(),
-        }
-      );
-
-      const result = await runOnce(wrapped, 
-        createRunOptions([assistantMsg], assistantMsg)
-      );
-
-      const text = result.content?.find((part) => part.type === "text");
-      expect(text?.type).toBe("text");
-      if (text?.type === "text") {
-        expect(text.text).toContain("Export failed");
-        expect(text.text).toContain("No active design document.");
-      }
+    expect(adapter.run).toHaveBeenCalledTimes(1);
+    expect(result.content?.[0]).toMatchObject({
+      type: "text",
+      text: "fallback",
     });
   });
 });

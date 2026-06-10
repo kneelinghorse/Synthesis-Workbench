@@ -25,6 +25,10 @@ describe("buildLoadBundleToolResult", () => {
       ok: true,
       componentCount: 5,
       tokenSuggestionCount: 12,
+      components: [],
+      tokenSuggestions: {},
+      enrichedTokens: {},
+      compositionPatterns: [],
       errors: [],
     });
 
@@ -40,6 +44,10 @@ describe("buildLoadBundleToolResult", () => {
       ok: false,
       componentCount: 0,
       tokenSuggestionCount: 0,
+      components: [],
+      tokenSuggestions: {},
+      enrichedTokens: {},
+      compositionPatterns: [],
       errors: ["Invalid bundle format"],
     });
 
@@ -113,6 +121,8 @@ describe("buildInspectToolResult", () => {
       discoveredComponents: ["Button", "Card", "Header"],
       tokenPaths: ["colors.primary", "typography.fontSize.base"],
       errors: [],
+      hasEnrichedTokens: true,
+      compositionPatternCount: 3,
     };
 
     const result = buildInspectToolResult(
@@ -173,7 +183,7 @@ describe("tool definitions include inspect tools", () => {
     expect(def!.input_schema.properties).toHaveProperty("seedRoutes");
   });
 
-  it("has 11 total tool definitions", () => {
-    expect(definitions).toHaveLength(11);
+  it("has 10 total tool definitions", () => {
+    expect(definitions).toHaveLength(10);
   });
 });

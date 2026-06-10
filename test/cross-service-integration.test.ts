@@ -57,6 +57,7 @@ function createMockFoundryClient(): FoundryMcpClient {
       raw: null,
     })),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    fetchStructuredData: vi.fn(),
   };
 }
 
@@ -66,9 +67,9 @@ function createMockFoundryClient(): FoundryMcpClient {
 
 const MOCK_STAGE1_BUNDLE: Stage1BundlePayload = {
   manifest: {
-    hostname: "test-app.example.com",
-    timestamp: "2026-02-26T12:00:00Z",
-    runId: "test-run-001",
+    projectId: "test-app",
+    generatedAt: "2026-02-26T12:00:00Z",
+    bundleVersion: "test-run-001",
   },
   components: [
     { name: "Header", count: 1 },
@@ -172,10 +173,10 @@ function resetAllStores() {
 // ============================================================================
 
 describe("Cross-Service Integration: Tool Definitions", () => {
-  it("should export all 11 tool definitions for the Anthropic adapter", () => {
+  it("should export all 10 tool definitions for the Anthropic adapter", () => {
     const tools = getAnthropicToolDefinitions();
 
-    expect(tools).toHaveLength(11);
+    expect(tools).toHaveLength(10);
 
     const toolNames = tools.map((t) => t.name);
     expect(toolNames).toContain("render_component");
@@ -184,7 +185,6 @@ describe("Cross-Service Integration: Tool Definitions", () => {
     expect(toolNames).toContain("patch_node");
     expect(toolNames).toContain("set_data_context");
     expect(toolNames).toContain("update_token_state");
-    expect(toolNames).toContain("export_design");
     expect(toolNames).toContain("component_catalog");
     expect(toolNames).toContain("load_bundle");
     expect(toolNames).toContain("inspect_app");
@@ -483,9 +483,9 @@ describe("Cross-Service Integration: Graceful Degradation", () => {
     const store = useStage1BundleStore.getState();
     const result = store.loadBundle({
       manifest: {
-        hostname: "empty.example.com",
-        timestamp: "2026-02-26T12:00:00Z",
-        runId: "empty-run",
+        projectId: "empty",
+        generatedAt: "2026-02-26T12:00:00Z",
+        bundleVersion: "empty-run",
       },
       components: [],
       artifacts: [],

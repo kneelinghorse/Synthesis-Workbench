@@ -57,6 +57,7 @@ export type Stage1BundlePayload = {
   tokenSuggestions?: unknown;
   styleFingerprint?: unknown;
   components?: unknown;
+  compositionPatterns?: unknown;
 };
 
 export type Stage1BundleInput = Stage1BundlePayload | string;
@@ -90,6 +91,28 @@ export type Stage1ComponentClustersArtifact = {
   clusters: Stage1ComponentClusterEntry[];
 };
 
+export type Stage1EnrichedToken = {
+  value: string;
+  confidence?: number;
+  category?: string;
+  occurrences?: number;
+};
+
+export type Stage1ComponentProp = {
+  name: string;
+  type?: string;
+  values?: string[];
+  required?: boolean;
+};
+
+export type Stage1CompositionPattern = {
+  name: string;
+  components: string[];
+  frequency?: number;
+  confidence?: number;
+  description?: string;
+};
+
 export type Stage1Component = {
   id?: string;
   name: string;
@@ -99,6 +122,7 @@ export type Stage1Component = {
   selectors?: Stage1ComponentClusterSelectors;
   parentCluster?: string | null;
   variants?: string[];
+  props?: Stage1ComponentProp[];
 };
 
 export type Stage1BundleLoadResult = {
@@ -107,6 +131,8 @@ export type Stage1BundleLoadResult = {
   tokenSuggestionCount: number;
   components: Stage1Component[];
   tokenSuggestions: Record<string, string>;
+  enrichedTokens: Record<string, Stage1EnrichedToken>;
+  compositionPatterns: Stage1CompositionPattern[];
   errors: string[];
 };
 

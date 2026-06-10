@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  typescript: {
+    // Production build type-checks app code via tsconfig.build.json (which excludes
+    // test fixtures + scripts). Full-tree type-checking is `npm run typecheck`.
+    tsconfigPath: "./tsconfig.build.json",
+  },
   env: {
     OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL ?? "",
     OLLAMA_MODEL: process.env.OLLAMA_MODEL ?? "",

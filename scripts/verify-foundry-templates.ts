@@ -79,7 +79,7 @@ const run = async () => {
 
     checks.push({
       slug,
-      title: document.metadata.title,
+      title: document.metadata.title ?? "",
       componentCount: composed.components.length,
       hasErrorFallback: failedComponents.length > 0,
       errorCount: composed.errors.length,

@@ -22,6 +22,9 @@ type FoundryFragmentScreenChild = {
   id: string;
   component: string;
   props?: Record<string, unknown>;
+  meta?: {
+    label?: string;
+  };
 };
 
 type FoundryFragmentSchema = {
@@ -166,8 +169,24 @@ const renderErrorFallback = (component: ComponentNode, message: string): string 
     component.ref,
   )}] Render failed: ${escapeHtml(message)}</div>`;
 
-const wrapComponent = (component: ComponentNode, html: string): string =>
-  `<div data-component-id="${component.id}" data-component-ref="${component.ref}">${html}</div>`;
+// The comment layer's click handler selects via
+// `closest("[data-oods-node-id],[data-oods-label]")`. Forge emits
+// data-oods-node-id on rendered AND empty shells, so most fragments are already
+// comment-clickable. The anchorless paths — a missing-fragment error fallback,
+// or any shell Forge returns without an anchor — would not be. Add a fallback
+// anchor on the wrapper ONLY when the inner html carries none, so every
+// component is selectable without duplicating Forge's own anchor (s20-m09).
+// Require the trailing `=` so we match the attribute itself, not a hyphenated
+// superset like `data-oods-node-id-extra` (the `\b` after "id" would otherwise
+// match before the hyphen). Forge always emits these as `name="value"`.
+const FRAGMENT_ANCHOR_RE = /\bdata-oods-(?:node-id|label)=/;
+
+const wrapComponent = (component: ComponentNode, html: string): string => {
+  const anchorAttr = FRAGMENT_ANCHOR_RE.test(html)
+    ? ""
+    : ` data-oods-node-id="${component.id}"`;
+  return `<div data-component-id="${component.id}" data-component-ref="${component.ref}"${anchorAttr}>${html}</div>`;
+};
 
 const parseIssueNodeId = (
   value: unknown,
@@ -276,10 +295,17 @@ export const buildFoundryFragmentRenderInput = (
   for (const [order, component] of components.entries()) {
     const resolvedProps = resolveComponentProps(component, dataContext, bindingErrors);
     const normalizedComponent = normalizeComponentName(component.ref);
+    // Forward a slot label so Forge emits data-oods-label on the slot node. Use
+    // the raw label/title prop (not resolvedProps) so the anchor stays stable
+    // across data changes — the comment layer pins slot-kind anchors to it.
+    // (s20-m06; durable slot name from Forge lands via option (b) in s20-m07.)
+    const slotLabel =
+      toStringValue(component.props.label) ?? toStringValue(component.props.title);
     children.push({
       id: component.id,
       component: normalizedComponent,
       props: Object.keys(resolvedProps).length > 0 ? resolvedProps : undefined,
+      meta: slotLabel ? { label: slotLabel } : undefined,
     });
     componentIndex.push({
       id: component.id,

@@ -15,6 +15,7 @@ import type {
   ComponentNode,
   ComponentProps,
 } from "@/types/document-model";
+import type { CommentChangeLink } from "@/lib/stores/comment-state";
 import { isLayoutNode, isComponentNode } from "@/types/document-model";
 import { useDocumentStateStore } from "@/lib/stores/document-state";
 import { useDataContextStore } from "@/lib/stores/data-context";
@@ -48,6 +49,12 @@ export type SetDocumentToolArgs = {
   persist?: boolean;
   /** Optional data context for $data.x binding resolution */
   data?: Record<string, unknown>;
+  /**
+   * Ids of the pinned review comments this change addresses. On Accept these
+   * comments are marked resolved so they leave the agent's context and aren't
+   * re-proposed. Consumed by the Tool UI (DocumentToolUI), not the executor.
+   */
+  addressesCommentIds?: string[];
 };
 
 export type SetDocumentToolResult = {
@@ -60,6 +67,12 @@ export type SetDocumentToolResult = {
   persistedPath?: string;
   errors?: string[];
   resolvedAt: string;
+  /**
+   * Suggest-and-confirm outcome. 'applied' = the human accepted and the change
+   * was written; 'rejected' = the human discarded the proposal (nothing
+   * mutated). Absent on direct (non-gated) execution.
+   */
+  decision?: "applied" | "rejected";
 };
 
 // ============================================================================
@@ -76,6 +89,13 @@ export type PatchNodeToolArgs = {
   props?: ComponentProps;
   /** New component ref (e.g. "oods:Button") */
   ref?: string;
+  /**
+   * Ids of the pinned review comments this change addresses. On Accept these
+   * comments are marked resolved so they leave the agent's context and aren't
+   * re-proposed. (A patch is also auto-linked to any comment pinned to its
+   * `nodeId`, so this is the belt to that anchor-match suspenders.)
+   */
+  addressesCommentIds?: string[];
 };
 
 export type PatchNodeToolResult = {
@@ -83,6 +103,8 @@ export type PatchNodeToolResult = {
   nodeId: string;
   errors?: string[];
   resolvedAt: string;
+  /** See SetDocumentToolResult.decision. */
+  decision?: "applied" | "rejected";
 };
 
 // ============================================================================
@@ -358,6 +380,80 @@ export function executePatchNode(
     resolvedAt: new Date().toISOString(),
   };
 }
+
+// ============================================================================
+// Suggest-and-confirm wrappers
+//
+// The agent's set_document / patch_node calls are PROPOSALS surfaced as a diff
+// card. The human accepts (apply) or rejects (discard); only `confirm*` mutates
+// the document store. These keep the React tool UI thin and unit-testable.
+// ============================================================================
+
+export async function confirmSetDocument(
+  args: SetDocumentToolArgs,
+): Promise<SetDocumentToolResult> {
+  const result = await executeSetDocument(args);
+  return { ...result, decision: "applied" };
+}
+
+export function rejectSetDocument(): SetDocumentToolResult {
+  return {
+    saved: false,
+    persisted: false,
+    nodeCount: 0,
+    componentCount: 0,
+    decision: "rejected",
+    resolvedAt: new Date().toISOString(),
+  };
+}
+
+export function confirmPatchNode(args: PatchNodeToolArgs): PatchNodeToolResult {
+  return { ...executePatchNode(args), decision: "applied" };
+}
+
+export function rejectPatchNode(args: PatchNodeToolArgs): PatchNodeToolResult {
+  return {
+    patched: false,
+    nodeId: args.nodeId,
+    decision: "rejected",
+    resolvedAt: new Date().toISOString(),
+  };
+}
+
+// ============================================================================
+// Comment resolution linkage (suggest-and-confirm → pinned review comments)
+//
+// When a human ACCEPTS a change, the comments it addresses must be resolved so
+// they leave the agent's per-turn context (review-context) and stop being
+// re-proposed (mission s20-m10). These pure helpers decide WHAT to resolve and
+// return null when the change did NOT apply — a reject, or a failed/no-op
+// execution — so a discarded proposal never silently closes a comment. The Tool
+// UI passes a non-null result to commentStore.resolveCommentsForChange.
+// ============================================================================
+
+/**
+ * Linkage to resolve after a patch_node Accept: the comment ids the agent
+ * declared PLUS this patch's `nodeId` (the instance-anchor safety net). Null
+ * unless the patch actually applied.
+ */
+export const patchNodeCommentLink = (
+  args: PatchNodeToolArgs,
+  result: PatchNodeToolResult,
+): CommentChangeLink | null =>
+  result.patched
+    ? { commentIds: args.addressesCommentIds, nodeId: args.nodeId }
+    : null;
+
+/**
+ * Linkage to resolve after a set_document Accept: only the comment ids the agent
+ * declared (a full rewrite has no single target node). Null unless the document
+ * was actually set.
+ */
+export const setDocumentCommentLink = (
+  args: SetDocumentToolArgs,
+  result: SetDocumentToolResult,
+): CommentChangeLink | null =>
+  result.saved ? { commentIds: args.addressesCommentIds } : null;
 
 // ============================================================================
 // set_data_context Types

@@ -1,4 +1,5 @@
 import type {
+  ChatModelAdapter,
   ChatModelRunOptions,
   ChatModelRunResult,
   ThreadMessage,
@@ -6,6 +7,31 @@ import type {
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createOllamaAdapter } from "./ollama";
+
+// adapter.run() is typed Promise<ChatModelRunResult> | AsyncGenerator<...>; the
+// Ollama adapter streams (a generator). Narrow + drain it without weakening types.
+const collectRun = async (
+  adapter: ChatModelAdapter,
+  runOptions: ChatModelRunOptions
+): Promise<ChatModelRunResult[]> => {
+  const runResult = adapter.run(runOptions);
+  const updates: ChatModelRunResult[] = [];
+  if (
+    typeof runResult === "object" &&
+    runResult !== null &&
+    Symbol.asyncIterator in runResult
+  ) {
+    for await (const update of runResult as AsyncGenerator<
+      ChatModelRunResult,
+      void
+    >) {
+      updates.push(update);
+    }
+  } else {
+    updates.push(await runResult);
+  }
+  return updates;
+};
 
 // CI-critical streaming contract test suite for Ollama adapter behavior.
 
@@ -62,12 +88,10 @@ describe("createOllamaAdapter", () => {
       onResponse,
     });
 
-    const updates: ChatModelRunResult[] = [];
-    for await (const update of adapter.run(
+    const updates = await collectRun(
+      adapter,
       createRunOptions([createUserMessage("u-1", "Hi there")])
-    )) {
-      updates.push(update);
-    }
+    );
 
     const call = fetchMock.mock.calls[0];
     if (!call) {
@@ -109,12 +133,10 @@ describe("createOllamaAdapter", () => {
       onError,
     });
 
-    const updates: ChatModelRunResult[] = [];
-    for await (const update of adapter.run(
+    const updates = await collectRun(
+      adapter,
       createRunOptions([createUserMessage("u-2", "Hello")])
-    )) {
-      updates.push(update);
-    }
+    );
 
     expect(onError).toHaveBeenCalledOnce();
     expect(updates[0]?.status).toMatchObject({

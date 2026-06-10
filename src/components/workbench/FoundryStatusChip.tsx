@@ -11,7 +11,7 @@ type FoundryStatusChipProps = {
 const STATUS_LABELS: Record<PreviewFoundryStatus, string> = {
   live: "Live Render",
   "dry-run": "Dry-Run",
-  offline: "Offline (Static)",
+  offline: "Offline",
 };
 
 const STATUS_CONTAINER_STYLES: Record<PreviewFoundryStatus, string> = {

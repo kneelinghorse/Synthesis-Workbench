@@ -22,7 +22,7 @@ describe("FoundryStatusChip", () => {
 
   it("renders offline status label", () => {
     render(<FoundryStatusChip status="offline" endpoint={null} />);
-    expect(screen.getByText("Offline (Static)")).toBeTruthy();
+    expect(screen.getByText("Offline")).toBeTruthy();
   });
 
   it("shows endpoint in tooltip title", () => {

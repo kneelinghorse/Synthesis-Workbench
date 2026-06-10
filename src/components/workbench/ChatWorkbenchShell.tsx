@@ -1,26 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ChatPanel } from "@/components/workbench/ChatPanel";
-import { ComponentBrowser } from "@/components/workbench/ComponentBrowser";
-import { FirstRunOnboarding } from "@/components/workbench/FirstRunOnboarding";
 import { PreviewPanel } from "@/components/workbench/PreviewPanel";
-import { ProjectBrowser } from "@/components/workbench/ProjectBrowser";
 import { ProjectSwitcher } from "@/components/workbench/ProjectSwitcher";
-import { TemplateBrowser } from "@/components/workbench/TemplateBrowser";
-import { usePhaseStore } from "@/lib/stores/phase-state";
 import { cn } from "@/lib/utils";
 import {
-  SHORTCUT_COMMANDS,
   WORKBENCH_SHORTCUT_HELP,
   isEditableEventTarget,
   resolveWorkbenchShortcutAction,
-  writeCommandToComposer,
 } from "@/lib/workbench/keyboard-shortcuts";
-import { DEFAULT_PHASES } from "@/types/phase";
 
 type ShortcutNoticeTone = "info" | "warning";
 
@@ -35,11 +26,7 @@ const NOTICE_STYLE: Record<ShortcutNoticeTone, string> = {
 };
 
 export const ChatWorkbenchShell = () => {
-  const currentPhase = usePhaseStore((state) => state.currentPhase);
-  const workflowMode = usePhaseStore((state) => state.workflowMode);
-  const setWorkflowMode = usePhaseStore((state) => state.setWorkflowMode);
   const [previewVisible, setPreviewVisible] = useState(true);
-  const [componentBrowserOpen, setComponentBrowserOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [shortcutNotice, setShortcutNotice] = useState<ShortcutNotice | null>(
     null
@@ -72,51 +59,6 @@ export const ChatWorkbenchShell = () => {
     [clearNoticeTimer]
   );
 
-  const transitionPhaseBy = useCallback(
-    (direction: 1 | -1) => {
-      const { currentPhase, transitionTo } = usePhaseStore.getState();
-      const currentIndex = DEFAULT_PHASES.findIndex(
-        (phase) => phase.id === currentPhase
-      );
-      if (currentIndex === -1) {
-        showNotice("Current phase is unknown. Transition skipped.", "warning");
-        return;
-      }
-
-      const nextIndex = currentIndex + direction;
-      const nextPhase = DEFAULT_PHASES[nextIndex];
-
-      if (!nextPhase) {
-        showNotice(
-          direction > 0
-            ? "Already at the final phase."
-            : "Already at the first phase.",
-          "warning"
-        );
-        return;
-      }
-
-      const assessment = transitionTo(nextPhase.id, DEFAULT_PHASES);
-      if (assessment.allowed) {
-        showNotice(`Phase changed: ${nextPhase.label}.`);
-        return;
-      }
-
-      showNotice(
-        assessment.blockers[0] ?? "Phase transition blocked by guardrails.",
-        "warning"
-      );
-    },
-    [showNotice]
-  );
-
-  const phaseLabel = useMemo(() => {
-    return (
-      DEFAULT_PHASES.find((phase) => phase.id === currentPhase)?.label ??
-      currentPhase
-    );
-  }, [currentPhase]);
-
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const action = resolveWorkbenchShortcutAction(
@@ -127,41 +69,25 @@ export const ChatWorkbenchShell = () => {
         return;
       }
 
-      event.preventDefault();
-
       if (action.type === "toggle-help") {
+        event.preventDefault();
         setHelpOpen((open) => !open);
         return;
       }
 
       if (action.type === "close-help") {
+        event.preventDefault();
         setHelpOpen(false);
         return;
       }
 
-      if (action.type === "phase-step") {
-        transitionPhaseBy(action.direction);
-        return;
-      }
-
       if (action.type === "toggle-preview") {
+        event.preventDefault();
         setPreviewVisible((visible) => {
           const next = !visible;
           showNotice(next ? "Preview panel shown." : "Preview panel hidden.");
           return next;
         });
-        return;
-      }
-
-      if (action.type === "insert-command") {
-        const command = SHORTCUT_COMMANDS[action.commandId];
-        const wrote = writeCommandToComposer(command);
-        showNotice(
-          wrote
-            ? `Inserted command: ${command}`
-            : "Composer input is unavailable for command insertion.",
-          wrote ? "info" : "warning"
-        );
       }
     };
 
@@ -169,69 +95,33 @@ export const ChatWorkbenchShell = () => {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [showNotice, transitionPhaseBy]);
+  }, [showNotice]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0c0f] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#0b0c0f] text-white lg:h-screen">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_at_15%_0%,rgba(95,167,150,0.16),transparent_60%),radial-gradient(900px_at_85%_15%,rgba(214,168,94,0.18),transparent_60%)]" />
-      <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10 sm:px-10">
+      {/* On lg the shell is pinned to the viewport (h-screen + overflow-hidden) so
+          the columns scroll INTERNALLY — growing chat can't push the canvas down
+          the page (s20-m12). Mobile keeps the natural min-h-screen stacking. */}
+      <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10 sm:px-10 lg:h-screen lg:overflow-hidden">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">
-              Workbench Runtime
+              Synthesis Workbench
             </p>
             <div className="mt-2 flex items-center gap-3">
               <h1 className="text-2xl font-semibold text-white">
-                LocalRuntime Chat Surface
+                Review &amp; Iterate
               </h1>
               <ProjectSwitcher />
             </div>
             <p className="mt-2 text-xs text-white/55">
-              Active phase: {phaseLabel}. Workflow mode: {workflowMode}. Press{" "}
-              <span className="font-semibold">?</span> for keyboard shortcuts.
+              Review what Forge generated, leave feedback, let the agent
+              regenerate. Press <span className="font-semibold">?</span> for
+              keyboard shortcuts.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="inline-flex items-center rounded-lg border border-white/20 bg-black/30 p-0.5 text-xs">
-              <button
-                type="button"
-                className={cn(
-                  "rounded-md px-2 py-1 transition",
-                  workflowMode === "strict"
-                    ? "bg-white text-black"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                )}
-                onClick={() => {
-                  setWorkflowMode("strict");
-                  showNotice("Workflow mode set to strict.");
-                }}
-              >
-                Strict
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  "rounded-md px-2 py-1 transition",
-                  workflowMode === "flexible"
-                    ? "bg-white text-black"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                )}
-                onClick={() => {
-                  setWorkflowMode("flexible");
-                  showNotice("Workflow mode set to flexible.");
-                }}
-              >
-                Flexible
-              </button>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="border-white/30 bg-white/5 text-white hover:bg-white/10"
-              onClick={() => setComponentBrowserOpen((open) => !open)}
-            >
-              {componentBrowserOpen ? "Hide Components" : "Components"}
-            </Button>
             <Button
               type="button"
               variant="outline"
@@ -248,13 +138,6 @@ export const ChatWorkbenchShell = () => {
             >
               Shortcuts
             </Button>
-            <Button
-              variant="outline"
-              className="border-white/30 bg-white/5 text-white"
-              asChild
-            >
-              <Link href="/">Back to Overview</Link>
-            </Button>
           </div>
         </header>
 
@@ -270,14 +153,11 @@ export const ChatWorkbenchShell = () => {
           </div>
         ) : null}
 
-        <FirstRunOnboarding />
-        <ProjectBrowser />
-        <TemplateBrowser />
-        {componentBrowserOpen && <ComponentBrowser />}
-
         <section
           className={cn(
-            "grid flex-1 gap-6",
+            // lg:min-h-0 lets the columns row shrink below its content height so
+            // each column scrolls internally instead of growing the page.
+            "grid flex-1 gap-6 lg:min-h-0",
             previewVisible ? "lg:grid-cols-[1.1fr_0.9fr]" : "lg:grid-cols-1"
           )}
         >
@@ -301,9 +181,7 @@ export const ChatWorkbenchShell = () => {
                 <h2 className="text-lg font-semibold text-white">
                   Keyboard Shortcuts
                 </h2>
-                <p className="mt-1 text-xs text-white/60">
-                  Power-user controls for phase navigation and command launch.
-                </p>
+                <p className="mt-1 text-xs text-white/60">Workspace controls.</p>
               </div>
               <Button
                 type="button"
@@ -320,7 +198,9 @@ export const ChatWorkbenchShell = () => {
                   key={`${entry.keys}-${entry.description}`}
                   className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-black/20 px-3 py-2"
                 >
-                  <span className="text-xs text-white/70">{entry.description}</span>
+                  <span className="text-xs text-white/70">
+                    {entry.description}
+                  </span>
                   <kbd className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-[11px] uppercase tracking-[0.14em] text-white/90">
                     {entry.keys}
                   </kbd>

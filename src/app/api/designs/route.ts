@@ -3,14 +3,10 @@ import { NextResponse } from 'next/server';
 import {
   deleteDesign,
   getDesignPath,
-  listDesigns,
-  loadDesign,
   saveDesign,
 } from '@/lib/persistence/design-store';
 import {
   deleteProjectDesign,
-  listProjectDesigns,
-  loadProjectDesignState,
   saveProjectDesign,
 } from '@/lib/persistence/project-design-store';
 import { setProjectActiveDesign } from '@/lib/persistence/project-catalog';
@@ -20,7 +16,6 @@ import { parseDesignDocument } from '@/types/document-model.schema';
 
 /**
  * POST /api/designs — Persist a design document to YAML
- * GET /api/designs — List project designs or load one by slug
  * DELETE /api/designs — Delete a design (confirm=true required)
  *
  * Body (POST): {
@@ -29,7 +24,6 @@ import { parseDesignDocument } from '@/types/document-model.schema';
  *   document: DesignDocument,
  *   tokenState?: { values, changes, history, updatedAt }
  * }
- * Query (GET): ?projectSlug=<slug>&slug=<designSlug>
  * Query (DELETE): ?projectSlug=<slug>&slug=<designSlug>&confirm=true
  */
 
@@ -91,65 +85,6 @@ export async function POST(request: Request) {
       slug,
       projectSlug: projectSlug ?? null,
       filePath,
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    const status = isNotFoundError(message) ? 404 : 500;
-    return NextResponse.json({ error: message }, { status });
-  }
-}
-
-export async function GET(request: Request) {
-  try {
-    const url = new URL(request.url);
-    const projectSlug = parseProjectSlug(url.searchParams.get('projectSlug'));
-    const slug = parseSlug(url.searchParams.get('slug'));
-
-    if (slug) {
-      if (projectSlug) {
-        const { document, dataContext, tokenState, restoredAt } =
-          await loadProjectDesignState(projectSlug, slug);
-        try {
-          await setProjectActiveDesign(projectSlug, slug);
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "";
-          if (!isNotFoundError(message)) {
-            throw error;
-          }
-        }
-        return NextResponse.json({
-          loaded: true,
-          slug,
-          projectSlug,
-          document,
-          dataContext,
-          tokenState,
-          restoredAt,
-          filePath: getProjectDesignPath(projectSlug, slug),
-        });
-      }
-
-      const document = await loadDesign(slug);
-      return NextResponse.json({
-        loaded: true,
-        slug,
-        projectSlug: null,
-        document,
-        dataContext: document.data ?? {},
-        restoredAt: new Date().toISOString(),
-        filePath: getDesignPath(slug),
-      });
-    }
-
-    const designs = projectSlug
-      ? await listProjectDesigns(projectSlug)
-      : await listDesigns();
-
-    return NextResponse.json({
-      listed: true,
-      projectSlug: projectSlug ?? null,
-      count: designs.length,
-      designs,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';

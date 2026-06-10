@@ -10,7 +10,7 @@ import {
 } from '../src/lib/persistence/project-design-store';
 import { saveProjectTokenState } from '../src/lib/persistence/project-token-store';
 import type { DesignDocument } from '../src/types/document-model';
-import { DELETE, GET, POST } from '../src/app/api/designs/route';
+import { DELETE, POST } from '../src/app/api/designs/route';
 import { DEFAULT_TOKEN_STATE } from '../src/types/token-state';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -114,72 +114,6 @@ describe('/api/designs route', () => {
     expect(
       await projectDesignExists('workspace', 'home', TEST_BASE_DIR)
     ).toBe(true);
-  });
-
-  it('loads and lists designs in project scope via GET', async () => {
-    await saveProjectDesign(
-      'workspace',
-      'home',
-      SAMPLE_DOCUMENT,
-      TEST_BASE_DIR
-    );
-    await saveProjectTokenState(
-      'workspace',
-      'home',
-      {
-        values: {
-          ...DEFAULT_TOKEN_STATE,
-          colors: {
-            ...DEFAULT_TOKEN_STATE.colors,
-            primary: '#123456',
-          },
-          custom: {
-            ...DEFAULT_TOKEN_STATE.custom,
-            'brand.glow': '0 0 0 3px #123456',
-          },
-        },
-        changes: {
-          'colors.primary': {
-            from: DEFAULT_TOKEN_STATE.colors.primary,
-            to: '#123456',
-          },
-          'custom.brand.glow': {
-            from: '',
-            to: '0 0 0 3px #123456',
-          },
-        },
-        history: [],
-      },
-      TEST_BASE_DIR
-    );
-
-    const listResponse = await GET(
-      new Request('http://localhost/api/designs?projectSlug=workspace')
-    );
-    const listPayload = await requestJson(listResponse);
-
-    expect(listResponse.status).toBe(200);
-    expect(listPayload.listed).toBe(true);
-    expect(listPayload.projectSlug).toBe('workspace');
-    expect(listPayload.count).toBe(1);
-    expect(listPayload.designs[0].slug).toBe('home');
-
-    const loadResponse = await GET(
-      new Request(
-        'http://localhost/api/designs?projectSlug=workspace&slug=home'
-      )
-    );
-    const loadPayload = await requestJson(loadResponse);
-
-    expect(loadResponse.status).toBe(200);
-    expect(loadPayload.loaded).toBe(true);
-    expect(loadPayload.slug).toBe('home');
-    expect(loadPayload.document.metadata.title).toBe('Workspace Home');
-    expect(loadPayload.dataContext.brand).toBe('Workbench');
-    expect(loadPayload.tokenState.values.colors.primary).toBe('#123456');
-    expect(loadPayload.tokenState.values.custom['brand.glow']).toBe(
-      '0 0 0 3px #123456'
-    );
   });
 
   it('requires explicit confirmation before DELETE', async () => {

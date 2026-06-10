@@ -1,0 +1,23 @@
+#!/bin/sh
+# Build-health gate (s21-m01) — blocks `git push` if the tree fails typecheck or build.
+# Runs the SAME two checks as CI (.github/workflows/build-health.yml).
+#
+# Why BOTH checks (neither alone is sufficient):
+#   - `npm run typecheck` (tsc on tsconfig.json) covers the FULL tree, including
+#     tests + scripts, which the production build deliberately excludes (decision 104).
+#   - `npm run build` (next build on tsconfig.build.json) covers app code the way
+#     it ships. Closes learning id2: 949 green tests sat on an unbuildable tree
+#     for ~3 months because nothing ran the build.
+#
+# Bypass in a genuine emergency with `git push --no-verify` (CI remains the backstop).
+#
+# Installed by the package.json "prepare" script: git config core.hooksPath .githooks
+set -e
+
+echo "[pre-push] typecheck (full tree)…"
+npm run --silent typecheck
+
+echo "[pre-push] build (production)…"
+npm run --silent build
+
+echo "[pre-push] build-health passed ✓"

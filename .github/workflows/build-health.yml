@@ -1,0 +1,45 @@
+name: build-health
+
+# Enforced build-health gate (s21-m01). Closes learning id2: 949 green vitest
+# tests sat on an unbuildable tree for ~3 months because nothing ran the build.
+# Runs the SAME two checks as the local pre-push hook (.githooks/pre-push).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Supersede in-flight runs on the same ref so only the latest commit is gated.
+concurrency:
+  group: build-health-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-health:
+    name: typecheck + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Full-tree type check (tsc on tsconfig.json) — covers tests + scripts,
+      # which the production build's narrowed tsconfig.build.json deliberately
+      # excludes (decision 104). A test/script type error is invisible to the
+      # build alone, so this job is required IN ADDITION to the build below.
+      - name: Typecheck (full tree)
+        run: npm run typecheck
+
+      # Production build (next build via tsconfig.build.json) — covers app code
+      # the way it ships. Required IN ADDITION to typecheck because each covers a
+      # gap the other misses. No env needed: every build-time env read in
+      # next.config.ts falls back to "" (no secrets at build time).
+      - name: Build (production)
+        run: npm run build

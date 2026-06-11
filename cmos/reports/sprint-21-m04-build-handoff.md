@@ -29,10 +29,15 @@ discovery + a11y/perf/network); keep `maxPages`/`crawlDepth` modest.
 
 1. **`FoundryMcpClient.designCompose`** — new method on the client
    (`foundry-client.ts`: add to the type at `:43-54`, impl ~`:782` alongside
-   `fetchStructuredData`, calling the shared `callTool` at `:632`). ⚠️ Confirm the
-   exact wire name under the action-mode contract — the hub tool is `design_compose`;
-   check the bridge allowlist (`OODS-Forge/packages/mcp-bridge/src/config.ts`) for
-   whether it's `design_compose` / `design.compose` / a grouped tool.
+   `fetchStructuredData`, calling the shared `callTool` at `:632`). ✅ RESOLVED
+   (verified live 2026-06-10 against the fresh :4466 bridge): wire name is
+   **`design_compose`** (external underscore name; bridge maps to internal
+   `design.compose`, and `/run` accepts both per `server.ts`
+   `resolveInternalToolName`). A live probe through the LOCAL bridge (not just
+   the hub) returned `ok:true` with the full result shape: `{status, layout,
+   schema, schemaRef, schemaRefCreatedAt, schemaRefExpiresAt, selections,
+   validation, warnings, meta}` — `meta.label` present on slot children,
+   7 selections, dry-run mode.
 
 2. **`ComponentNode.meta?: { label?: string }`** in `src/types/document-model.ts`
    — the "adapter option (b)" my m03 doc flagged. Persist Forge's composed

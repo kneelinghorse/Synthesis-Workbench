@@ -1,5 +1,7 @@
+import { PRIMITIVE_PROP_GUIDANCE } from "@/lib/foundry/catalog";
 import { COMPONENT_CATALOG_TOOL_NAME } from "@/lib/runtime/tools/component-catalog-tool";
 import { PATCH_NODE_TOOL_NAME, SET_DATA_CONTEXT_TOOL_NAME, SET_DOCUMENT_TOOL_NAME } from "@/lib/runtime/tools/document-tools";
+import { FORGE_REGENERATE_TOOL_NAME } from "@/lib/runtime/tools/forge-regenerate-tools";
 import { RENDER_COMPONENT_TOOL_NAME } from "@/lib/runtime/tools/oods-tools";
 import {
   LOAD_BUNDLE_TOOL_NAME,
@@ -130,6 +132,50 @@ export const getAnthropicToolDefinitions = (): AnthropicToolDefinition[] => [
         addressesCommentIds: ADDRESSES_COMMENT_IDS_SCHEMA,
       },
       required: ["requestId", "nodeId"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: FORGE_REGENERATE_TOOL_NAME,
+    description:
+      "Regenerate the WHOLE document via headless Forge: your intent is composed " +
+      "into a fresh document (design_compose) and proposed to the human for " +
+      "review before anything applies. Use this to SEED a document or when " +
+      "critique demands structural change; iterate on the seeded document with " +
+      "patch_node — do NOT recompose on every turn. Anchor your reasoning about " +
+      "comments on the durable slot label (data-oods-label), never the node id " +
+      "(ids are re-minted as ${slot}-${counter} on every regenerate). " +
+      "addressesCommentIds is REQUIRED: a full regenerate has no target node for " +
+      "auto-matching, so the ids you declare are the only thing that resolves " +
+      "pinned comments (pass [] only when no open comment applies). " +
+      PRIMITIVE_PROP_GUIDANCE,
+    input_schema: {
+      type: "object",
+      properties: {
+        requestId: REQUEST_ID_SCHEMA,
+        title: OPTIONAL_TEXT_SCHEMA,
+        prompt: OPTIONAL_TEXT_SCHEMA,
+        intent: {
+          type: "string",
+          description:
+            "Natural-language description of the FULL desired document (e.g. " +
+            "'marketing landing page: hero with headline and CTA, three feature " +
+            "sections, footer'). Fold the open review comments you are " +
+            "addressing into this description.",
+        },
+        layout: {
+          type: "string",
+          description:
+            "Forge layout template: dashboard, form, detail, list, card, " +
+            "timeline, landing, or auto (default).",
+        },
+        addressesCommentIds: {
+          ...ADDRESSES_COMMENT_IDS_SCHEMA,
+          description:
+            "REQUIRED. " + ADDRESSES_COMMENT_IDS_SCHEMA.description,
+        },
+      },
+      required: ["requestId", "intent", "addressesCommentIds"],
       additionalProperties: false,
     },
   },

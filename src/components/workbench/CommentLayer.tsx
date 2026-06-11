@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 export type LiveAnchor = {
   nodeId: string | null;
   label: string | null;
+  /** Nearest ancestor data-oods-label — the entity-slot disambiguator (dec 119). */
+  ancestorLabel?: string | null;
   rect: PreviewAnchorRect;
 };
 
@@ -36,12 +38,22 @@ type CommentLayerProps = {
 };
 
 const anchorLabel = (anchor: CommentAnchor): string =>
-  anchor.kind === "slot" ? anchor.slotLabel ?? "slot" : anchor.componentId ?? "element";
+  anchor.kind === "instance"
+    ? anchor.componentId ?? "element"
+    : anchor.slotLabel ?? "slot";
 
-const rectFor = (
+export const rectFor = (
   anchor: CommentAnchor,
   anchors: LiveAnchor[],
 ): PreviewAnchorRect | null => {
+  if (anchor.kind === "entity-slot") {
+    // Durable anchors pin only on an UNAMBIGUOUS match (decisions 119/141):
+    // when the label collides, attaching to an arbitrary collider would be a
+    // silent mis-pin — rendering detached is the honest state. Instance/slot
+    // anchors keep their v1 first-match behavior unchanged.
+    const matches = anchors.filter((live) => anchorMatchesPreview(anchor, live));
+    return matches.length === 1 ? matches[0].rect : null;
+  }
   const match = anchors.find((live) => anchorMatchesPreview(anchor, live));
   return match ? match.rect : null;
 };

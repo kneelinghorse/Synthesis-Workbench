@@ -5,6 +5,7 @@ import { Stage1BundleToolUI } from "./Stage1BundleTool";
 import { TokenAdjustmentToolUI } from "./TokenAdjustmentToolUI";
 import { FoundryTokenSyncToolUI } from "./FoundryTokenSyncToolUI";
 import { SetDocumentToolUI, PatchNodeToolUI } from "./DocumentToolUI";
+import { ForgeRegenerateToolUI } from "./ForgeRegenerateToolUI";
 import { SetDataContextToolUI } from "./SetDataContextToolUI";
 import { ValidateSchemaToolUI } from "./ValidateSchemaToolUI";
 import { ComponentCatalogToolUI } from "./ComponentCatalogToolUI";
@@ -35,6 +36,9 @@ export const ToolUIRegistry = () => (
     </ToolErrorBoundary>
     <ToolErrorBoundary>
       <PatchNodeToolUI />
+    </ToolErrorBoundary>
+    <ToolErrorBoundary>
+      <ForgeRegenerateToolUI />
     </ToolErrorBoundary>
     <ToolErrorBoundary>
       <SetDataContextToolUI />

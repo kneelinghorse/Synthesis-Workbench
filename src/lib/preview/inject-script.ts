@@ -135,17 +135,29 @@ const buildPreviewInjectScript = () => {
     return { top: r.top, left: r.left, width: r.width, height: r.height };
   };
 
+  // Nearest ANCESTOR data-oods-label — the entity-slot disambiguator
+  // (decision 119) that tells colliding slot labels apart.
+  const readAncestorLabel = (el) => {
+    const labeled = el.parentElement
+      ? el.parentElement.closest("[data-oods-label]")
+      : null;
+    return labeled ? labeled.getAttribute("data-oods-label") : null;
+  };
+
   const readAnchor = (el) => ({
     nodeId: el.getAttribute("data-oods-node-id"),
     label: el.getAttribute("data-oods-label"),
+    ancestorLabel: readAncestorLabel(el),
   });
 
   const collectAnchors = () => {
     const anchors = [];
     document.querySelectorAll(ANCHOR_SELECTOR).forEach((el) => {
+      const anchor = readAnchor(el);
       anchors.push({
-        nodeId: readAnchor(el).nodeId,
-        label: readAnchor(el).label,
+        nodeId: anchor.nodeId,
+        label: anchor.label,
+        ancestorLabel: anchor.ancestorLabel,
         rect: readRect(el),
       });
     });
@@ -188,12 +200,14 @@ const buildPreviewInjectScript = () => {
       const anchorEl = target.closest(ANCHOR_SELECTOR);
       if (!anchorEl) return;
       const text = (anchorEl.textContent || "").trim().slice(0, 200);
+      const anchor = readAnchor(anchorEl);
       postToParent({
         source: SOURCE,
         type: TYPES.PREVIEW_SELECTION,
         payload: {
-          nodeId: readAnchor(anchorEl).nodeId,
-          label: readAnchor(anchorEl).label,
+          nodeId: anchor.nodeId,
+          label: anchor.label,
+          ancestorLabel: anchor.ancestorLabel,
           rect: readRect(anchorEl),
           text,
         },

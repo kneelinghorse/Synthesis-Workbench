@@ -57,6 +57,7 @@ function createMockFoundryClient(): FoundryMcpClient {
       raw: null,
     })),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    designCompose: vi.fn(),
     fetchStructuredData: vi.fn(),
   };
 }
@@ -173,16 +174,17 @@ function resetAllStores() {
 // ============================================================================
 
 describe("Cross-Service Integration: Tool Definitions", () => {
-  it("should export all 10 tool definitions for the Anthropic adapter", () => {
+  it("should export all 11 tool definitions for the Anthropic adapter", () => {
     const tools = getAnthropicToolDefinitions();
 
-    expect(tools).toHaveLength(10);
+    expect(tools).toHaveLength(11);
 
     const toolNames = tools.map((t) => t.name);
     expect(toolNames).toContain("render_component");
     expect(toolNames).toContain("validate_schema");
     expect(toolNames).toContain("set_document");
     expect(toolNames).toContain("patch_node");
+    expect(toolNames).toContain("forge_regenerate");
     expect(toolNames).toContain("set_data_context");
     expect(toolNames).toContain("update_token_state");
     expect(toolNames).toContain("component_catalog");

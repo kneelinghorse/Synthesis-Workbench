@@ -88,6 +88,7 @@ const createClient = (
     vi.fn(renderImpl ?? (async () => makeFragmentResponse({}))),
   validate: vi.fn(async () => ({ errors: [], warnings: [], valid: true, raw: null })),
   buildTokens: vi.fn(async () => ({ raw: null })),
+  designCompose: vi.fn(),
   fetchStructuredData: vi.fn(),
   ...overrides,
 });

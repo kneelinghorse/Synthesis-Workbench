@@ -79,6 +79,13 @@ export const componentRefSchema = z
   });
 
 /**
+ * Component meta schema (Forge-composed durable slot label)
+ */
+export const componentMetaSchema = z.object({
+  label: z.string().optional(),
+});
+
+/**
  * ComponentNode schema
  */
 export const componentNodeSchema = z.object({
@@ -86,6 +93,7 @@ export const componentNodeSchema = z.object({
   id: z.string().min(1, 'Component id is required'),
   ref: componentRefSchema,
   props: componentPropsSchema,
+  meta: componentMetaSchema.optional(),
 }) satisfies z.ZodType<ComponentNode>;
 
 /**

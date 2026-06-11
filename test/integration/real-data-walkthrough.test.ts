@@ -299,6 +299,7 @@ function createRealDataClient(): FoundryMcpClient {
       return { valid: true, errors: [], warnings: [], raw: schema };
     }),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    designCompose: vi.fn(),
     fetchStructuredData: vi.fn(),
   };
 }

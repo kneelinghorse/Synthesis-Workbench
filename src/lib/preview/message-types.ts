@@ -60,11 +60,14 @@ export type PreviewAnchorRect = {
 /**
  * A Forge anchor located in the preview DOM. `nodeId` is `data-oods-node-id`
  * (the deterministic instance anchor); `label` is `data-oods-label` (the slot
- * anchor). At least one is non-null.
+ * anchor). At least one is non-null. `ancestorLabel` is the nearest ANCESTOR's
+ * `data-oods-label` — the entity-slot disambiguator (decision 119) — null when
+ * no labeled ancestor exists.
  */
 export type PreviewAnchor = {
   nodeId: string | null;
   label: string | null;
+  ancestorLabel?: string | null;
 };
 
 export type PreviewSelectionMessage = {

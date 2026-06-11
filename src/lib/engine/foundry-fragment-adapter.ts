@@ -295,12 +295,15 @@ export const buildFoundryFragmentRenderInput = (
   for (const [order, component] of components.entries()) {
     const resolvedProps = resolveComponentProps(component, dataContext, bindingErrors);
     const normalizedComponent = normalizeComponentName(component.ref);
-    // Forward a slot label so Forge emits data-oods-label on the slot node. Use
-    // the raw label/title prop (not resolvedProps) so the anchor stays stable
-    // across data changes — the comment layer pins slot-kind anchors to it.
-    // (s20-m06; durable slot name from Forge lands via option (b) in s20-m07.)
+    // Forward a slot label so Forge emits data-oods-label on the slot node.
+    // Prefer the Forge-composed durable slot name persisted on the node
+    // (meta.label, set by the design_compose -> document converter, s21-m04);
+    // fall back to the raw label/title prop (not resolvedProps) so the anchor
+    // stays stable across data changes — the comment layer pins to it.
     const slotLabel =
-      toStringValue(component.props.label) ?? toStringValue(component.props.title);
+      toStringValue(component.meta?.label) ??
+      toStringValue(component.props.label) ??
+      toStringValue(component.props.title);
     children.push({
       id: component.id,
       component: normalizedComponent,

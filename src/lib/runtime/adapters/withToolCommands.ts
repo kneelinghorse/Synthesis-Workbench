@@ -51,6 +51,7 @@ import {
   type ComponentCatalogToolArgs,
   type ComponentCatalogToolResult,
 } from "@/lib/runtime/tools/component-catalog-tool";
+import { FORGE_REGENERATE_TOOL_NAME } from "@/lib/runtime/tools/forge-regenerate-tools";
 import { useTokenStateStore } from "@/lib/stores/token-state";
 import { getComponentCatalogPromptSection } from "@/lib/foundry/catalog";
 
@@ -981,13 +982,15 @@ export const withToolCommands = (
       return await validateSchema(args as ValidateSchemaToolArgs);
     }
 
-    // set_document / patch_node are GATED through the suggest-and-confirm tool
-    // UI (DocumentToolUI) — only a human Accept applies the change. This
-    // dispatcher is not wired to the LocalRuntime path, but guard it so a future
-    // mis-wiring can never silently mutate the document without confirmation.
+    // set_document / patch_node / forge_regenerate are GATED through the
+    // suggest-and-confirm tool UI (DocumentToolUI / ForgeRegenerateToolUI) —
+    // only a human Accept applies the change. This dispatcher is not wired to
+    // the LocalRuntime path, but guard it so a future mis-wiring can never
+    // silently mutate the document without confirmation.
     if (
       toolName === SET_DOCUMENT_TOOL_NAME ||
-      toolName === PATCH_NODE_TOOL_NAME
+      toolName === PATCH_NODE_TOOL_NAME ||
+      toolName === FORGE_REGENERATE_TOOL_NAME
     ) {
       return {
         error: `"${toolName}" is gated through the suggest-and-confirm UI and cannot be auto-executed.`,

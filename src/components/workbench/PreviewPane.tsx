@@ -13,8 +13,10 @@ import {
   createTokenStateUpdateMessage,
   isPreviewMessage,
 } from "@/lib/preview/message-types";
+import { isForgeComposedDocument } from "@/lib/engine/foundry-compose-adapter";
 import { anchorFromPreview } from "@/lib/stores/comment-state";
 import { useDataContextStore } from "@/lib/stores/data-context";
+import { useDocumentStateStore } from "@/lib/stores/document-state";
 import { usePreviewStateStore } from "@/lib/stores/preview-state";
 import { useTokenStateStore } from "@/lib/stores/token-state";
 import { cn } from "@/lib/utils";
@@ -122,6 +124,9 @@ export const PreviewPane = ({
   // Comment-layer state, fed entirely by iframe -> parent messages (the
   // sandboxed iframe DOM is unreadable from here).
   const [anchors, setAnchors] = useState<LiveAnchor[]>([]);
+  // Mirror of `anchors` readable inside the stable message handler (the
+  // handler's effect deps must not churn per anchor broadcast).
+  const liveAnchorsRef = useRef<LiveAnchor[]>([]);
   const [selection, setSelection] = useState<PendingSelection | null>(null);
   const lastHtmlRef = useRef("");
   const initialCssVarsRef = useRef(cssVars);
@@ -261,14 +266,32 @@ export const PreviewPane = ({
         // Defensive: isPreviewMessage only validates source+type, not payload.
         const { anchors: nextAnchors } = event.data.payload;
         if (Array.isArray(nextAnchors)) {
+          liveAnchorsRef.current = nextAnchors;
           setAnchors(nextAnchors);
         }
         return;
       }
 
       if (event.data.type === PREVIEW_MESSAGE_TYPES.PREVIEW_SELECTION) {
-        const { nodeId, label, rect, text } = event.data.payload;
-        const anchor = rect ? anchorFromPreview(nodeId, label) : null;
+        const { nodeId, label, ancestorLabel, rect, text } = event.data.payload;
+        // Forge-composed documents lose instance ids on every regenerate, so
+        // pins there prefer the durable entity-slot anchor (decision 119) —
+        // but ONLY when the clicked label is unambiguous in the live preview:
+        // a colliding label cannot identify the clicked element, so the pin
+        // falls back to the instance anchor rather than mis-pinning to an
+        // arbitrary collider. Reads stores/refs imperatively at click time.
+        const labelIsUnambiguous =
+          Boolean(label) &&
+          liveAnchorsRef.current.filter((live) => live.label === label).length === 1;
+        const preferDurable =
+          labelIsUnambiguous &&
+          isForgeComposedDocument(useDocumentStateStore.getState().document);
+        const anchor = rect
+          ? anchorFromPreview(nodeId, label, {
+              preferDurable,
+              ancestorLabel: ancestorLabel ?? null,
+            })
+          : null;
         if (anchor) {
           setSelection({ anchor, rect, text: text ?? "" });
         }
@@ -335,6 +358,7 @@ export const PreviewPane = ({
     setConnectionStatus("connecting");
     startHandshakeTimeout();
     // The reloaded document re-broadcasts its anchors; drop stale overlay state.
+    liveAnchorsRef.current = [];
     setAnchors([]);
     setSelection(null);
     pendingCssVarsRef.current = cssVars;

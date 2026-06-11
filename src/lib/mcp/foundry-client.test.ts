@@ -451,6 +451,117 @@ describe("foundry MCP client", () => {
     });
   });
 
+  it("composes a design via the bridge design_compose tool", async () => {
+    const fetcher = createMockFetch({
+      jsonPayload: {
+        ok: true,
+        result: {
+          status: "ok",
+          layout: "landing",
+          schema: {
+            version: "2026.02",
+            screens: [
+              {
+                id: "screen-landing-1",
+                component: "Stack",
+                children: [
+                  {
+                    id: "slot-hero-2",
+                    component: "DetailHeader",
+                    meta: { label: "hero", intent: "slot:hero", confidence: 0.61 },
+                  },
+                ],
+              },
+            ],
+          },
+          schemaRef: "compose-abc123",
+          schemaRefExpiresAt: "2026-06-11T05:15:46.552Z",
+          selections: [
+            {
+              slotName: "hero",
+              intent: "page-header",
+              selectedComponent: "DetailHeader",
+              confidence: 0.61,
+              confidenceLevel: "medium",
+              explanation: "DetailHeader was selected for slot \"hero\".",
+            },
+          ],
+          validation: { status: "ok", errors: [], warnings: [] },
+          warnings: [],
+          meta: {
+            slotCount: 1,
+            intelligence: {
+              lowConfidenceSlots: 1,
+              lowConfidenceSlotNames: ["hero"],
+            },
+          },
+        },
+      },
+    });
+    const fetchSpy = fetcher as unknown as ReturnType<typeof vi.fn>;
+
+    const client = createFoundryMcpClient({
+      baseUrl: "http://foundry.test/run",
+      fetcher,
+    });
+
+    const output = await client.designCompose({
+      intent: "Marketing landing page",
+      layout: "landing",
+    });
+
+    expect(output.status).toBe("ok");
+    expect(output.layout).toBe("landing");
+    expect(output.schemaRef).toBe("compose-abc123");
+    expect(output.schema.version).toBe("2026.02");
+    expect(Array.isArray(output.schema.screens)).toBe(true);
+    expect(output.selections).toEqual([
+      {
+        slotName: "hero",
+        intent: "page-header",
+        selectedComponent: "DetailHeader",
+        confidence: 0.61,
+        confidenceLevel: "medium",
+        explanation: 'DetailHeader was selected for slot "hero".',
+      },
+    ]);
+    expect(output.lowConfidenceSlotNames).toEqual(["hero"]);
+    expect(output.validation?.valid).toBe(true);
+
+    const requestBody = JSON.parse(
+      String(fetchSpy.mock.calls[0]?.[1]?.body ?? "{}")
+    ) as Record<string, unknown>;
+    expect(requestBody).toEqual({
+      tool: "design_compose",
+      input: {
+        intent: "Marketing landing page",
+        layout: "landing",
+      },
+    });
+  });
+
+  it("rejects design compose responses without a UiSchema", async () => {
+    const fetcher = createMockFetch({
+      jsonPayload: {
+        ok: true,
+        result: { status: "ok", layout: "landing" },
+      },
+    });
+
+    const client = createFoundryMcpClient({
+      baseUrl: "http://foundry.test/run",
+      fetcher,
+      retry: { maxAttempts: 1 },
+    });
+
+    await expect(
+      client.designCompose({ intent: "anything" })
+    ).rejects.toMatchObject({
+      name: "FoundryMcpError",
+      code: "MISSING_SCHEMA",
+    });
+  });
+
   it("returns token build payloads", async () => {
     const fetcher = createMockFetch({
       jsonPayload: {

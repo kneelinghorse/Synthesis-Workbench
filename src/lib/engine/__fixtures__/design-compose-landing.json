@@ -1,0 +1,484 @@
+{
+  "status": "ok",
+  "layout": "landing",
+  "schema": {
+    "version": "2026.02",
+    "screens": [
+      {
+        "id": "screen-landing-15",
+        "component": "Stack",
+        "layout": {
+          "type": "stack",
+          "gapToken": "cluster-default"
+        },
+        "children": [
+          {
+            "id": "landing-hero-1",
+            "component": "Stack",
+            "layout": {
+              "type": "stack",
+              "align": "center",
+              "gapToken": "cluster-default"
+            },
+            "style": {
+              "spacingToken": "inset-default"
+            },
+            "children": [
+              {
+                "id": "slot-hero-2",
+                "component": "DetailHeader",
+                "meta": {
+                  "intent": "slot:hero",
+                  "label": "hero",
+                  "confidence": 0.61,
+                  "confidenceLevel": "low"
+                }
+              },
+              {
+                "id": "slot-hero-cta-3",
+                "component": "Button",
+                "meta": {
+                  "intent": "slot:hero-cta",
+                  "label": "hero-cta",
+                  "confidence": 0.94,
+                  "confidenceLevel": "low"
+                }
+              }
+            ]
+          },
+          {
+            "id": "landing-sections-10",
+            "component": "Stack",
+            "layout": {
+              "type": "stack",
+              "gapToken": "cluster-default"
+            },
+            "children": [
+              {
+                "id": "landing-section-0-4",
+                "component": "Card",
+                "layout": {
+                  "type": "stack",
+                  "gapToken": "cluster-tight"
+                },
+                "style": {
+                  "spacingToken": "inset-default"
+                },
+                "children": [
+                  {
+                    "id": "slot-section-0-5",
+                    "component": "Card",
+                    "meta": {
+                      "intent": "slot:section-0",
+                      "label": "section-0",
+                      "confidence": 0.82,
+                      "confidenceLevel": "low"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "landing-section-1-6",
+                "component": "Card",
+                "layout": {
+                  "type": "stack",
+                  "gapToken": "cluster-tight"
+                },
+                "style": {
+                  "spacingToken": "inset-default"
+                },
+                "children": [
+                  {
+                    "id": "slot-section-1-7",
+                    "component": "Card",
+                    "meta": {
+                      "intent": "slot:section-1",
+                      "label": "section-1",
+                      "confidence": 0.82,
+                      "confidenceLevel": "low"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "landing-section-2-8",
+                "component": "Card",
+                "layout": {
+                  "type": "stack",
+                  "gapToken": "cluster-tight"
+                },
+                "style": {
+                  "spacingToken": "inset-default"
+                },
+                "children": [
+                  {
+                    "id": "slot-section-2-9",
+                    "component": "Card",
+                    "meta": {
+                      "intent": "slot:section-2",
+                      "label": "section-2",
+                      "confidence": 0.82,
+                      "confidenceLevel": "low"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "landing-cta-11",
+            "component": "Stack",
+            "layout": {
+              "type": "inline",
+              "align": "center"
+            },
+            "style": {
+              "spacingToken": "inset-default"
+            },
+            "children": [
+              {
+                "id": "slot-cta-12",
+                "component": "Button",
+                "meta": {
+                  "intent": "slot:cta",
+                  "label": "cta",
+                  "confidence": 0.94,
+                  "confidenceLevel": "low"
+                }
+              }
+            ]
+          },
+          {
+            "id": "landing-footer-13",
+            "component": "Stack",
+            "layout": {
+              "type": "inline",
+              "align": "space-between"
+            },
+            "style": {
+              "spacingToken": "inset-squish"
+            },
+            "children": [
+              {
+                "id": "slot-footer-14",
+                "component": "AuditTimeline",
+                "meta": {
+                  "intent": "slot:footer",
+                  "label": "footer",
+                  "confidence": 0.26,
+                  "confidenceLevel": "low"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "schemaRef": "compose-f54fd615",
+  "schemaRefCreatedAt": "2026-06-11T04:45:46.552Z",
+  "schemaRefExpiresAt": "2026-06-11T05:15:46.552Z",
+  "selections": [
+    {
+      "slotName": "hero",
+      "intent": "page-header",
+      "selectedComponent": "DetailHeader",
+      "confidence": 0.61,
+      "confidenceLevel": "medium",
+      "explanation": "DetailHeader was selected for slot \"hero\" because preferred for \"page-header\" (rank 2); 1 context match(es); 1 trait(s); name contains \"header\". Confidence is medium (0.61).",
+      "candidates": [
+        {
+          "name": "DetailHeader",
+          "confidence": 1,
+          "reason": "preferred for \"page-header\" (rank 2); 1 context match(es); 1 trait(s); name contains \"header\"",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Text",
+          "confidence": 0.92,
+          "reason": "preferred for \"page-header\" (rank 1); 1 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Badge",
+          "confidence": 0.3,
+          "reason": "1 context match(es); 1 region match(es); 1 trait(s)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "hero-cta",
+      "intent": "action-button",
+      "selectedComponent": "Button",
+      "confidence": 0.94,
+      "confidenceLevel": "high",
+      "explanation": "Button was selected for slot \"hero-cta\" because preferred for \"action-button\" (rank 1); 2 tag match(es); tag match (action); 1 region match(es); 1 category match(es); name contains \"button\". Confidence is high (0.94).",
+      "candidates": [
+        {
+          "name": "Button",
+          "confidence": 1,
+          "reason": "preferred for \"action-button\" (rank 1); 2 tag match(es); tag match (action); 1 region match(es); 1 category match(es); name contains \"button\"",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Checkbox",
+          "confidence": 0.14,
+          "reason": "1 tag match(es); 1 category match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "DatePicker",
+          "confidence": 0.14,
+          "reason": "1 tag match(es); 1 category match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "section-0",
+      "intent": "data-display",
+      "selectedComponent": "Card",
+      "confidence": 0.82,
+      "confidenceLevel": "high",
+      "explanation": "Card was selected for slot \"section-0\" because preferred for \"data-display\" (rank 1); 2 tag match(es); 2 context match(es); 1 region match(es). Confidence is high (0.82).",
+      "candidates": [
+        {
+          "name": "Card",
+          "confidence": 1,
+          "reason": "preferred for \"data-display\" (rank 1); 2 tag match(es); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.98,
+          "reason": "preferred for \"data-display\" (rank 2); 1 tag match(es); tag match (data); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Stack",
+          "confidence": 0.66,
+          "reason": "preferred for \"data-display\" (rank 3); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "section-1",
+      "intent": "data-display",
+      "selectedComponent": "Card",
+      "confidence": 0.82,
+      "confidenceLevel": "high",
+      "explanation": "Card was selected for slot \"section-1\" because preferred for \"data-display\" (rank 1); 2 tag match(es); 2 context match(es); 1 region match(es). Confidence is high (0.82).",
+      "candidates": [
+        {
+          "name": "Card",
+          "confidence": 1,
+          "reason": "preferred for \"data-display\" (rank 1); 2 tag match(es); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.98,
+          "reason": "preferred for \"data-display\" (rank 2); 1 tag match(es); tag match (data); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Stack",
+          "confidence": 0.66,
+          "reason": "preferred for \"data-display\" (rank 3); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "section-2",
+      "intent": "data-display",
+      "selectedComponent": "Card",
+      "confidence": 0.82,
+      "confidenceLevel": "high",
+      "explanation": "Card was selected for slot \"section-2\" because preferred for \"data-display\" (rank 1); 2 tag match(es); 2 context match(es); 1 region match(es). Confidence is high (0.82).",
+      "candidates": [
+        {
+          "name": "Card",
+          "confidence": 1,
+          "reason": "preferred for \"data-display\" (rank 1); 2 tag match(es); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.98,
+          "reason": "preferred for \"data-display\" (rank 2); 1 tag match(es); tag match (data); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Stack",
+          "confidence": 0.66,
+          "reason": "preferred for \"data-display\" (rank 3); 2 context match(es); 1 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "cta",
+      "intent": "action-button",
+      "selectedComponent": "Button",
+      "confidence": 0.94,
+      "confidenceLevel": "high",
+      "explanation": "Button was selected for slot \"cta\" because preferred for \"action-button\" (rank 1); 2 tag match(es); tag match (action); 1 region match(es); 1 category match(es); name contains \"button\". Confidence is high (0.94).",
+      "candidates": [
+        {
+          "name": "Button",
+          "confidence": 1,
+          "reason": "preferred for \"action-button\" (rank 1); 2 tag match(es); tag match (action); 1 region match(es); 1 category match(es); name contains \"button\"",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Checkbox",
+          "confidence": 0.14,
+          "reason": "1 tag match(es); 1 category match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "DatePicker",
+          "confidence": 0.14,
+          "reason": "1 tag match(es); 1 category match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "footer",
+      "intent": "data-display",
+      "selectedComponent": "AuditTimeline",
+      "confidence": 0.26,
+      "confidenceLevel": "low",
+      "explanation": "AuditTimeline was selected for slot \"footer\" because tag match (metadata); 1 context match(es); 2 trait(s). Confidence is low (0.26). Alternatives to review: LabelCell (0.92), RelativeTimestamp (0.92). Review this slot before shipping, or pin a component with preferences.componentOverrides if you disagree with the pick.",
+      "candidates": [
+        {
+          "name": "AuditTimeline",
+          "confidence": 1,
+          "reason": "tag match (metadata); 1 context match(es); 2 trait(s)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "LabelCell",
+          "confidence": 0.92,
+          "reason": "tag match (metadata); 1 context match(es); 1 trait(s)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "RelativeTimestamp",
+          "confidence": 0.92,
+          "reason": "tag match (metadata); 1 context match(es); 1 trait(s)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        }
+      ],
+      "alternativeCandidates": [
+        {
+          "name": "LabelCell",
+          "confidence": 0.92,
+          "reason": "tag match (metadata); 1 context match(es); 1 trait(s)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "RelativeTimestamp",
+          "confidence": 0.92,
+          "reason": "tag match (metadata); 1 context match(es); 1 trait(s)",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        }
+      ],
+      "reviewHint": "Low-confidence selection for \"footer\". Consider preferences.componentOverrides to pin a different component if needed."
+    }
+  ],
+  "validation": {
+    "status": "ok",
+    "errors": [],
+    "warnings": []
+  },
+  "warnings": [],
+  "meta": {
+    "intentParsed": "Marketing landing page for a developer-tools product: hero with headline and CTA, three feature sections, closing call-to-action, footer",
+    "layoutDetected": "explicit: landing",
+    "slotCount": 7,
+    "nodeCount": 15,
+    "intelligence": {
+      "positionAffinityUsed": true,
+      "fieldAffinityUsed": false,
+      "compositionConfidence": 0.74,
+      "lowConfidenceSlots": 1,
+      "lowConfidenceSlotNames": [
+        "footer"
+      ]
+    }
+  }
+}

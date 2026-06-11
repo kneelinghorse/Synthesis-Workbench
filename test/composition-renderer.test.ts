@@ -46,6 +46,7 @@ function createMockClient(
     }),
     validate: vi.fn(async () => ({ errors: [], warnings: [], valid: true, raw: null })),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    designCompose: vi.fn(),
     fetchStructuredData: vi.fn(async () => ({
       dataset: 'components' as const,
       version: null,

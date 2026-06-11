@@ -9,6 +9,7 @@ import type {
 } from "@/types/document-model";
 
 import {
+  collectExpectedRegenerateAnchors,
   confirmForgeRegenerate,
   forgeRegenerateCommentLink,
   reconcileAnchorsAfterRegenerate,
@@ -160,12 +161,36 @@ describe("fresh-anchor reconciliation after a full Forge regenerate", () => {
     expect(r.status).toBe("orphaned");
   });
 
-  it("an instance (node-id) anchor survives only if Forge kept the exact id", () => {
+  it("a surviving instance anchor with a unique durable label is RE-PINNED to entity-slot (decision 119)", () => {
+    // The id survived THIS regenerate, but the next one will re-mint it — the
+    // flip to the durable label is what makes the comment regenerate-proof.
     const comments = [openComment("c-1", { kind: "instance", componentId: "btn-1" })];
     const newAnchors = [{ nodeId: "btn-1", label: "primary-cta" }];
 
     const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
+    expect(r.status).toBe("repinned");
+    expect(r.anchor).toEqual({ kind: "entity-slot", slotLabel: "primary-cta" });
+  });
+
+  it("a surviving instance anchor stays instance when its label would be ambiguous — no unsafe upgrade", () => {
+    const comments = [openComment("c-1", { kind: "instance", componentId: "card-1" })];
+    const newAnchors = [
+      { nodeId: "card-1", label: "card" },
+      { nodeId: "card-2", label: "card" },
+    ];
+
+    const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
     expect(r.status).toBe("survived");
+    expect(r.anchor).toEqual({ kind: "instance", componentId: "card-1" });
+  });
+
+  it("a surviving instance anchor stays instance when the node carries no label", () => {
+    const comments = [openComment("c-1", { kind: "instance", componentId: "btn-1" })];
+    const newAnchors = [{ nodeId: "btn-1", label: null }];
+
+    const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
+    expect(r.status).toBe("survived");
+    expect(r.anchor).toEqual({ kind: "instance", componentId: "btn-1" });
   });
 
   it("an instance anchor orphans when Forge renumbered the id — the durability gap that motivates label anchoring", () => {
@@ -173,6 +198,59 @@ describe("fresh-anchor reconciliation after a full Forge regenerate", () => {
     // counter, so btn-1 becomes (e.g.) btn-2 and the instance anchor cannot recover.
     const comments = [openComment("c-1", { kind: "instance", componentId: "btn-1" })];
     const newAnchors = [{ nodeId: "btn-2", label: "primary-cta" }];
+
+    const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
+    expect(r.status).toBe("orphaned");
+  });
+
+  it("an entity-slot anchor survives when its (label, ancestor) pair matches exactly once", () => {
+    const comments = [
+      openComment("c-1", {
+        kind: "entity-slot",
+        slotLabel: "cta",
+        disambiguator: "hero",
+      }),
+    ];
+    const newAnchors = [
+      { nodeId: "cta-7", label: "cta", ancestorLabel: "hero" },
+      { nodeId: "cta-9", label: "cta", ancestorLabel: "footer" },
+    ];
+
+    const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
+    expect(r.status).toBe("survived");
+  });
+
+  it("an entity-slot anchor re-pins when the slot moved under a different ancestor but the label stayed unique", () => {
+    const comments = [
+      openComment("c-1", {
+        kind: "entity-slot",
+        slotLabel: "cta",
+        disambiguator: "hero",
+      }),
+    ];
+    const newAnchors = [{ nodeId: "cta-9", label: "cta", ancestorLabel: "footer" }];
+
+    const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
+    expect(r.status).toBe("repinned");
+    expect(r.anchor).toEqual({
+      kind: "entity-slot",
+      slotLabel: "cta",
+      disambiguator: "footer",
+    });
+  });
+
+  it("an entity-slot anchor orphans on a colliding label — never pinned to an ambiguous candidate", () => {
+    const comments = [
+      openComment("c-1", {
+        kind: "entity-slot",
+        slotLabel: "card",
+        disambiguator: "gone-section",
+      }),
+    ];
+    const newAnchors = [
+      { nodeId: "card-1", label: "card", ancestorLabel: "section-a" },
+      { nodeId: "card-2", label: "card", ancestorLabel: "section-b" },
+    ];
 
     const [r] = reconcileAnchorsAfterRegenerate(comments, newAnchors);
     expect(r.status).toBe("orphaned");
@@ -189,6 +267,59 @@ describe("fresh-anchor reconciliation after a full Forge regenerate", () => {
     expect(result.map((r) => [r.commentId, r.status])).toEqual([
       ["survives", "survived"],
       ["orphans", "orphaned"],
+    ]);
+  });
+});
+
+// ============================================================================
+// Expected anchors from the converted document — what reconciliation runs
+// against at Accept time, mirroring the render contract (id + the same label
+// source the fragments adapter forwards as data-oods-label).
+// ============================================================================
+
+describe("collectExpectedRegenerateAnchors", () => {
+  it("emits one anchor per component with the meta.label the converter persisted", () => {
+    const document: DesignDocument = {
+      metadata: { title: "t", tags: ["forge-composed"] },
+      root: {
+        nodeType: "layout",
+        layout: { type: "stack" },
+        children: [
+          {
+            nodeType: "component",
+            id: "slot-hero-2",
+            ref: "oods:DetailHeader",
+            props: {},
+            meta: { label: "hero" },
+          },
+          {
+            nodeType: "layout",
+            layout: { type: "grid", columns: 1 },
+            children: [
+              {
+                nodeType: "component",
+                id: "slot-cta-12",
+                ref: "oods:Button",
+                // No meta.label -> falls back to the raw label prop, exactly
+                // like the fragments adapter does when it forwards the label.
+                props: { label: "cta" },
+              },
+            ],
+          },
+          {
+            nodeType: "component",
+            id: "plain-3",
+            ref: "oods:Card",
+            props: {},
+          },
+        ],
+      },
+    };
+
+    expect(collectExpectedRegenerateAnchors(document)).toEqual([
+      { nodeId: "slot-hero-2", label: "hero", ancestorLabel: null },
+      { nodeId: "slot-cta-12", label: "cta", ancestorLabel: null },
+      { nodeId: "plain-3", label: null, ancestorLabel: null },
     ]);
   });
 });

@@ -34,6 +34,7 @@ export function createSuccessClient(): FoundryMcpClient {
       raw: null,
     }) satisfies FoundryValidateOutput),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    designCompose: vi.fn(),
     fetchStructuredData: vi.fn(async () => ({
       dataset: "components" as const,
       version: null,
@@ -82,6 +83,7 @@ export function createStrictValidateClient(): FoundryMcpClient {
       } satisfies FoundryValidateOutput;
     }),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    designCompose: vi.fn(),
     fetchStructuredData: vi.fn(async () => ({
       dataset: "components" as const,
       version: null,
@@ -124,6 +126,7 @@ export function createPartialFailureClient(
       raw: null,
     }) satisfies FoundryValidateOutput),
     buildTokens: vi.fn(async () => ({ raw: null })),
+    designCompose: vi.fn(),
     fetchStructuredData: vi.fn(async () => ({
       dataset: "components" as const,
       version: null,

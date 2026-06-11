@@ -40,10 +40,57 @@ export type FoundryStructuredDataOutput<TPayload = Record<string, unknown>> = {
   raw: unknown;
 };
 
+export type FoundryDesignComposeArgs = {
+  /** Natural-language description of the desired UI. */
+  intent?: string;
+  /** OODS registry object name for object-aware composition. */
+  object?: string;
+  /** Layout template (e.g. "landing", "dashboard", "auto"). */
+  layout?: string;
+  /** View context for object-aware composition. */
+  context?: string;
+  preferences?: Record<string, unknown>;
+  options?: {
+    topN?: number;
+    validate?: boolean;
+  };
+  dslVersion?: string;
+};
+
+export type FoundryDesignComposeSelection = {
+  slotName: string | null;
+  intent: string | null;
+  selectedComponent: string | null;
+  confidence: number | null;
+  confidenceLevel: string | null;
+  explanation: string | null;
+};
+
+export type FoundryDesignComposeOutput = {
+  status: string | null;
+  layout: string | null;
+  /** The composed Forge UiSchema ({ version, screens }) — the regenerate seed. */
+  schema: Record<string, unknown>;
+  /** Server-side handle for reuse in validate/render (TTL ~30 min). */
+  schemaRef: string | null;
+  schemaRefExpiresAt: string | null;
+  /** Per-slot component picks with confidence — the review-surface signal. */
+  selections: FoundryDesignComposeSelection[];
+  /** Slot names Forge itself flagged as low-confidence picks. */
+  lowConfidenceSlotNames: string[];
+  validation: FoundryValidateOutput | null;
+  warnings?: string[];
+  meta?: Record<string, unknown>;
+  raw: unknown;
+};
+
 export type FoundryMcpClient = {
   render: (schema: unknown) => Promise<FoundryRenderOutput>;
   validate: (schema: unknown) => Promise<FoundryValidateOutput>;
   buildTokens: (brand: unknown, theme?: unknown) => Promise<FoundryTokenBuildOutput>;
+  designCompose: (
+    args: FoundryDesignComposeArgs
+  ) => Promise<FoundryDesignComposeOutput>;
   fetchStructuredData: <TPayload = Record<string, unknown>>(
     dataset: FoundryStructuredDataset,
     options?: {
@@ -532,6 +579,75 @@ const normalizeStructuredDataOutput = <TPayload = Record<string, unknown>>(
   };
 };
 
+const toNumberValue = (value: unknown): number | null =>
+  typeof value === "number" && Number.isFinite(value) ? value : null;
+
+const normalizeComposeSelection = (value: unknown): FoundryDesignComposeSelection => {
+  const record = isRecord(value) ? value : {};
+  return {
+    slotName: toStringValue(record.slotName) ?? null,
+    intent: toStringValue(record.intent) ?? null,
+    selectedComponent: toStringValue(record.selectedComponent) ?? null,
+    confidence: toNumberValue(record.confidence),
+    confidenceLevel: toStringValue(record.confidenceLevel) ?? null,
+    explanation: toStringValue(record.explanation) ?? null,
+  };
+};
+
+const normalizeDesignComposeOutput = (payload: unknown): FoundryDesignComposeOutput => {
+  const raw = payload;
+
+  if (!isRecord(payload)) {
+    throw new FoundryMcpError(
+      "Foundry design compose response is malformed.",
+      "INVALID_RESPONSE",
+      raw
+    );
+  }
+
+  const errors = toIssueStrings(payload.errors);
+  if (errors.length > 0) {
+    throw new FoundryMcpError(
+      `Foundry design compose failed: ${errors.join("; ")}`,
+      "TOOL_ERROR",
+      raw
+    );
+  }
+
+  const schema = payload.schema;
+  if (!isRecord(schema) || !Array.isArray(schema.screens)) {
+    throw new FoundryMcpError(
+      "Foundry design compose response is missing a UiSchema (schema.screens).",
+      "MISSING_SCHEMA",
+      raw
+    );
+  }
+
+  const meta = isRecord(payload.meta) ? payload.meta : undefined;
+  const intelligence = meta && isRecord(meta.intelligence) ? meta.intelligence : undefined;
+  const warnings = toIssueStrings(payload.warnings ?? payload.warning);
+
+  return {
+    status: toStringValue(payload.status) ?? null,
+    layout: toStringValue(payload.layout) ?? null,
+    schema,
+    schemaRef: toStringValue(payload.schemaRef) ?? null,
+    schemaRefExpiresAt: toStringValue(payload.schemaRefExpiresAt) ?? null,
+    selections: Array.isArray(payload.selections)
+      ? payload.selections.map(normalizeComposeSelection)
+      : [],
+    lowConfidenceSlotNames: intelligence
+      ? toStringArray(intelligence.lowConfidenceSlotNames)
+      : [],
+    validation: payload.validation !== undefined
+      ? normalizeValidateOutput(payload.validation)
+      : null,
+    warnings: warnings.length ? warnings : undefined,
+    meta,
+    raw,
+  };
+};
+
 const DEFAULT_REPL_DSL_VERSION = "2025.11";
 
 const coerceUiSchema = (value: unknown): unknown => {
@@ -759,6 +875,24 @@ export const createFoundryMcpClient = (
         "building design tokens via Foundry"
       );
     },
+    async designCompose(args: FoundryDesignComposeArgs) {
+      return addBreadcrumb(
+        () =>
+          retryWithBackoff(async () => {
+            const payload = await callTool<unknown>("design_compose", {
+              intent: args.intent,
+              object: args.object,
+              layout: args.layout,
+              context: args.context,
+              preferences: args.preferences,
+              options: args.options,
+              dslVersion: args.dslVersion,
+            });
+            return normalizeDesignComposeOutput(payload);
+          }, retryOptions),
+        "composing design schema via Foundry"
+      );
+    },
     async fetchStructuredData<TPayload = Record<string, unknown>>(
       dataset: FoundryStructuredDataset,
       options?: {
@@ -824,6 +958,8 @@ export const getFoundryMcpClient = () => {
       executeWithRecovery((client) => client.validate(schema)),
     buildTokens: (brand: unknown, theme?: unknown) =>
       executeWithRecovery((client) => client.buildTokens(brand, theme)),
+    designCompose: (args: FoundryDesignComposeArgs) =>
+      executeWithRecovery((client) => client.designCompose(args)),
     fetchStructuredData: <TPayload = Record<string, unknown>>(
       dataset: FoundryStructuredDataset,
       options?: {

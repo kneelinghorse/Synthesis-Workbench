@@ -220,3 +220,102 @@ describe("comment anchor helpers", () => {
     expect(anchorMatchesPreview({ kind: "slot" }, { nodeId: null, label: null })).toBe(false);
   });
 });
+
+// ============================================================================
+// Entity-slot anchors (decision 119) — the regenerate-path durable anchor:
+// slot label + nearest-ancestor-label disambiguator. Instance ids do not
+// survive a Forge regenerate, so Forge-composed documents pin by these.
+// ============================================================================
+
+describe("entity-slot anchors (decision 119)", () => {
+  beforeEach(() => {
+    resetCommentState();
+  });
+
+  it("anchorFromPreview flips to entity-slot on the regenerate path (preferDurable)", () => {
+    // Even with an instance id available, the durable label wins — that id is
+    // re-minted on the next regenerate, the label is not.
+    expect(
+      anchorFromPreview("slot-cta-12", "cta", {
+        preferDurable: true,
+        ancestorLabel: "hero",
+      }),
+    ).toEqual({ kind: "entity-slot", slotLabel: "cta", disambiguator: "hero" });
+    // No labeled ancestor -> no disambiguator (matches on label alone).
+    expect(anchorFromPreview("slot-cta-12", "cta", { preferDurable: true })).toEqual(
+      { kind: "entity-slot", slotLabel: "cta" },
+    );
+    // Unlabeled element on the regenerate path still falls back to instance.
+    expect(anchorFromPreview("node-3", null, { preferDurable: true })).toEqual({
+      kind: "instance",
+      componentId: "node-3",
+    });
+    // Off the regenerate path nothing changes (patch_node keeps ids stable).
+    expect(anchorFromPreview("btn-1", "cta")).toEqual(INSTANCE_ANCHOR);
+  });
+
+  it("entity-slot anchors match by label AND disambiguator — collisions cannot mis-pin", () => {
+    const anchor = { kind: "entity-slot" as const, slotLabel: "cta", disambiguator: "hero" };
+    expect(
+      anchorMatchesPreview(anchor, { nodeId: "x", label: "cta", ancestorLabel: "hero" }),
+    ).toBe(true);
+    // Same label under a DIFFERENT ancestor is a different entity slot.
+    expect(
+      anchorMatchesPreview(anchor, { nodeId: "x", label: "cta", ancestorLabel: "footer" }),
+    ).toBe(false);
+    expect(
+      anchorMatchesPreview(anchor, { nodeId: "x", label: "cta", ancestorLabel: null }),
+    ).toBe(false);
+    // Without a stored disambiguator, the label alone decides.
+    expect(
+      anchorMatchesPreview(
+        { kind: "entity-slot", slotLabel: "cta" },
+        { nodeId: "x", label: "cta", ancestorLabel: "anything" },
+      ),
+    ).toBe(true);
+    // Missing identifier never matches (null===null guard).
+    expect(
+      anchorMatchesPreview({ kind: "entity-slot" }, { nodeId: null, label: null }),
+    ).toBe(false);
+  });
+
+  it("keys entity-slot anchors by label + disambiguator", () => {
+    expect(anchorKey({ kind: "entity-slot", slotLabel: "cta", disambiguator: "hero" })).toBe(
+      "entity-slot:cta:hero",
+    );
+    expect(anchorKey({ kind: "entity-slot", slotLabel: "cta" })).toBe("entity-slot:cta:");
+    expect(
+      anchorsEqual(
+        { kind: "entity-slot", slotLabel: "cta", disambiguator: "hero" },
+        { kind: "entity-slot", slotLabel: "cta", disambiguator: "footer" },
+      ),
+    ).toBe(false);
+  });
+
+  it("reanchorComments re-pins OPEN comments only and bumps revision once", () => {
+    const store = useCommentStateStore.getState();
+    store.addComment({ kind: "instance", componentId: "btn-1" }, "open one");
+    store.addComment({ kind: "instance", componentId: "btn-2" }, "resolved one");
+    const [open, toResolve] = useCommentStateStore.getState().comments;
+    store.resolveComment(toResolve.id);
+    const revisionBefore = useCommentStateStore.getState().revision;
+
+    useCommentStateStore.getState().reanchorComments([
+      { commentId: open.id, anchor: { kind: "entity-slot", slotLabel: "cta" } },
+      { commentId: toResolve.id, anchor: { kind: "entity-slot", slotLabel: "footer" } },
+    ]);
+
+    const state = useCommentStateStore.getState();
+    expect(state.comments[0].anchor).toEqual({ kind: "entity-slot", slotLabel: "cta" });
+    // Resolved comments keep their historical anchor — their pin is history.
+    expect(state.comments[1].anchor).toEqual({ kind: "instance", componentId: "btn-2" });
+    expect(state.revision).toBe(revisionBefore + 1);
+
+    // No-op updates (same anchor / unknown id) do not bump the revision.
+    useCommentStateStore.getState().reanchorComments([
+      { commentId: open.id, anchor: { kind: "entity-slot", slotLabel: "cta" } },
+      { commentId: "nope", anchor: { kind: "slot", slotLabel: "x" } },
+    ]);
+    expect(useCommentStateStore.getState().revision).toBe(revisionBefore + 1);
+  });
+});

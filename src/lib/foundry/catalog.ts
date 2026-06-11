@@ -58,7 +58,7 @@ const WORKBENCH_S44_COMPONENT_SET = new Set<string>(WORKBENCH_S44_COMPONENTS);
 // catalog's live propSchema is empty for these primitives, so without this hint
 // the agent invents prop names and the element renders blank (s20-m09). Keep it
 // grounded — only state what's verified against the live renderer.
-const PRIMITIVE_PROP_GUIDANCE =
+export const PRIMITIVE_PROP_GUIDANCE =
   "Prop contract: a component's visible copy goes in its content prop — Text uses `text` (a string). Props Forge does not recognise are silently dropped and the component renders EMPTY, so never invent props like `content` or `variant`; use the prop names shown above.";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>

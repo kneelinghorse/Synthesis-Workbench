@@ -14,14 +14,21 @@ import { create } from "zustand";
  * anchors so the Option B flip (s20-m07) needs no UI rewrite.
  */
 
-export type CommentAnchorKind = "instance" | "slot";
+export type CommentAnchorKind = "instance" | "slot" | "entity-slot";
 
 export type CommentAnchor = {
   kind: CommentAnchorKind;
   /** `data-oods-node-id` — present for instance anchors. */
   componentId?: string;
-  /** `data-oods-label` — present for slot anchors. */
+  /** `data-oods-label` — present for slot and entity-slot anchors. */
   slotLabel?: string;
+  /**
+   * Entity-slot disambiguator (decision 119): the nearest ANCESTOR's
+   * `data-oods-label`, telling colliding slot labels apart (N slot children,
+   * cross-screen repeats). Absent when the element has no labeled ancestor —
+   * the anchor then matches on label alone.
+   */
+  disambiguator?: string;
 };
 
 /** How a comment was resolved: a human click vs. an accepted agent change. */
@@ -75,6 +82,15 @@ type CommentState = {
    * the agent's open list (`formatReviewComments`) so it stops being re-proposed.
    */
   resolveCommentsForChange: (change: CommentChangeLink) => void;
+
+  /**
+   * Re-pin OPEN comments to fresh anchors after a Forge regenerate (the
+   * reconciliation pass's re-pin output, decision 119). Resolved comments are
+   * never re-anchored — their pin is history, not a live target.
+   */
+  reanchorComments: (
+    updates: Array<{ commentId: string; anchor: CommentAnchor }>,
+  ) => void;
 
   /** Remove a comment by id. */
   deleteComment: (id: string) => void;
@@ -156,6 +172,23 @@ export const useCommentStateStore = create<CommentState>((set) => ({
       return { comments, revision: state.revision + 1 };
     }),
 
+  reanchorComments: (updates) =>
+    set((state) => {
+      const anchorById = new Map(
+        updates.map((update) => [update.commentId, update.anchor]),
+      );
+      let changed = false;
+      const comments = state.comments.map((comment) => {
+        const nextAnchor = anchorById.get(comment.id);
+        if (!nextAnchor || comment.resolved || anchorsEqual(comment.anchor, nextAnchor)) {
+          return comment;
+        }
+        changed = true;
+        return { ...comment, anchor: nextAnchor };
+      });
+      return changed ? { comments, revision: state.revision + 1 } : state;
+    }),
+
   deleteComment: (id) =>
     set((state) => {
       const comments = state.comments.filter((comment) => comment.id !== id);
@@ -174,15 +207,39 @@ export const resetCommentState = () => {
 
 // ---- Pure anchor helpers (shared by the overlay + pin resolution) -----------
 
+export type AnchorFromPreviewContext = {
+  /**
+   * Prefer the durable slot label over the instance id (decision 119). Set on
+   * the regenerate path — when the active document is Forge-composed — because
+   * Forge re-mints instance ids (`${slot}-${counter}`) on every regenerate,
+   * while `meta.label` survives. Elsewhere instance ids stay the default:
+   * patch_node preserves them AND auto-matches comments pinned to them.
+   */
+  preferDurable?: boolean;
+  /** Nearest ANCESTOR `data-oods-label` of the clicked element, if any. */
+  ancestorLabel?: string | null;
+};
+
 /**
- * Derive a comment anchor from a Forge preview anchor. Prefers the deterministic
- * instance id (`data-oods-node-id`) — the v1 default that patch_node preserves —
- * and falls back to the slot label. Returns null when neither is present.
+ * Derive a comment anchor from a Forge preview anchor. Default prefers the
+ * deterministic instance id (`data-oods-node-id`) — the v1 default that
+ * patch_node preserves — falling back to the slot label. On the regenerate
+ * path (`preferDurable`) a labeled element pins as an `entity-slot` (durable
+ * label + ancestor disambiguator) instead, so the pin survives the next
+ * regenerate. Returns null when no anchor attribute is present.
  */
 export const anchorFromPreview = (
   nodeId: string | null,
   label: string | null,
+  context: AnchorFromPreviewContext = {},
 ): CommentAnchor | null => {
+  if (context.preferDurable && label) {
+    return {
+      kind: "entity-slot",
+      slotLabel: label,
+      ...(context.ancestorLabel ? { disambiguator: context.ancestorLabel } : {}),
+    };
+  }
   if (nodeId) {
     return { kind: "instance", componentId: nodeId };
   }
@@ -224,10 +281,15 @@ export const commentsAddressedByChange = (
 };
 
 /** Stable key for an anchor — used for grouping and equality. */
-export const anchorKey = (anchor: CommentAnchor): string =>
-  anchor.kind === "instance"
-    ? `instance:${anchor.componentId ?? ""}`
-    : `slot:${anchor.slotLabel ?? ""}`;
+export const anchorKey = (anchor: CommentAnchor): string => {
+  if (anchor.kind === "instance") {
+    return `instance:${anchor.componentId ?? ""}`;
+  }
+  if (anchor.kind === "entity-slot") {
+    return `entity-slot:${anchor.slotLabel ?? ""}:${anchor.disambiguator ?? ""}`;
+  }
+  return `slot:${anchor.slotLabel ?? ""}`;
+};
 
 export const anchorsEqual = (a: CommentAnchor, b: CommentAnchor): boolean =>
   anchorKey(a) === anchorKey(b);
@@ -235,8 +297,21 @@ export const anchorsEqual = (a: CommentAnchor, b: CommentAnchor): boolean =>
 /** Does a live preview anchor (nodeId/label) resolve to this comment anchor? */
 export const anchorMatchesPreview = (
   anchor: CommentAnchor,
-  preview: { nodeId: string | null; label: string | null },
-): boolean =>
-  anchor.kind === "instance"
-    ? Boolean(anchor.componentId) && anchor.componentId === preview.nodeId
-    : Boolean(anchor.slotLabel) && anchor.slotLabel === preview.label;
+  preview: { nodeId: string | null; label: string | null; ancestorLabel?: string | null },
+): boolean => {
+  if (anchor.kind === "instance") {
+    return Boolean(anchor.componentId) && anchor.componentId === preview.nodeId;
+  }
+  if (anchor.kind === "entity-slot") {
+    // The label must match; a stored disambiguator must match the live
+    // ancestor label too — matching on label alone would re-introduce the
+    // colliding-label mis-pin the disambiguator exists to prevent.
+    return (
+      Boolean(anchor.slotLabel) &&
+      anchor.slotLabel === preview.label &&
+      (anchor.disambiguator === undefined ||
+        anchor.disambiguator === (preview.ancestorLabel ?? undefined))
+    );
+  }
+  return Boolean(anchor.slotLabel) && anchor.slotLabel === preview.label;
+};

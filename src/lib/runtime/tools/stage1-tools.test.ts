@@ -183,7 +183,7 @@ describe("tool definitions include inspect tools", () => {
     expect(def!.input_schema.properties).toHaveProperty("seedRoutes");
   });
 
-  it("has 10 total tool definitions", () => {
-    expect(definitions).toHaveLength(10);
+  it("has 11 total tool definitions", () => {
+    expect(definitions).toHaveLength(11);
   });
 });

@@ -68,10 +68,21 @@ export interface LayoutNode {
 export type ComponentProps = Record<string, unknown>;
 
 /**
+ * Component metadata carried through from Forge composition.
+ * `label` is the durable slot name (`meta.label` from `design_compose`) — it
+ * survives a Forge regenerate while node ids (`${slot}-${counter}`) do not, so
+ * the comment layer anchors to it (`data-oods-label`).
+ */
+export interface ComponentMeta {
+  label?: string;
+}
+
+/**
  * ComponentNode: Reference to an OODS component
  * - id: Required unique identifier for AI patching/diffing
  * - ref: Component reference in format "oods:ComponentName"
  * - props: Key-value properties passed to component
+ * - meta: Optional Forge-composed metadata (durable slot label)
  *
  * Note: $data.x binding syntax is reserved in types but not implemented in runtime
  */
@@ -80,6 +91,7 @@ export interface ComponentNode {
   id: string;
   ref: string; // Format: "oods:ComponentName" (e.g., "oods:Button", "oods:Card")
   props: ComponentProps;
+  meta?: ComponentMeta;
 }
 
 // ============================================================================
